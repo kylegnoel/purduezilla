@@ -8,7 +8,6 @@ function App() {
     //add in routing in here instead
     <div className="App">
       <Routing />
-      hi lol
     </div>
   );
 }
