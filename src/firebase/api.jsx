@@ -1,4 +1,3 @@
-// import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { getDatabase } from "firebase/database";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -19,7 +18,7 @@ const firebaseConfig = {
 const fireapp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(fireapp);
 
-//const db = getFirestore(fireapp);
+// Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 
 //export functions here
