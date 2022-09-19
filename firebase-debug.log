@@ -95,3 +95,28 @@ Before we get started, keep in mind:
 [debug] [2022-09-19T23:18:14.265Z] >>> [apiv2][query] GET https://api.github.com/repos//actions/secrets/public-key type=owner
 [debug] [2022-09-19T23:18:14.426Z] <<< [apiv2][status] GET https://api.github.com/repos//actions/secrets/public-key 404
 [debug] [2022-09-19T23:18:14.426Z] <<< [apiv2][body] GET https://api.github.com/repos//actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[debug] [2022-09-19T23:23:08.018Z] ----------------------------------------------------------------------
+[debug] [2022-09-19T23:23:08.020Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\pzjia\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2022-09-19T23:23:08.020Z] CLI Version:   11.9.0
+[debug] [2022-09-19T23:23:08.020Z] Platform:      win32
+[debug] [2022-09-19T23:23:08.020Z] Node Version:  v16.17.0
+[debug] [2022-09-19T23:23:08.021Z] Time:          Mon Sep 19 2022 19:23:08 GMT-0400 (Eastern Daylight Time)
+[debug] [2022-09-19T23:23:08.022Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-09-19T23:23:08.096Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-09-19T23:23:08.097Z] > authorizing via signed-in user (werdwebe@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\pzjia\JSprojects\cs407\purduezilla
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
