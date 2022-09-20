@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import NavBar from '../components/NavBar';
 
 
 const Dashboard = () => {
 
     return (
-        <div> Dashboard Page</div>
+        <div> 
+            <NavBar></NavBar>
+            Dashboard Page</div>
     );
 }
 
