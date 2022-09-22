@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-d
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import NotFound from "../pages/NotFound";
+import Register from "../pages/Register"
 import NavBar from '../components/NavBar';
 
 const Routing = props => {
@@ -13,6 +14,7 @@ const Routing = props => {
             <Routes>
                 <Route exact path="/" element={<Login />} />
                 <Route exact path="/home" element={<Dashboard />} />
+                <Route exact path="/register" element={<Register />} />
                 <Route exact path="*" element={<NotFound />} />
             </Routes>
         </Router>
