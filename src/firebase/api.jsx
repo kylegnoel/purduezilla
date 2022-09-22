@@ -1,8 +1,13 @@
-import { getDatabase } from "firebase/database";
 import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, push, onValue } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 
 
+/*****
+ *  
+ * Configurations
+ *
+*****/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCo0gPK4fEqqPd5WgmhISKfy1P8AgPmf3Y",
@@ -15,10 +20,78 @@ const firebaseConfig = {
     measurementId: "G-9G4NCBXCZX"
 };
 
-const fireapp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(fireapp);
+// Initialze firebase
+const app = initializeApp(firebaseConfig);
+// Initialize analytics
+const analytics = getAnalytics(app);
 
-// Initialize Realtime Database and get a reference to the service
-const database = getDatabase(app);
 
-//export functions here
+/*****
+ *  
+ * Write functions
+ *
+*****/
+
+// Write user information to db
+// Will create new user if userID does not exist, or replaces data
+var writeUserData = function writeUserData(userId, email, firstName, lastName, profileDescription, notificationSetting) {
+    const db = getDatabase(app);
+    const userRef = ref(db, 'users/' + userId);
+
+    set(userRef, {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        profileDescription: profileDescription,
+        notificationSetting: notificationSetting
+    });
+}
+
+/*
+// Create new group or update name
+function writeGroupData(groupId, name, creatorUserId) {db
+    const db = getDatabase(app);
+    const groupRef = ref(db, 'groups/' + groupId);
+    const ownersListRef = groupRef.child("owners"); // TODO: check if works
+    ownersListRef.push(creatorUserId);
+}
+
+// Add owner to group; also adds member to group
+function addOwnerToGroup(groupId, newOwnerId) {
+    const db = getDatabase(app);
+    const groupRef = ref(db, 'groups/' + groupId);
+    const ownersListRef = groupRef.child("owners"); // TODO: check if works
+    ownersListRef.push(newOwnerId);
+    addMemberToGroup(groupId, newOwnerId);
+}
+
+// Add member to group
+function addMemberToGroup(groupId, newMemberId) {
+    const db = getDatabase(app);
+    const groupRef = ref(db, 'groups/' + groupId);
+    const membersListRef = groupRef.child("members"); // TODO: check if works
+    membersListRef.push(newOwnerId);
+}
+*/
+
+// TODO: Remove from group - owner and member
+// TODO: Delete group
+
+/*****
+ *  
+ * Read functions
+ *
+*****/
+
+// Reads all user information from db and gets/retrieves every time a change is made
+// Need a listener that recieves snapshot; can get data in snapshot with val() method
+/*
+const db = getDatabase(app);
+const userRef = ref(db, 'users/' + userId);
+onValue(userRef, (snapshot) => ) {
+    const data = snapshot.val();
+    getUserData(userData, data)
+}
+*/
+
+export default writeUserData;
