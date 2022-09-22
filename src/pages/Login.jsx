@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import NavBar from '../components/NavBar';
+import SignIn from '../components/SignIn'
 
 const Login = () => {
 
     return (
         <div> 
-            <NavBar></NavBar>
-            Login Page
-            </div>
+            <SignIn></SignIn>
+        </div>
     );
 }
 
