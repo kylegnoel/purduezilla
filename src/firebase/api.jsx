@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, push, onValue } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 
 
 /*****
@@ -35,6 +37,7 @@ const db = getDatabase(app);
 
 // Write user information to db
 // Will create new user if userID does not exist, or replaces data
+//not the user for authentication
 const writeUserData = (userId, email, firstName, lastName, profileDescription, notificationSetting) => {
     //I think we can initialize db outside the functions - PJ
     //const db = getDatabase(app);
@@ -50,6 +53,57 @@ const writeUserData = (userId, email, firstName, lastName, profileDescription, n
     });
 }
 
+//create user account with email password authentication
+const createAccount = (email, password) => {
+    //maybe initialize outside? -PJ
+    const auth = getAuth();
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed in 
+            // We need to set user in context
+            const user = userCredential.user;
+            // for now print out user
+            console.log(user);
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            //change these later to actually do something meaningfull
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
+}
+
+const signInAccount = (email, password) => {
+    //also maybe initialize outside
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed in 
+            const user = userCredential.user;
+            //temperary print
+            console.log(user);
+            // ...
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            //temporary print
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
+}
+
+//sign out account
+const signOutAccount = () => {
+    //once again probably initialize outside
+    const auth = getAuth();
+    signOut(auth).then(() => {
+        console.log("signed out successfully");
+    }).catch((error) => {
+        console.log("wasn't able to sign out :(");
+    });
+}
 /*
 // Create new group or update name
 function writeGroupData(groupId, name, creatorUserId) {db
@@ -98,8 +152,12 @@ onValue(userRef, (snapshot) => ) {
 */
 
 //wrap all functions up to export all at the same time
+//considering moving the authentication functions to a different file? - PJ
 const apiFunctions = {
     writeUserData,
+    createAccount,
+    signInAccount,
+    signOutAccount,
 };
 
 export default apiFunctions;
