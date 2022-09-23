@@ -43,7 +43,8 @@ var writeUserData = function writeUserData(userId, email, firstName, lastName, p
         firstName: firstName,
         lastName: lastName,
         profileDescription: profileDescription,
-        notificationSetting: notificationSetting
+        notificationSetting: notificationSetting,
+        uid: userId
     });
 }
 
