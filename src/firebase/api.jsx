@@ -97,4 +97,9 @@ onValue(userRef, (snapshot) => ) {
 }
 */
 
-export default writeUserData;
+//wrap all functions up to export all at the same time
+const apiFunctions = {
+    writeUserData,
+};
+
+export default apiFunctions;
