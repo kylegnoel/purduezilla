@@ -35,7 +35,7 @@ const db = getDatabase(app);
 
 // Write user information to db
 // Will create new user if userID does not exist, or replaces data
-var writeUserData = function writeUserData(userId, email, firstName, lastName, profileDescription, notificationSetting) {
+const writeUserData = (userId, email, firstName, lastName, profileDescription, notificationSetting) => {
     //I think we can initialize db outside the functions - PJ
     //const db = getDatabase(app);
     const userRef = ref(db, 'users/' + userId);
