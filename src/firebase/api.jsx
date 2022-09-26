@@ -39,6 +39,7 @@ const db = getDatabase(app);
 // Will create new user if username does not exist, or replaces data
 // Does not authenticate user
 const writeUserData = function writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting) {
+    // TODO: instead of username have uid generated for user
     const userRef = ref(db, 'users/' + username);
 
     set(userRef, {
@@ -47,6 +48,22 @@ const writeUserData = function writeUserData(username, email, firstName, lastNam
         lastName: lastName,
         profileDescription: profileDescription,
         notificationSetting: notificationSetting,
+    });
+}
+
+const writeTaskData = function writeTaskData(title, description, estimatedTime, status, permittedUsers, owners, assignedUsers, followers) {
+    // TODO: instead of id have uid generated for task
+    const userRef = ref(db, 'tasks/' + task);
+
+    set(userRef, {
+        title: title,
+        description: description,
+        estimatedTime: estimatedTime,
+        status: status,
+        permittedUsers: permittedUsers,
+        owners: owners,
+        assignedUsers: assignedUsers,
+        followers: followers
     });
 }
 
@@ -148,7 +165,7 @@ function addMemberToGroup(groupId, newMemberId) {
 // Need a listener that recieves snapshot; can get data in snapshot with val() method
 /*
 const db = getDatabase(app);
-const userRef = ref(db, 'users/' + userId);
+const userRef = ref(db, 'users/' + username);
 onValue(userRef, (snapshot) => ) {
     const data = snapshot.val();
     getUserData(userData, data)
@@ -165,4 +182,3 @@ const apiFunctions = {
 };
 
 export default apiFunctions;
-// export default writeUserData;
