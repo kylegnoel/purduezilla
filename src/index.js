@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-//import writeUserData from './firebase/api';
+import apiFunctions from './firebase/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,5 +18,4 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-//writeUserData("daddyDaniels", "mitchj@purdue.edu", "Mitch", "Daniels", "Go Purdue!", 1);
-
+// apiFunctions.writeUserData("gdubbs", "gW3@purdue.edu", "George", "Washington", "USA!", 1);

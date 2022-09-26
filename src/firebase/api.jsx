@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
@@ -36,12 +36,10 @@ const db = getDatabase(app);
 *****/
 
 // Write user information to db
-// Will create new user if userID does not exist, or replaces data
-//not the user for authentication
-const writeUserData = (userId, email, firstName, lastName, profileDescription, notificationSetting) => {
-    //I think we can initialize db outside the functions - PJ
-    //const db = getDatabase(app);
-    const userRef = ref(db, 'users/' + userId);
+// Will create new user if username does not exist, or replaces data
+// Does not authenticate user
+const writeUserData = function writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting) {
+    const userRef = ref(db, 'users/' + username);
 
     set(userRef, {
         email: email,
@@ -49,11 +47,11 @@ const writeUserData = (userId, email, firstName, lastName, profileDescription, n
         lastName: lastName,
         profileDescription: profileDescription,
         notificationSetting: notificationSetting,
-        uid: userId
     });
 }
 
-//create user account with email password authentication
+
+// Create user account with email password authentication
 const createAccount = (email, password) => {
     //maybe initialize outside? -PJ
     const auth = getAuth();
@@ -72,6 +70,11 @@ const createAccount = (email, password) => {
             console.log(errorCode);
             console.log(errorMessage);
         });
+    /*
+    TODO - get user info into database when they create an account - JM
+
+    writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting);
+    */
 }
 
 const signInAccount = (email, password) => {
@@ -104,6 +107,7 @@ const signOutAccount = () => {
         console.log("wasn't able to sign out :(");
     });
 }
+
 /*
 // Create new group or update name
 function writeGroupData(groupId, name, creatorUserId) {db
@@ -161,3 +165,4 @@ const apiFunctions = {
 };
 
 export default apiFunctions;
+// export default writeUserData;
