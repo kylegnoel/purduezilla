@@ -6,6 +6,7 @@ import Dashboard from "../pages/Dashboard";
 import NotFound from "../pages/NotFound";
 import Register from "../pages/Register"
 import NavBar from '../components/NavBar';
+import Projects from '../pages/Projects';
 
 const Routing = props => {
 
@@ -15,6 +16,7 @@ const Routing = props => {
                 <Route exact path="/" element={<Login />} />
                 <Route exact path="/home" element={<Dashboard />} />
                 <Route exact path="/register" element={<Register />} />
+                <Route exact path="/project" element={<Projects />} />
                 <Route exact path="*" element={<NotFound />} />
             </Routes>
         </Router>
