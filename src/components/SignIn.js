@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -9,18 +9,42 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import apiFunctions from '../firebase/api';
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
+
+
 export default function SignIn() {
-  const handleSubmit = (event) => {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    let signInAttept = await apiFunctions.trySignInAccount(email, password)
+
+    if (signInAttept) {
+      navigateToDashboard()
+    } else {
+      // perform error UI like highlighting textfield to red
+      alert("invalid login\n TODO: perform error UI")
+    }
   };
+
+  const handleEmailChange = event => {
+    setEmail(event.target.value)
+  }
+
+  const handlePasswordChange = event => {
+    setPassword(event.target.value)
+  }
+
+  const navigateToDashboard = () => {
+    navigate('/home');
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -44,6 +68,8 @@ export default function SignIn() {
               label="Email Address"
               name="email"
               autoComplete="email"
+              value={email}
+              onChange={handleEmailChange}
               autoFocus
             />
             <TextField
@@ -54,6 +80,8 @@ export default function SignIn() {
               label="Password"
               type="password"
               id="password"
+              value={password}
+              onChange={handlePasswordChange}
               autoComplete="current-password"
             />
             <FormControlLabel

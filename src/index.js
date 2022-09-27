@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import writeUserData from './firebase/api';
+import apiFunctions from './firebase/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-console.log("happens");
+
 root.render(
   <React.StrictMode>
     <App />
@@ -17,6 +17,11 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
-writeUserData("daddyDaniels", "mitchj@purdue.edu", "Mitch", "Daniels", "Go Purdue!", 1);
-
+ 
+/* 
+// Test functions for database
+apiFunctions.createNewUser("test@purdue.edu", "First", "Last", "USA!", 1);
+apiFunctions.createNewTask("123", "TitleTest0", "This is the first task.", 4, "Planned", ["123", "456"], ["123", "456"], ["123", "456"], ["123", "456"]);
+apiFunctions.createNewProject("newProject", "first project!", "In progress", ["123", "456"], ["123", "456"]);
+apiFunctions.createNewGroup("Mygroup", ["123", "456"], ["123", "456"]);
+*/
