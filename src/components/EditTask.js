@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container, Link, CssBaseline, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import Box from '@mui/material/box';
+import Divider from '@mui/material/divider';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -15,13 +15,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
+import Grid from '@mui/material/grid';
+import Button from '@mui/material/button';
 
 
 const theme = createTheme();
 
-export default function AddTask() {
+export default function EditTask() {
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
