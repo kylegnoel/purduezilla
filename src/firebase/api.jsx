@@ -35,8 +35,8 @@ const db = getDatabase(app);
  *
 *****/
 
-// Create new user
-// Does not authenticate user
+// Create new user in our db
+// Does not authenticate user: must also call createAccount() for authentication
 const createNewUser = function createNewUser(email, firstName, lastName, profileDescription, notificationSetting) {
     // TODO: need to check for unique email before user is created
     
@@ -173,6 +173,7 @@ const createNewTask = function createNewTask(projectId, title, description, esti
 *****/
 
 // Create user account with email password authentication
+// Upon account creation, must also call createNewUser() to put user in our db
 const createAccount = (email, password) => {
     //maybe initialize outside? -PJ
     const auth = getAuth();
@@ -191,11 +192,6 @@ const createAccount = (email, password) => {
             console.log(errorCode);
             console.log(errorMessage);
         });
-    /*
-    TODO - get user info into our database when they create an account - JM
-
-    writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting);
-    */
 }
 
 const trySignInAccount = async (email, password) => {
