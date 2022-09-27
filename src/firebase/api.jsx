@@ -194,22 +194,24 @@ const createAccount = (email, password) => {
         });
 }
 
+/*  Asynchronous function that returns true or false based on the
+ *  results from firebase.signInWithEmailAndPassword
+ *  @param {string} email       email entered by the user in the textfield
+ *  @param {string} password    password entered by the user in the textfield
+ */
 const trySignInAccount = async (email, password) => {
     //also maybe initialize outside
     const auth = getAuth();
     let result = await signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // Signed in 
+            // user credential is correct, now signed in
             const user = userCredential.user;
-            //temperary print
-            console.log("success")
-            console.log(user);
-            // ...
+            // TODO: return user information together with the boolean
             return true;
         }).catch((error) => {
+            // user crednetial not found
             const errorCode = error.code;
             const errorMessage = error.message;
-            // temporary print
             console.log(errorCode);
             console.log(errorMessage);
             return false;
