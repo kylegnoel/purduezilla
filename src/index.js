@@ -17,6 +17,11 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
-// apiFunctions.writeUserData(test@purdue.edu", "First", "Last", "USA!", 1);
-apiFunctions.writeTaskData("TitleTest3", "This is the first task.", 4, "Planned");
+ 
+/* 
+// Test functions for database
+apiFunctions.createNewUser("test@purdue.edu", "First", "Last", "USA!", 1);
+apiFunctions.createNewTask("123", "TitleTest0", "This is the first task.", 4, "Planned", ["123", "456"], ["123", "456"], ["123", "456"], ["123", "456"]);
+apiFunctions.createNewProject("newProject", "first project!", "In progress", ["123", "456"], ["123", "456"]);
+apiFunctions.createNewGroup("Mygroup", ["123", "456"], ["123", "456"]);
+*/
