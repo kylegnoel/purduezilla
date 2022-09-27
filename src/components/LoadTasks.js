@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import List from '@mui/material/List';
+import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import WorkIcon from '@mui/icons-material/Work';
 import Checkbox from '@mui/material/Checkbox';
-import Box from '@mui/material/box';
-import Grid from '@mui/material/grid';
-import Button from '@mui/material/button';
-import Divider from '@mui/material/divider';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import { Container, Typography } from '@mui/material';
 import ListSubheader from '@mui/material/ListSubheader';
 
@@ -70,64 +70,28 @@ export default function LoadTasks() {
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12} lg={'50%'}>
-                                <List sx={{border: 1, borderColor:'black',}}>
+                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
+        flexDirection:"column",}} height={400}>
                                     <ListSubheader>Project 1</ListSubheader>
-                                    <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
-                                        <ListItem onClick={() => this.handleClick()}>
-                                            <ListItemAvatar>
-                                                <WorkIcon color="grey"/>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Task" secondary="Task Owner"/>
-                                            <Button
-                                            sx={{
-                                                marginTop:-2,
-                                                marginBottom:-2,
-                                            }}><h1>+</h1></Button>
-                                        </ListItem>
-                                    </Button>
-                                    <Divider />
-                                    <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
-                                        <ListItem onClick={() => this.handleClick()}>
-                                            <ListItemAvatar>
-                                                <WorkIcon color="grey"/>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Task" secondary="Task Owner"/>
-                                            <Button
-                                            sx={{
-                                                marginTop:-2,
-                                                marginBottom:-2,
-                                            }}><h1>+</h1></Button>
-                                        </ListItem>
-                                    </Button>
-                                    <Divider />
-                                    <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
-                                        <ListItem onClick={() => this.handleClick()}>
-                                            <ListItemAvatar>
-                                                <WorkIcon color="grey"/>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Task" secondary="Task Owner"/>
-                                            <Button
-                                            sx={{
-                                                marginTop:-2,
-                                                marginBottom:-2,
-                                            }}><h1>+</h1></Button>
-                                        </ListItem>
-                                    </Button>
-                                    <Divider />
-                                    <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
-                                        <ListItem onClick={() => this.handleClick()}>
-                                            <ListItemAvatar>
-                                                <WorkIcon color="grey"/>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Task" secondary="Task Owner"/>
-                                            <Button
-                                            sx={{
-                                                marginTop:-2,
-                                                marginBottom:-2,
-                                            }}><h1>+</h1></Button>
-                                        </ListItem>
-                                    </Button>
-                                </List>
+                                    {[1,2,3,4,5,6,7,8,9,10].map((value) => (
+                                        <div>
+                                            <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
+                                                <ListItem onClick={() => this.handleClick()}>
+                                                    <ListItemAvatar>
+                                                        <WorkIcon color="grey"/>
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={`Task ${value}`} secondary="Task Owner"/>
+                                                    <Button
+                                                    sx={{
+                                                        marginTop:-2,
+                                                        marginBottom:-2,
+                                                    }}><h1>+</h1></Button>
+                                                </ListItem>
+                                            </Button>
+                                            <Divider />
+                                        </div>
+                                    ))}
+                                </FixedSizeList>
                             </Grid>
                         </Grid>
                     </Box>
