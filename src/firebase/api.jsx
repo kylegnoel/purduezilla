@@ -53,7 +53,7 @@ const writeUserData = function writeUserData(username, email, firstName, lastNam
 
 const writeTaskData = function writeTaskData(title, description, estimatedTime, status, permittedUsers, owners, assignedUsers, followers) {
     // TODO: instead of id have uid generated for task
-    const userRef = ref(db, 'tasks/' + task);
+    const userRef = ref(db, 'tasks/');
 
     set(userRef, {
         title: title,
@@ -94,24 +94,27 @@ const createAccount = (email, password) => {
     */
 }
 
-const signInAccount = (email, password) => {
+const trySignInAccount = async (email, password) => {
     //also maybe initialize outside
     const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
+    let result = await signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
             const user = userCredential.user;
             //temperary print
+            console.log("success")
             console.log(user);
             // ...
-        })
-        .catch((error) => {
+            return true;
+        }).catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            //temporary print
+            // temporary print
             console.log(errorCode);
             console.log(errorMessage);
+            return false;
         });
+    return result
 }
 
 //sign out account
@@ -177,7 +180,7 @@ onValue(userRef, (snapshot) => ) {
 const apiFunctions = {
     writeUserData,
     createAccount,
-    signInAccount,
+    trySignInAccount,
     signOutAccount,
 };
 
