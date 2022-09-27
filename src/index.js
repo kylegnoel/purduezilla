@@ -18,4 +18,5 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-// apiFunctions.writeUserData("gdubbs", "gW3@purdue.edu", "George", "Washington", "USA!", 1);
+// apiFunctions.writeUserData(test@purdue.edu", "First", "Last", "USA!", 1);
+apiFunctions.writeTaskData("TitleTest3", "This is the first task.", 4, "Planned");

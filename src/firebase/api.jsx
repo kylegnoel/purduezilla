@@ -38,33 +38,34 @@ const db = getDatabase(app);
 // Write user information to db
 // Will create new user if username does not exist, or replaces data
 // Does not authenticate user
-const writeUserData = function writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting) {
+const writeUserData = function writeUserData(email, firstName, lastName, profileDescription, notificationSetting) {
     // TODO: instead of username have uid generated for user
-    const userRef = ref(db, 'users/' + username);
-
-    set(userRef, {
+    
+    const userListRef = ref(db, 'users');
+    const newUserRef = push(userListRef);
+    set(newUserRef, {
         email: email,
         firstName: firstName,
         lastName: lastName,
         profileDescription: profileDescription,
         notificationSetting: notificationSetting,
     });
+
 }
 
 const writeTaskData = function writeTaskData(title, description, estimatedTime, status, permittedUsers, owners, assignedUsers, followers) {
-    // TODO: instead of id have uid generated for task
-    const userRef = ref(db, 'tasks/');
 
-    set(userRef, {
+    const taskListRef = ref(db, 'tasks');
+    const newTaskRef = push(taskListRef);
+    set(newTaskRef, {
         title: title,
         description: description,
         estimatedTime: estimatedTime,
         status: status,
-        permittedUsers: permittedUsers,
-        owners: owners,
-        assignedUsers: assignedUsers,
-        followers: followers
     });
+
+    // TODO: figure out how to add from passed in list
+
 }
 
 
@@ -88,7 +89,7 @@ const createAccount = (email, password) => {
             console.log(errorMessage);
         });
     /*
-    TODO - get user info into database when they create an account - JM
+    TODO - get user info into our database when they create an account - JM
 
     writeUserData(username, email, firstName, lastName, profileDescription, notificationSetting);
     */
@@ -179,6 +180,7 @@ onValue(userRef, (snapshot) => ) {
 //considering moving the authentication functions to a different file? - PJ
 const apiFunctions = {
     writeUserData,
+    writeTaskData,
     createAccount,
     trySignInAccount,
     signOutAccount,
