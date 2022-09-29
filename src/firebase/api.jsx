@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue, } from "firebase/database";
+import { getDatabase, ref, set, push } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
@@ -49,7 +49,6 @@ const createNewUser = function createNewUser(email, firstName, lastName, profile
         profileDescription: profileDescription,
         notificationSetting: notificationSetting,
     });
-
 }
 
 // Create new group
@@ -230,23 +229,6 @@ const signOutAccount = () => {
     });
 }
 
-/*****
- *  
- * Read functions
- *
-*****/
-
-// Reads all user information from db and gets/retrieves every time a change is made
-// Need a listener that recieves snapshot; can get data in snapshot with val() method
-/*
-const db = getDatabase(app);
-const userRef = ref(db, 'users/' + username);
-onValue(userRef, (snapshot) => ) {
-    const data = snapshot.val();
-    getUserData(userData, data)
-}
-*/
-
 //wrap all functions up to export all at the same time
 //considering moving the authentication functions to a different file? - PJ
 const apiFunctions = {
@@ -257,6 +239,7 @@ const apiFunctions = {
     createAccount,
     trySignInAccount,
     signOutAccount,
+    db
 };
 
 export default apiFunctions;
