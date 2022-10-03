@@ -17,12 +17,19 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import FormHelperText from '@mui/material/FormHelperText';
+
+import apiFunctions from '../firebase/api';
 
 
 const theme = createTheme();
 
 export default function AddTask() {
     const [open, setOpen] = React.useState(false);
+    const [selected, setSelected] = React.useState([]);
+    const [selectedFollower, setSelectedFollower] = React.useState([]);
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -33,17 +40,36 @@ export default function AddTask() {
         setOpen(false);
     };
 
+    const selectionChangeHandler = (event) => {
+        setSelected(event.target.value);
+    };
+
+    const followerChangeHandler = (event) => {
+        setSelectedFollower(event.target.value);
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
-          email: data.get('taskName'),
+          taskName: data.get('taskName'),
           password: data.get('label'),
           project: data.get('projectLabel'),
           description: data.get('taskDescription'),
           owner: data.get('ownerSelect'),
           assign: data.get('assignSelect'),
         });
+        apiFunctions.createNewTask(
+            0, // projectId 
+            data.get('taskName'), // title 
+            data.get('taskDescription'), // description
+            0, // estimatedTime
+            data.get('assignSelect'), // status
+            data.get('ownerSelect'), // permiteedUserIds
+            // ownerIds
+            // assignedUserIds
+            // followerIds
+            )
     };
 
     return(
@@ -87,15 +113,35 @@ export default function AddTask() {
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <TextField
-                                                autoComplete="given-name"
-                                                name="label"
-                                                required
-                                                fullWidth
-                                                id="label"
-                                                label="Labels"
-                                                autoFocus
-                                                />
+                                                <FormControl xs={12} fullWidth>
+                                                    <InputLabel id="assignLabel">Label</InputLabel>
+                                                    <Select
+                                                        multiple
+                                                        defaultValue={10}
+                                                        value={selected}
+                                                        onChange={selectionChangeHandler}
+                                                        label="Label"
+                                                        textOverflow="ellipsis"
+                                                        overflow="hidden"
+                                                        renderValue={(selected) => (
+                                                        <div>
+                                                            {selected.map((value) => (
+                                                            <Chip key={value} label={value} />
+                                                            ))}
+                                                        </div>
+                                                        )}
+                                                    >
+                                                        <MenuItem value={'To Do'}>To Do</MenuItem>
+                                                        <MenuItem value={'In Progress'}>In Progress</MenuItem>
+                                                        <MenuItem value={'To Review'}>To Review</MenuItem>
+                                                        <MenuItem value={'In Review'}>In Review</MenuItem>
+                                                        <MenuItem value={'Complete'}>Complete</MenuItem>
+                                                        <MenuItem value={'Saved'}>Saved</MenuItem>
+                                                        <MenuItem value={'Closed'}>Closed</MenuItem>
+                                                        <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                    </Select>
+                                                    <FormHelperText>Select corresponding labels.</FormHelperText>
+                                                </FormControl>
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -136,7 +182,7 @@ export default function AddTask() {
                                             <Select
                                                 labelId="ownerLabelSelect"
                                                 id="ownerSelect"
-                                                label="Owner"
+                                                label="ownerLabel"
                                                 defaultValue={10}
                                             >
                                                 <MenuItem value={10}>Me (default)</MenuItem>
@@ -150,17 +196,47 @@ export default function AddTask() {
                                     <Divider>ASSIGN</Divider>
                                     <br></br>
                                     <FormControl fullWidth>
-                                        <InputLabel id="assignLabel">Owner</InputLabel>
+                                        <InputLabel id="assignLabel">Assignee</InputLabel>
                                         <Select
                                             labelId="assignLabelSelect"
                                             id="assignSelect"
-                                            label="Assign"
+                                            label="assignLabel"
                                             defaultValue={10}
                                         >
                                             <MenuItem value={10}>Me (default)</MenuItem>
                                             <MenuItem value={20}>User 2</MenuItem>
                                             <MenuItem value={30}>User 3</MenuItem>
                                         </Select>
+                                    </FormControl>
+
+                                    <br></br>
+                                    <br></br>
+                                    <Divider>FOLLOWERS</Divider>
+                                    <br></br>
+
+                                    <FormControl xs={12} fullWidth>
+                                        <InputLabel id="followerLabel">Follower</InputLabel>
+                                        <Select
+                                            multiple
+                                            defaultValue={10}
+                                            value={selectedFollower}
+                                            onChange={followerChangeHandler}
+                                            label="followerLabel"
+                                            textOverflow="ellipsis"
+                                            overflow="hidden"
+                                            renderValue={(selected) => (
+                                            <div>
+                                                {selected.map((value) => (
+                                                <Chip key={value} label={value} />
+                                                ))}
+                                            </div>
+                                            )}
+                                        >
+                                            <MenuItem value={"Me"}>Me (default)</MenuItem>
+                                            <MenuItem value={"User 2"}>User 2</MenuItem>
+                                            <MenuItem value={"User 3"}>User 3</MenuItem>
+                                        </Select>
+                                        <FormHelperText>Select corresponding labels.</FormHelperText>
                                     </FormControl>
 
                                     <Button
