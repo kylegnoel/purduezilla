@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import apiFunctions from './firebase/api';
+import { ref, onValue } from "firebase/database";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -19,9 +20,27 @@ root.render(
 reportWebVitals();
  
 /* 
-// Test functions for database
+// Test functions for writing to database
 apiFunctions.createNewUser("test@purdue.edu", "First", "Last", "USA!", 1);
 apiFunctions.createNewTask("123", "TitleTest0", "This is the first task.", 4, "Planned", ["123", "456"], ["123", "456"], ["123", "456"], ["123", "456"]);
 apiFunctions.createNewProject("newProject", "first project!", "In progress", ["123", "456"], ["123", "456"]);
 apiFunctions.createNewGroup("Mygroup", ["123", "456"], ["123", "456"]);
 */
+
+
+/*****
+ *  
+ * Example of how to read from db. Must import the following:
+ *       import apiFunctions from './firebase/api';
+ *       import { ref, onValue } from "firebase/database";
+ * Make sure reference path is correct
+ * This function returns the entire user's info
+ * 
+*****/
+const userId = "-ND0gmr6QlvyjUcNCDCI";
+
+onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
+    const user = snapshot.val();
+    // Do whatever with data here
+  });
+
