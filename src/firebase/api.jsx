@@ -49,6 +49,8 @@ const createNewUser = function createNewUser(email, firstName, lastName, profile
         profileDescription: profileDescription,
         notificationSetting: notificationSetting,
     });
+
+    return newUserRef.key;
 }
 
 // Create new group
@@ -77,6 +79,8 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
             userId: memberIds[i]
         });
     }
+
+    return newGroupRef.key;
 
 }
 
@@ -109,6 +113,8 @@ const createNewProject = function createNewProject(name, description, status, me
             userId: memberIds[i]
         });
     }
+
+    return newProjectRef.key;
 
 }
 
@@ -162,6 +168,8 @@ const createNewTask = function createNewTask(projectId, title, description, esti
             userId: followerIds[i]
         });
     }
+
+    return newTaskRef.key;
 
 }
 
