@@ -26,11 +26,11 @@ export default function SignIn() {
     event.preventDefault();
     let signInAttept = await apiFunctions.trySignInAccount(email, password)
 
-    if (signInAttept) {
+    if (signInAttept.status) {
       navigateToDashboard()
     } else {
       // perform error UI like highlighting textfield to red
-      alert("invalid login\n TODO: perform error UI")
+      alert(signInAttept.msg + "\ninvalid login\n TODO: perform error UI")
     }
   };
 
