@@ -8,11 +8,16 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import apiFunctions from '../firebase/api';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     
@@ -23,9 +28,20 @@ export default function SignUp() {
         document.getElementById('password')
         alert("Password is too weak!")
     } else {
-        //TODO: adding functionality here for adding user profile to the database
+        let createSuccess = await apiFunctions.tryCreateAccount(data.get('email'), data.get('password'))
+        if (createSuccess.status) {
+          // create as new user since firebase auth user creation is successful
+          apiFunctions.createNewUser(data.get('email'), data.get('firstName'), data.get('lastName'))
+          navigateToDashboard()
+        } else {
+          alert(createSuccess.msg)
+        }
     }
   };
+
+  const navigateToDashboard = () => {
+    navigate('/home');
+  }
 
   return (
     <ThemeProvider theme={theme}>

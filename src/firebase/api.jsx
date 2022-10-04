@@ -37,9 +37,8 @@ const db = getDatabase(app);
 
 // Create new user in our db
 // Does not authenticate user: must also call createAccount() for authentication
-const createNewUser = function createNewUser(email, firstName, lastName, profileDescription, notificationSetting) {
-    // TODO: need to check for unique email before user is created
-    
+// kyle: it is called only when createAccount returns true, this assures that the email is not duplicated
+const createNewUser = function createNewUser(email, firstName, lastName, profileDescription = "", notificationSetting = "") {
     const userListRef = ref(db, 'users');
     const newUserRef = push(userListRef);
     set(newUserRef, {
@@ -171,18 +170,21 @@ const createNewTask = function createNewTask(projectId, title, description, esti
  *
 *****/
 
-// Create user account with email password authentication
-// Upon account creation, must also call createNewUser() to put user in our db
-const createAccount = (email, password) => {
+/* Asynchronous function that returns true or false with a message based
+ * on the results from firebase.createUserWithEmailAndPassword
+ * @param {string} email        email entered by the user in the textfield
+ * @param {string} password     password entered by the user in the textfield
+ */
+async function tryCreateAccount(email, password) {
     //maybe initialize outside? -PJ
     const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
+    let result = createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
             // We need to set user in context
             const user = userCredential.user;
             // for now print out user
-            console.log(user);
+            return { status: true, msg: "OK" };
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -190,7 +192,9 @@ const createAccount = (email, password) => {
             //change these later to actually do something meaningfull
             console.log(errorCode);
             console.log(errorMessage);
+            return { status: false, msg: error.message };
         });
+    return result;
 }
 
 /*  Asynchronous function that returns true or false based on the
@@ -206,14 +210,14 @@ const trySignInAccount = async (email, password) => {
             // user credential is correct, now signed in
             const user = userCredential.user;
             // TODO: return user information together with the boolean
-            return true;
+            return {status: true, msg: "OK"};
         }).catch((error) => {
             // user crednetial not found
             const errorCode = error.code;
             const errorMessage = error.message;
             console.log(errorCode);
             console.log(errorMessage);
-            return false;
+            return {status: false, msg: error.message};
         });
     return result
 }
@@ -236,7 +240,7 @@ const apiFunctions = {
     createNewGroup,
     createNewProject,
     createNewTask,
-    createAccount,
+    tryCreateAccount,
     trySignInAccount,
     signOutAccount,
     db
