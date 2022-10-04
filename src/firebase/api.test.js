@@ -5,7 +5,7 @@ test("Sanity check", () => {
     expect(true).toBe(true);
 });
 
-test("Inserts new user into db correctly", () => {
+test("Inserts and reads new user into db correctly", () => {
     const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
 
     const inputUser = {
@@ -26,16 +26,16 @@ test("Inserts new user into db correctly", () => {
       });
 });
 
-/*
-test("Inserts new group into db correctly", () => {
-    const groupId = apiFunctions.createNewUser("newGroupName", ["22", "99"], ["123", "456"]);
+
+test("Inserts and reads new group into db correctly", () => {
+    const groupId = apiFunctions.createNewGroup("newGroupName", ["22", "99"], ["123", "456"]);
 
     const inputGroup = {
-      "tasks": {
+      "groups": {
         groupId: {
-          "members": { "22", "99" }
+          "members": ["22", "99"],
           "name": "newGroupName",
-          "owners": { "123", "456" }
+          "owners": ["123", "456"]
         }
       }
     }
@@ -45,6 +45,53 @@ test("Inserts new group into db correctly", () => {
         expect(retrievedGroup).toMatch(inputGroup);
       });
 });
-*/
+
+
+test("Inserts and reads new project into db correctly", () => {
+    const projectId = apiFunctions.createNewProject("New Project Name", "Project description", "In Progress", ["22", "99"], ["123", "456"]);
+
+    const inputProject = {
+      "projects": {
+        projectId: {
+          "description": "Project description",
+          "members": ["22", "99"],
+          "name": "New Project Name",
+          "owners": ["123", "456"],
+          "status": "In Progress"
+        }
+      }
+    }
+
+    onValue(ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
+        const retrievedProject = snapshot.val();
+        expect(retrievedProject).toMatch(inputProject);
+      });
+});
+
+
+test("Inserts and reads new task into db correctly", () => {
+    const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"], ["25", "50"]);
+
+    const inputTask = {
+      "tasks": {
+        taskId: {
+          "assignedUsers": ["11", "88"],
+          "description": "Task description",
+          "estimatedTime": 2,
+          "followers": ["25", "50"],
+          "owners": ["123", "456"],
+          "permittedUsers": ["22", "99"],
+          "projectId": "1234",
+          "status": "Planned",
+          "title": "Task Title"
+        }
+      }
+    }
+
+    onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+        const retrievedTask = snapshot.val();
+        expect(retrievedTask).toMatch(inputTask);
+      });
+});
 
 
