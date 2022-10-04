@@ -28,6 +28,7 @@ apiFunctions.createNewGroup("Mygroup", ["123", "456"], ["123", "456"]);
 */
 
 
+
 /*****
  *  
  * Example of how to read from db. Must import the following:
@@ -37,6 +38,8 @@ apiFunctions.createNewGroup("Mygroup", ["123", "456"], ["123", "456"]);
  * This function returns the entire user's info
  * 
 *****/
+
+// Might have to get new one from db
 const userId = "-ND0gmr6QlvyjUcNCDCI";
 
 onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
