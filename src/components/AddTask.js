@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container, Link, CssBaseline, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -6,10 +6,7 @@ import Divider from '@mui/material/Divider';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -19,9 +16,9 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
+import Input from '@mui/material/Input';
 
 import apiFunctions from '../firebase/api';
-
 
 const theme = createTheme();
 
@@ -29,14 +26,22 @@ export default function AddTask() {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState([]);
     const [selectedFollower, setSelectedFollower] = React.useState([]);
+    const [name, setName] = useState('');
+    const [description, setDesc] = useState('');
+    const [assignee, setAssign] = useState('');
+    const [hour, setHour] = useState('');
+    const [label, setLabel] = useState('');
+    const [owner, setOwner] = useState('');
+    const [project, setProject] = useState('');
+    
 
-
-    const handleClickOpen = () => {
+    const handleClickOpen = (event) => {
+        event.preventDefault();
         setOpen(true);
-
     };
 
-    const handleClose = () => {
+    const handleClose = (event) => {
+        event.preventDefault();
         setOpen(false);
     };
 
@@ -44,32 +49,62 @@ export default function AddTask() {
         setSelected(event.target.value);
     };
 
-    const followerChangeHandler = (event) => {
+    const handleFollowerChange = (event) => {
         setSelectedFollower(event.target.value);
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-          taskName: data.get('taskName'),
-          password: data.get('label'),
-          project: data.get('projectLabel'),
-          description: data.get('taskDescription'),
-          owner: data.get('ownerSelect'),
-          assign: data.get('assignSelect'),
-        });
-        apiFunctions.createNewTask(
+    const handleNameChange = event => {
+        setName(event.target.value)
+    };
+
+    const handleDescChange = event => {
+        setDesc(event.target.value)
+    };
+    
+    const handleHourChange = event => {
+        setHour(event.target.value)
+    };
+
+    const handleLabelChange = event => {
+        setLabel(event.target.value)
+    };
+
+    const handleOwnerChange = event => {
+        setOwner(event.target.value)
+    };
+
+    const handleProjectChange = event => {
+        setProject(event.target.value)
+    };
+
+    const handleAssignChange = event => {
+        setAssign(event.target.value)
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        console.log("submitted")
+
+        let createNewTask = await apiFunctions.createNewTask(
             0, // projectId 
-            data.get('taskName'), // title 
-            data.get('taskDescription'), // description
-            0, // estimatedTime
-            data.get('assignSelect'), // status
-            data.get('ownerSelect'), // permiteedUserIds
-            // ownerIds
-            // assignedUserIds
-            // followerIds
+            name, // title 
+            description, // description
+            hour, // estimatedTime
+            label, // status
+            selectedFollower, // permiteedUserIds
+            owner, // ownerIds
+            assignee, // assignedUserIds
+            selectedFollower, // followerIds
             )
+
+        if (createNewTask) {
+            
+        } else {
+        // perform error UI like highlighting textfield to red
+            alert("invalid login\n TODO: perform error UI")
+        }
+        console.log("FINISHED");
+        alert("hi");
     };
 
     return(
@@ -83,12 +118,12 @@ export default function AddTask() {
                     New Task
                 </Button>
                 <Dialog open={open}  onClose={handleClose}>
-                    <DialogContent component="form" onSubmit={handleSubmit}>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <DialogContent>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
-                                marginTop:0,
-                                marginBottom:-2,
+                                marginTop:-4,
+                                marginBottom:-5,
                             }}>New Task</DialogTitle>
                                 <Box
                                 sx={{
@@ -96,8 +131,8 @@ export default function AddTask() {
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                 }}
-                                >
-                                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 6 }}>
+                                >                                
+                                <Box component="form" sx={{ mt: 4 }}>
                                     <Grid container spacing={2}>
                                     <Grid item xs={50} sm={12}>
                                         <Grid container spacing={2}>
@@ -105,6 +140,7 @@ export default function AddTask() {
                                                 <TextField
                                                 autoComplete="given-name"
                                                 name="taskName"
+                                                onChange={handleNameChange}
                                                 required
                                                 fullWidth
                                                 id="taskName"
@@ -112,8 +148,8 @@ export default function AddTask() {
                                                 autoFocus
                                                 />
                                             </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControl xs={12} fullWidth>
+                                            <Grid item xs={8}>
+                                                <FormControl xs={8} fullWidth>
                                                     <InputLabel id="assignLabel">Label</InputLabel>
                                                     <Select
                                                         multiple
@@ -121,6 +157,7 @@ export default function AddTask() {
                                                         value={selected}
                                                         onChange={selectionChangeHandler}
                                                         label="Label"
+                                                        id="label"
                                                         textOverflow="ellipsis"
                                                         overflow="hidden"
                                                         renderValue={(selected) => (
@@ -143,6 +180,19 @@ export default function AddTask() {
                                                     <FormHelperText>Select corresponding labels.</FormHelperText>
                                                 </FormControl>
                                             </Grid>
+                                            <Grid item xs={4}>
+                                                <Input
+                                                    type="number"
+                                                    autoComplete="given-name"
+                                                    name="estimatedHours"
+                                                    required
+                                                    fullWidth
+                                                    onChange={handleHourChange}
+                                                    id="estimatedHours"
+                                                    label="Estimated Hours"
+                                                    autoFocus
+                                                    />
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -152,6 +202,8 @@ export default function AddTask() {
                                                 labelId="projectLabel"
                                                 id="projectLabel"
                                                 label="Project"
+                                                defaultValue={10}
+                                                onChange={handleProjectChange}
                                             >
                                                 <MenuItem value={10}>Project 1</MenuItem>
                                                 <MenuItem value={20}>Project 2</MenuItem>
@@ -165,7 +217,8 @@ export default function AddTask() {
                                         required
                                         fullWidth
                                         multiline
-                                            rows={4}
+                                        onChange={handleDescChange}
+                                        rows={4}
                                         id="taskDescription"
                                         label="Task Description"
                                         name="taskDescription"
@@ -183,12 +236,14 @@ export default function AddTask() {
                                                 labelId="ownerLabelSelect"
                                                 id="ownerSelect"
                                                 label="ownerLabel"
+                                                onChange={handleOwnerChange}
                                                 defaultValue={10}
                                             >
                                                 <MenuItem value={10}>Me (default)</MenuItem>
                                                 <MenuItem value={20}>User 2</MenuItem>
                                                 <MenuItem value={30}>User 3</MenuItem>
                                             </Select>
+                                            <FormHelperText>Select the team member who oversees this task.</FormHelperText>
                                         </FormControl>
 
                                     <br></br>
@@ -207,6 +262,7 @@ export default function AddTask() {
                                             <MenuItem value={20}>User 2</MenuItem>
                                             <MenuItem value={30}>User 3</MenuItem>
                                         </Select>
+                                        <FormHelperText>Select the team member who is assigned to this task.</FormHelperText>
                                     </FormControl>
 
                                     <br></br>
@@ -220,10 +276,11 @@ export default function AddTask() {
                                             multiple
                                             defaultValue={10}
                                             value={selectedFollower}
-                                            onChange={followerChangeHandler}
+                                            onChange={handleFollowerChange}
                                             label="followerLabel"
                                             textOverflow="ellipsis"
                                             overflow="hidden"
+                                            id="followerSelect"
                                             renderValue={(selected) => (
                                             <div>
                                                 {selected.map((value) => (
@@ -236,10 +293,11 @@ export default function AddTask() {
                                             <MenuItem value={"User 2"}>User 2</MenuItem>
                                             <MenuItem value={"User 3"}>User 3</MenuItem>
                                         </Select>
-                                        <FormHelperText>Select corresponding labels.</FormHelperText>
+                                        <FormHelperText>Select the team members to follow this task..</FormHelperText>
                                     </FormControl>
-
-                                    <Button
+                                </Box>
+                                </Box>
+                                <Button
                                         type="submit"
                                         fullWidth
                                         variant="contained"
@@ -247,8 +305,6 @@ export default function AddTask() {
                                         >
                                     Add Task
                                     </Button>
-                                </Box>
-                                </Box>
                             </Box>
                         </DialogContent>
                     <DialogActions>
