@@ -105,10 +105,6 @@ const ResponsiveAppBar = () => {
             <MenuItem component={Link} to="/project"><h1>
                 <Typography textAlign="center">Projects</Typography></h1>
             </MenuItem>
-
-            <MenuItem component={Link} to="/task">
-                <Typography textAlign="center">Tasks</Typography>
-            </MenuItem>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
