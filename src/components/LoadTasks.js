@@ -1,29 +1,32 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
 import WorkIcon from '@mui/icons-material/Work';
-import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import ListSubheader from '@mui/material/ListSubheader';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
+import CircularProgress from '@mui/material/CircularProgress';
+
+
+import apiFunctions from '../firebase/api';
+import { ref, onValue } from "firebase/database";
 
 const theme = createTheme();
 
@@ -63,41 +66,66 @@ export default function LoadTasks() {
           assign: data.get('assignSelect'),
         });
       };
+    
+    const [taskListarr, setTaskListArr] = useState([]);
+    const [isLoading, setLoading] = useState(true);
 
+    useEffect(() => {
+        console.log("hello")
+        // Update the document title using the browser API
+        onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
+            onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
+                snapshot.forEach(function(child) {
+                    const task = child.val()
+                    taskListarr.push(child.val())
+                    console.log(JSON.stringify(child.val(), null, 2))
+                    console.log("Added(" +taskListarr.length +"): " + child.val().title)
+                })
+            })
+        })
+        setLoading(false);
+    }, [taskListarr])
+    
+    if (isLoading == true) {
+        return (
+            <div  className="loadingContainer">
+                <br></br>
+                <CircularProgress color="primary" />
+            </div>
+            )
+    } 
     return (
-        <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="lg">
+        <div>
+            <ThemeProvider theme={theme}>
+                <Container component="main">
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={50} sm={12} lg={'50%'}>
+                            <Grid item xs={50} sm={12}>
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     <ListSubheader>Project 1</ListSubheader>
-                                    {[1,2,3,4,5,6,7,8,9,10].map((value) => (
-                                        <div>
+                                    {taskListarr && taskListarr.length > 0 ? taskListarr.map((data) => {
+                                        return (
+                                            <div key={data.projectId}>
                                             <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItem onClick={() => this.handleClick()}>
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={`Task ${value}`} secondary="Task Owner"/>
-                                                    <Button
-                                                    sx={{
-                                                        marginTop:-2,
-                                                        marginBottom:-2,
-                                                    }}><h1>+</h1></Button>
+                                                    <ListItemText primary={data.title} secondary={data.description}/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />
                                         </div>
-                                    ))}
+                                        )    
+                                        }) : ""}
                                 </FixedSizeList>
                             </Grid>
                         </Grid>
                     </Box>
 
                     <Dialog open={open}  onClose={handleClose}>
-                    <DialogContent component="form" onSubmit={handleSubmit}>
+                    <DialogContent>
                         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
@@ -111,7 +139,7 @@ export default function LoadTasks() {
                                     alignItems: 'center',
                                 }}
                                 >
-                                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 6 }}>
+                                <Box sx={{ mt: 6 }}>
                                     <Grid container spacing={2}>
                                     <Grid item xs={50} sm={12}>
                                         <Grid container spacing={2}>
@@ -220,6 +248,8 @@ export default function LoadTasks() {
                 </Dialog>
                 </Container>
             </ThemeProvider>
-        
+        </div>
     );
+
+    
 }
