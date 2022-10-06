@@ -71,22 +71,36 @@ export default function LoadTasks() {
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log("hello")
-        // Update the document title using the browser API
+        //const response = onValue(ref(apiFunctions.db, 'tasks/'), (response))
+        //console.log("response: " + response)
         onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-            onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
                 snapshot.forEach(function(child) {
                     const task = child.val()
                     taskListarr.push(child.val())
                     console.log(JSON.stringify(child.val(), null, 2))
                     console.log("Added(" +taskListarr.length +"): " + child.val().title)
                 })
-            })
         })
-        setLoading(false);
-    }, [taskListarr])
+        setLoading(false)
+    });
+
+    // const fetchData = async (event) => {
+    //     console.log("hello")
+    //     // Update the document title using the browser API
+    //     const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
+    //     console.log("response: " + response)
+    //     onValue(await ref(apiFunctions.db, 'tasks/'), (snapshot) => {
+    //             snapshot.forEach(function(child) {
+    //                 const task = child.val()
+    //                 taskListarr.push(child.val())
+    //                 console.log(JSON.stringify(child.val(), null, 2))
+    //                 console.log("Added(" +taskListarr.length +"): " + child.val().title)
+    //             })
+    //     })
+    //     return true;
+    // };
     
-    if (isLoading == true) {
+    if (isLoading === true) {
         return (
             <div  className="loadingContainer">
                 <br></br>

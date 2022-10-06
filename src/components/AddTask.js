@@ -100,8 +100,8 @@ export default function AddTask() {
         if (createNewTask) {
             
         } else {
-        // perform error UI like highlighting textfield to red
-            alert("unable to add task")
+        
+            
         }
         console.log("FINISHED");
     };
