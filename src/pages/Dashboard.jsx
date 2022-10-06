@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import NavBar from '../components/NavBar';
-import LoadTask from '../components/LoadTasks';
+import AddTask from '../components/AddTask';
+import LoadTasks from '../components/LoadTasks';
 
 
 const Dashboard = () => {
@@ -8,7 +9,10 @@ const Dashboard = () => {
     return (
         <div> 
             <NavBar></NavBar>
-            Dashboard Page</div>
+            <AddTask></AddTask>
+            <LoadTasks></LoadTasks>
+            Dashboard Page
+        </div>
     );
 }
 

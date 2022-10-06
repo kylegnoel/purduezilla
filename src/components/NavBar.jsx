@@ -15,8 +15,6 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-import Logo from './purduezilla.png';
-
 const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -43,7 +41,7 @@ const ResponsiveAppBar = () => {
     <AppBar position="static" style={{ background: '#CFB991' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-        <img src={Logo} style={{ height: 60, }}/>
+        <img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }}/>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
