@@ -11,9 +11,11 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { Container, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
@@ -21,11 +23,22 @@ export default function ProjectDashboard() {
     const [projListarr, setProjListArr] = useState([]);
     // const taskListarr = []
     const [isLoading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("reload")
         fetchData()
     }, []);
+
+    const handleTask = (event) => {
+        if (event.currentTarget.id !== "addproject") {
+            console.log("eventid: " + event.currentTarget.id)
+            navigate('/project/'+event.currentTarget.id);
+        }
+        else {
+            navigate('/newproject');
+        }
+    }
 
     const fetchData = (event) => {
         console.log("hello")
@@ -34,15 +47,16 @@ export default function ProjectDashboard() {
         // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                    const projectTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const project = child.val()
-                        projectTemp.push(child.val())
-                    })
+                const projectTemp = []
+    
+                snapshot.forEach(function(child) {
+                    const project = child.val()
+                    projectTemp.push([child.val(), child.key])
+                    console.log("key: " + child.key);
+                })
 
-                    setProjListArr(projectTemp)
-                    console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
+                setProjListArr(projectTemp)
+                console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
             })
             if (setProjListArr.length !== 0) {
                 setLoading(false)
@@ -68,20 +82,27 @@ export default function ProjectDashboard() {
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
-                                            return (
-                                            <div key={data.projectId}>
-                                            <Button sx={{ height: '100%', width: '100%'}}>
-                                                <ListItem onClick={() => this.handleClick()}>
+                                            return (  
+                                            <div key={data[1]}>
+                                            <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <ListItem>
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data.name}/>
+                                                    <ListItemText primary={data[0].name}/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />
                                         </div>   
                                         )}): "There are no Projects!" }
-        
+                                    <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
+                                            <ListItem>
+                                                <ListItemAvatar>
+                                                    <AddIcon color="grey"/>
+                                                </ListItemAvatar>
+                                                <ListItemText primary={"Add Project"}/>
+                                            </ListItem>
+                                        </Button>
                                 </FixedSizeList>
                             </Grid>
                         </Grid>

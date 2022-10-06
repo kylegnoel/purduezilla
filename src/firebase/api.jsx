@@ -129,35 +129,41 @@ const createNewTask = function createNewTask(projectId, name, description, estim
         name: name,
         description: description,
         estimatedTime: estimatedTime,
+        assignedUsers: assignedUserIds,
+        owner: ownerIds,
         status: status,
     });
 
-    // Add owner user Id's
-    const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
-    for (const i in ownerIds) {
-        const userRef = push(ownersListRef);
-        set(userRef, {
-            userId: ownerIds[i]
-        });
-    }
+    // // Add owner user Id's
+    // const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
+    // const userRef = push(ownersListRef);
+    // set(userRef, {
+    //   userId: ownerIds[i]
+    // });
+    // for (const i in ownerIds) {
+    //     const userRef = push(ownersListRef);
+    //     set(userRef, {
+    //         userId: ownerIds[i]
+    //     });
+    // }
 
     // Add assigned user Id's
-    const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
-    for (const i in assignedUserIds) {
-        const userRef = push(assignedUserListRef);
-        set(userRef, {
-            userId: assignedUserIds[i]
-        });
-    }
+    // const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
+    // for (const i in assignedUserIds) {
+    //     const userRef = push(assignedUserListRef);
+    //     set(userRef, {
+    //         userId: assignedUserIds[i]
+    //     });
+    // }
 
     // Add follower user Id's
     const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
-    for (const i in followerIds) {
-        const userRef = push(followersListRef);
-        set(userRef, {
-            userId: followerIds[i]
-        });
-    }
+    const followers = []
+
+    followerIds.forEach(function(child) {
+        const followerid = getUserid(child)
+        console.log("newUser: " + child + " " + followerid)
+    })
 
     return newTaskRef.key;
 
@@ -168,6 +174,30 @@ const createNewTask = function createNewTask(projectId, name, description, estim
  * Query functions
  *
 *****/
+
+// Returns project with given id
+async function getProject(id) {
+  onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
+    return snapshot.val();
+  });
+}
+
+// Returns project with given id
+const getUserid = async function getUserid(name) {
+  console.log("looking for " + name)
+  onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+
+    snapshot.forEach(function(child) {
+        const user = child.val()
+        console.log("name: " + name + " " + user.firstName + " " + user.lastName)
+        if (name === user.firstName + " " + user.lastName) {
+          console.log("returning: " + child.key + " " + name)
+          return child.key;
+        }
+    })
+})
+  console.log("error: no user found");
+}
 
 // Returns 2d array with each element as [taskKey, values]
 // call using snapshot of all tasks:
@@ -383,7 +413,9 @@ const apiFunctions = {
     createNewGroup,
     createNewProject,
     createNewTask,
+    getProject,
     getProjectsTasks,
+    getUserid,
     getUsersProjects,
     getUsersAssignedTasks,
     getUsersFollowedTasks,
