@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
-import WorkIcon from '@mui/icons-material/Work';
+import TaskIcon from '@mui/icons-material/Task';
 import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -72,15 +72,15 @@ export default function LoadTasks() {
                             <Grid item xs={50} sm={12} lg={'50%'}>
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                    <ListSubheader>Project 1</ListSubheader>
+                                    <ListSubheader><h2>Project 1</h2></ListSubheader>
                                     {[1,2,3,4,5,6,7,8,9,10].map((value) => (
                                         <div>
                                             <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItem onClick={() => this.handleClick()}>
                                                     <ListItemAvatar>
-                                                        <WorkIcon color="grey"/>
+                                                        <TaskIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={`Task ${value}`} secondary="Task Owner"/>
+                                                    <ListItemText primary={`Task ${value}`} secondary="Short Description"/>
                                                     <Button
                                                     sx={{
                                                         marginTop:-2,

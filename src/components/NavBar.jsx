@@ -39,9 +39,32 @@ const ResponsiveAppBar = () => {
 
   return (
     <AppBar position="static" style={{ background: '#CFB991' }}>
+      
       <Container maxWidth="xl">
+        
         <Toolbar disableGutters>
-        <img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }}/>
+        <Typography 
+            component={Link} to="/home"
+            marginLeft={'1%'}
+            variant="h5"
+            maxWidth={'9em'}
+            noWrap
+            href=""
+            sx={{
+              mr: 2,
+              display: { xs: 'flex'},
+              flexGrow: 1,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            PURDUEZILLA
+          </Typography>
+        
+        <a href='/home'><img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }}/></a>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -80,30 +103,13 @@ const ResponsiveAppBar = () => {
 
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+          
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <MenuItem component={Link} to="/project"><h1>
                 <Typography textAlign="center">Projects</Typography></h1>
             </MenuItem>
           </Box>
+          
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
