@@ -86,7 +86,7 @@ export default function AddTask() {
         console.log("submitted")
 
         let createNewTask = await apiFunctions.createNewTask(
-            0, // projectId 
+            1, // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime
@@ -100,11 +100,10 @@ export default function AddTask() {
         if (createNewTask) {
             
         } else {
-        // perform error UI like highlighting textfield to red
-            alert("invalid login\n TODO: perform error UI")
+        
+            
         }
         console.log("FINISHED");
-        alert("hi");
     };
 
     return(
