@@ -25,12 +25,11 @@ export default function ViewTasks() {
                                     {[1,2,3,4,5,6,7,8,9,10].map((value) => (
                                         <div>
                                             <Button sx={{ height: '100%', width: '100%'}}>
-                                                <ListItem onClick={() => this.handleClick()}>
+                                                <ListItem>
                                                     <ListItemAvatar>
                                                         <TaskIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={`Task ${value}`} secondary="Project Name"/>
-                                                    
+                                                    <ListItemText primary={`Task ${value}`} secondary="Project Name"/>   
                                                 </ListItem>
                                             </Button>
                                             <Divider />

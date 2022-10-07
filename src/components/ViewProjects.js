@@ -25,7 +25,7 @@ export default function ViewProjects() {
                                     {[1,2,3,4].map((value) => (
                                         <div>
                                             <Button sx={{ height: '100%', width: '100%'}}>
-                                                <ListItem onClick={() => this.handleClick()}>
+                                                <ListItem>
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
