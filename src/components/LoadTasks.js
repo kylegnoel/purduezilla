@@ -68,38 +68,46 @@ export default function LoadTasks() {
       };
     
     const [taskListarr, setTaskListArr] = useState([]);
+    // const taskListarr = []
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        //const response = onValue(ref(apiFunctions.db, 'tasks/'), (response))
-        //console.log("response: " + response)
-        onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                snapshot.forEach(function(child) {
-                    const task = child.val()
-                    taskListarr.push(child.val())
-                    console.log(JSON.stringify(child.val(), null, 2))
-                    console.log("Added(" +taskListarr.length +"): " + child.val().title)
-                })
-        })
-        setLoading(false)
-    });
+        console.log("reload")
+        fetchData()
+    }, []);
 
-    // const fetchData = async (event) => {
-    //     console.log("hello")
-    //     // Update the document title using the browser API
-    //     const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-    //     console.log("response: " + response)
-    //     onValue(await ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-    //             snapshot.forEach(function(child) {
-    //                 const task = child.val()
-    //                 taskListarr.push(child.val())
-    //                 console.log(JSON.stringify(child.val(), null, 2))
-    //                 console.log("Added(" +taskListarr.length +"): " + child.val().title)
-    //             })
-    //     })
-    //     return true;
-    // };
-    
+    const fetchData = (event) => {
+        console.log("hello")
+        // Update the document title using the browser API
+        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
+        // console.log("response: " + response)
+        try {
+            onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
+                    const taskTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const task = child.val()
+                        taskTemp.push(child.val())
+                    })
+
+                    setTaskListArr(taskTemp)
+                    console.log("snapshot: " + taskListarr.length + " " +  taskTemp.length)
+            })
+            if (taskListarr.length !== 0) {
+                setLoading(false)
+            }
+
+        }
+        catch {
+            // if there is no internet
+        }
+
+        setLoading(false)
+        
+        console.log("taskListarr: " + taskListarr.length)
+        return true;
+    };
+
     if (isLoading === true) {
         return (
             <div  className="loadingContainer">
@@ -110,6 +118,14 @@ export default function LoadTasks() {
     } 
     return (
         <div>
+            <Button variant="outlined" onClick={fetchData} sx={{
+                            marginTop:8,
+                            marginBottom:0,
+                            bgcolor: 'background.paper',
+                        }}>
+                    Reload
+                </Button>
+
             <ThemeProvider theme={theme}>
                 <Container component="main">
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
@@ -118,8 +134,8 @@ export default function LoadTasks() {
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     <ListSubheader>Project 1</ListSubheader>
-                                    {taskListarr && taskListarr.length > 0 ? taskListarr.map((data) => {
-                                        return (
+                                        { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                            return (
                                             <div key={data.projectId}>
                                             <Button onClick={handleClickOpen} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItem onClick={() => this.handleClick()}>
@@ -130,9 +146,8 @@ export default function LoadTasks() {
                                                 </ListItem>
                                             </Button>
                                             <Divider />
-                                        </div>
-                                        )    
-                                        }) : ""}
+                                        </div>   
+                                        )}): "There are no tasks!" }
                                 </FixedSizeList>
                             </Grid>
                         </Grid>
