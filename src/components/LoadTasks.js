@@ -102,7 +102,7 @@ export default function LoadTasks() {
             // if there is no internet
         }
 
-        setLoading(false)
+        //setLoading(false)
         
         console.log("taskListarr: " + taskListarr.length)
         return true;
