@@ -41,9 +41,31 @@ const ResponsiveAppBar = () => {
 
   return (
     <AppBar position="static" style={{ background: '#CFB991' }}>
+      
       <Container maxWidth="xl">
+        
         <Toolbar disableGutters>
-        <img src={Logo} style={{ height: 60, }}/>
+        <Typography 
+            component={Link} to="/home"
+            variant="h5"
+            maxWidth={'9em'}
+            noWrap
+            href=""
+            sx={{
+              mr: 2,
+              display: { xs: 'flex'},
+              flexGrow: 1,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            PURDUEZILLA
+          </Typography>
+        
+        <a href='/home'><img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }}/></a>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
