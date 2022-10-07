@@ -1,7 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, push } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import React from 'react';
+
 
 
 
@@ -28,6 +30,8 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 //initialize db
 const db = getDatabase(app);
+//auth
+const auth = getAuth();
 
 /*****
  *  
@@ -54,7 +58,7 @@ const createNewUser = function createNewUser(email, firstName, lastName, profile
 
 // Create new group
 const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
-    
+
     const groupListRef = ref(db, 'groups');
     const newGroupRef = push(groupListRef);
     set(newGroupRef, {
@@ -86,7 +90,7 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
 // Create new project
 // To get all tasks associated with project, query 'tasks' by project id
 const createNewProject = function createNewProject(name, description, status, memberIds, ownerIds) {
-    
+
     const projectListRef = ref(db, 'projects');
     const newProjectRef = push(projectListRef);
     set(newProjectRef, {
@@ -185,7 +189,7 @@ const createNewTask = function createNewTask(projectId, title, description, esti
  */
 async function tryCreateAccount(email, password) {
     //maybe initialize outside? -PJ
-    const auth = getAuth();
+    //const auth = getAuth();
     let result = createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
@@ -212,20 +216,20 @@ async function tryCreateAccount(email, password) {
  */
 const trySignInAccount = async (email, password) => {
     //also maybe initialize outside
-    const auth = getAuth();
+    //const auth = getAuth();
     let result = await signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // user credential is correct, now signed in
             const user = userCredential.user;
             // TODO: return user information together with the boolean
-            return {status: true, msg: "OK"};
+            return { status: true, msg: "OK" };
         }).catch((error) => {
             // user crednetial not found
             const errorCode = error.code;
             const errorMessage = error.message;
             console.log(errorCode);
             console.log(errorMessage);
-            return {status: false, msg: error.message};
+            return { status: false, msg: error.message };
         });
     return result
 }
@@ -233,13 +237,53 @@ const trySignInAccount = async (email, password) => {
 //sign out account
 const signOutAccount = () => {
     //once again probably initialize outside
-    const auth = getAuth();
+    //const auth = getAuth();
     signOut(auth).then(() => {
         console.log("signed out successfully");
     }).catch((error) => {
         console.log("wasn't able to sign out :(");
     });
 }
+
+//context stuff
+
+const FirebaseAuthContext = React.createContext();
+
+const FirebaseAuthProvider = ({ children }) => {
+    const [user, setUser] = React.useState(null);
+    //const value = { user };
+
+    React.useEffect(() => {
+        //const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);
+            }
+            else {
+                setUser(null);
+            }
+        });
+    }, []);
+
+    return (
+        <FirebaseAuthContext.Provider value={{ user }}>
+            {children}
+        </FirebaseAuthContext.Provider>
+    );
+};
+
+function useFirebaseAuth() {
+    const context = React.useContext(FirebaseAuthContext);
+    if (context === undefined) {
+        throw new Error(
+            "useFirebaseAuth must be used within a FirebaseAuthProvider"
+        );
+    }
+    return context.user;
+}
+
+
+
 
 //wrap all functions up to export all at the same time
 //considering moving the authentication functions to a different file? - PJ
@@ -251,7 +295,10 @@ const apiFunctions = {
     tryCreateAccount,
     trySignInAccount,
     signOutAccount,
-    db
+    db,
+    app,
+    FirebaseAuthProvider, useFirebaseAuth,
+    auth
 };
 
 export default apiFunctions;
