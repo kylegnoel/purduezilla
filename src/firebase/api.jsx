@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push } from "firebase/database";
+import { getDatabase, ref, set, push, onValue } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
@@ -119,27 +119,18 @@ const createNewProject = function createNewProject(name, description, status, me
 
 // Create new task
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
-const createNewTask = function createNewTask(projectId, title, description, estimatedTime, status, permittedUserIds, ownerIds, assignedUserIds, followerIds) {
+const createNewTask = function createNewTask(projectId, name, description, estimatedTime, status, ownerIds, assignedUserIds, followerIds) {
 
     // Create basic task
     const taskListRef = ref(db, 'tasks');
     const newTaskRef = push(taskListRef);
     set(newTaskRef, {
         projectId: projectId,
-        title: title,
+        name: name,
         description: description,
         estimatedTime: estimatedTime,
         status: status,
     });
-
-    // Add permitted user Id's
-    const permittedUsersListRef = ref(db, 'tasks/' + newTaskRef.key + '/permittedUsers');
-    for (const i in permittedUserIds) {
-        const userRef = push(permittedUsersListRef);
-        set(userRef, {
-            userId: permittedUserIds[i]
-        });
-    }
 
     // Add owner user Id's
     const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
@@ -170,6 +161,46 @@ const createNewTask = function createNewTask(projectId, title, description, esti
 
     return newTaskRef.key;
 
+}
+
+// Returns 2d array with each element as [taskKey, values]
+// call using snapshot of all tasks:
+//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+      // getProjectsTasks(projectId, snapshot)
+//  });
+const getProjectsTasks = function getProjectsTasks(projectId, snapshot) {
+    const tasksInProject = []
+
+    snapshot.forEach(function(childSnapshot) {
+      if (childSnapshot.val().projectId == projectId) {
+        // Keep track of task key and task's values
+        tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
+      }
+    })
+
+    return tasksInProject;
+}
+
+// Returns 2d array with each element as [projectKey, values]
+// call using snapshot of all projects:
+//  onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
+      // getProjectsTasks(userId, snapshot)
+//  });
+const getUserProjects = function getUserProjects(userId, snapshot) {
+    const usersProjects = []
+
+    snapshot.forEach(function(projectSnapshot) {
+      onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
+        snapshot2.forEach(function(memberSnapshot) {
+          if (memberSnapshot.val().userId == userId) {
+            // Keep track of projec key and project's values
+            usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
+          }
+        });
+      });
+    })
+
+    return usersProjects;
 }
 
 /*****
@@ -248,6 +279,8 @@ const apiFunctions = {
     createNewGroup,
     createNewProject,
     createNewTask,
+    getProjectsTasks,
+    getUserProjects,
     tryCreateAccount,
     trySignInAccount,
     signOutAccount,
