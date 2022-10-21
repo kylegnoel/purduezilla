@@ -28,4 +28,3 @@ apiFunctions.createNewProject("Create new tracking feature", "This feature will 
 apiFunctions.createNewGroup("Lab 268 Group", ["123", "456"], ["123", "456"]);
 */
 
-

@@ -163,6 +163,12 @@ const createNewTask = function createNewTask(projectId, name, description, estim
 
 }
 
+/*****
+ *  
+ * Query functions
+ *
+*****/
+
 // Returns 2d array with each element as [taskKey, values]
 // call using snapshot of all tasks:
 //  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
@@ -184,16 +190,16 @@ const getProjectsTasks = function getProjectsTasks(projectId, snapshot) {
 // Returns 2d array with each element as [projectKey, values]
 // call using snapshot of all projects:
 //  onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
-      // getProjectsTasks(userId, snapshot)
+      // getUsersProjects(userId, snapshot)
 //  });
-const getUserProjects = function getUserProjects(userId, snapshot) {
+const getUsersProjects = function getUsersProjects(userId, snapshot) {
     const usersProjects = []
 
     snapshot.forEach(function(projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function(memberSnapshot) {
           if (memberSnapshot.val().userId == userId) {
-            // Keep track of projec key and project's values
+            // Keep track of key and values
             usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
           }
         });
@@ -201,6 +207,104 @@ const getUserProjects = function getUserProjects(userId, snapshot) {
     })
 
     return usersProjects;
+}
+
+// Returns 2d array with each element as [taskKey, values]
+// call using snapshot of all tasks:
+//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+      // getUsersAssignedTasks(userId, snapshot)
+//  });
+const getUsersAssignedTasks = function getUsersAssignedTasks(userId, snapshot) {
+    const usersAssignedTasks = []
+
+    snapshot.forEach(function(taskSnapshot) {
+      onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
+        snapshot2.forEach(function(userSnapshot) {
+          if (userSnapshot.val().userId == userId) {
+            // Keep track of key and values
+            usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+          }
+        });
+      });
+    })
+
+    return usersAssignedTasks;
+}
+
+// Returns 2d array with each element as [taskKey, values]
+// call using snapshot of all tasks:
+//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+      // getUsersFollowedTasks(userId, snapshot)
+//  });
+const getUsersFollowedTasks = function getUsersFollowedTasks(userId, snapshot) {
+    const usersFollowedTasks = []
+
+    snapshot.forEach(function(taskSnapshot) {
+      onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
+        snapshot2.forEach(function(userSnapshot) {
+          if (userSnapshot.val().userId == userId) {
+            // Keep track of key and values
+            usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+          }
+        });
+      });
+    })
+
+    return usersFollowedTasks;
+}
+
+// Returns T/F
+const isTaskOwner = function isTaskOwner(userId, taskId) {
+    const isOwner = []
+
+    onValue(ref(apiFunctions.db, "tasks/" + taskId + '/owners'), (snapshot) => {
+      snapshot.forEach(function(userSnapshot) {
+        if (userSnapshot.val().userId == userId) {
+          isOwner.push(1);
+        }
+      });
+    });
+
+    if (isOwner.length == 0) {
+      return false;
+    }
+    return true;
+}
+
+// Returns T/F
+const isProjectOwner = function isProjectOwner(userId, projectId) {
+    const isOwner = []
+
+    onValue(ref(apiFunctions.db, "projects/" + projectId + '/owners'), (snapshot) => {
+      snapshot.forEach(function(userSnapshot) {
+        if (userSnapshot.val().userId == userId) {
+          isOwner.push(1);
+        }
+      });
+    });
+
+    if (isOwner.length == 0) {
+      return false;
+    }
+    return true;
+}
+
+// Returns T/F
+const isGroupOwner = function isGroupOwner(userId, groupId) {
+    const isOwner = []
+
+    onValue(ref(apiFunctions.db, "groups/" + groupId + '/owners'), (snapshot) => {
+      snapshot.forEach(function(userSnapshot) {
+        if (userSnapshot.val().userId == userId) {
+          isOwner.push(1);
+        }
+      });
+    });
+
+    if (isOwner.length == 0) {
+      return false;
+    }
+    return true;
 }
 
 /*****
@@ -280,7 +384,12 @@ const apiFunctions = {
     createNewProject,
     createNewTask,
     getProjectsTasks,
-    getUserProjects,
+    getUsersProjects,
+    getUsersAssignedTasks,
+    getUsersFollowedTasks,
+    isTaskOwner,
+    isGroupOwner,
+    isProjectOwner,
     tryCreateAccount,
     trySignInAccount,
     signOutAccount,
