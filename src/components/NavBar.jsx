@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,6 +13,8 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+
+import apifunctions from "../firebase/api";
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -144,7 +145,7 @@ const ResponsiveAppBar = () => {
               <MenuItem component={Link} to="/profile" key={"profile"} onClick={handleCloseUserMenu}>
                 <Typography textAlign="center">Profile</Typography>
               </MenuItem>
-              <MenuItem component={Link} to="/logout" key={"logout"} onClick={handleCloseUserMenu}>
+              <MenuItem component={Link} to="/" key={"logout"} onClick={apifunctions.signOutAccount}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
             </Menu>

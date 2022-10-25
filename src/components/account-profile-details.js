@@ -13,9 +13,10 @@ import {
 
 export const AccountProfileDetails = (props) => {
   const [values, setValues] = useState({
-    firstName: 'Example name',
-    lastName: 'Example name',
+    name: 'Example name',
     email: 'Example email',
+    description: 'Example description'
+    
   });
 
   const handleChange = (event) => {
@@ -49,27 +50,12 @@ export const AccountProfileDetails = (props) => {
             >
               <TextField
                 fullWidth
-                helperText="Please specify the first name"
-                label="First name"
-                name="firstName"
+                helperText="Please specify your name"
+                label="Name"
+                name="name"
                 onChange={handleChange}
                 required
-                value={values.firstName}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Last name"
-                name="lastName"
-                onChange={handleChange}
-                required
-                value={values.lastName}
+                value={values.name}
                 variant="outlined"
               />
             </Grid>
@@ -85,6 +71,21 @@ export const AccountProfileDetails = (props) => {
                 onChange={handleChange}
                 required
                 value={values.email}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={12}
+              xs={12}
+            >
+              <TextField
+                fullWidth
+                label="Description"
+                name="description"
+                onChange={handleChange}
+                required
+                value={values.description}
                 variant="outlined"
               />
             </Grid>
