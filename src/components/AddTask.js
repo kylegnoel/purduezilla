@@ -17,6 +17,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
+import { useNavigate } from "react-router-dom";
 
 import apiFunctions from '../firebase/api';
 
@@ -34,6 +35,7 @@ export default function AddTask() {
     const [owner, setOwner] = useState('');
     const [project, setProject] = useState('');
     
+    const navigate = useNavigate();
 
     const handleClickOpen = (event) => {
         event.preventDefault();
@@ -86,7 +88,7 @@ export default function AddTask() {
         console.log("submitted")
 
         let createNewTask = await apiFunctions.createNewTask(
-            0, // projectId 
+            1, // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime
@@ -100,12 +102,18 @@ export default function AddTask() {
         if (createNewTask) {
             
         } else {
-        // perform error UI like highlighting textfield to red
-            alert("invalid login\n TODO: perform error UI")
+        
+            
         }
         console.log("FINISHED");
-        alert("hi");
+        alert("Task Added");
+        
+        navigateToDashboard()
     };
+
+    const navigateToDashboard = () => {
+        navigate('/home');
+      }
 
     return(
         <ThemeProvider theme={theme}>
