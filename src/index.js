@@ -29,3 +29,4 @@ apiFunctions.createNewGroup("Lab 268 Group", ["123", "456"], ["123", "456"]);
 */
 
 
+console.log(apiFunctions.addProjectOwners("-NEqhri7RaC8Sg8jtYCD", ["3321","542332", "32132"]))

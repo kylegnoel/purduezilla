@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, update, child, remove } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
@@ -96,25 +96,33 @@ const createNewProject = function createNewProject(name, description, status, me
     });
 
     // Add owner user Id's
-    const ownersListRef = ref(db, 'projects/' + newProjectRef.key + '/owners');
-    for (const i in ownerIds) {
-        const userRef = push(ownersListRef);
-        set(userRef, {
-            userId: ownerIds[i]
-        });
-    }
+    addProjectOwners(newProjectRef.key, ownerIds)
 
     // Add member user Id's
-    const memberListRef = ref(db, 'projects/' + newProjectRef.key + '/members');
-    for (const i in memberIds) {
-        const userRef = push(memberListRef);
-        set(userRef, {
-            userId: memberIds[i]
-        });
-    }
+    addProjectMemebers(newProjectRef.key, memberIds)
 
     return newProjectRef.key;
 
+}
+
+/**
+ * Adds a list of people as owner of a project
+ * @param {*} id of a project
+ * @param {*} ownerIds 
+ */
+const addProjectOwners = (id, ownerIds) => {
+    const ownersListRef = ref(db, 'projects/' + id + '/owners');
+    push().setValue()
+}
+
+/**
+ * Adds a list of people as members of a project
+ * @param {*} id 
+ * @param {*} memberIds 
+ */
+const addProjectMemebers = (id, memberIds) => {
+    const memberListRef = ref(db, 'projects/' + id + '/members');
+    set(memberListRef, memberIds)
 }
 
 // Create new task
@@ -133,34 +141,46 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     });
 
     // Add owner user Id's
-    const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
+    addTaskOwners(newTaskRef.key, ownerIds)
+
+    // Add assigned user Id's
+    addTaskAssignedUsers(newTaskRef.key, assignedUserIds)
+
+    // Add follower user Id's
+    addTaskFollowers(newTaskRef.key, followerIds)
+
+    return newTaskRef.key;
+
+}
+
+const addTaskOwners = (taskId, ownerIds) => {
+    const ownersListRef = ref(db, 'tasks/' + ownerIds + '/owners');
     for (const i in ownerIds) {
         const userRef = push(ownersListRef);
-        set(userRef, {
+        push(userRef, {
             userId: ownerIds[i]
         });
     }
+}
 
-    // Add assigned user Id's
-    const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
+const addTaskAssignedUsers = (taskId, assignedUserIds) => {
+    const assignedUserListRef = ref(db, 'tasks/' + taskId + '/assignedUsers');
     for (const i in assignedUserIds) {
         const userRef = push(assignedUserListRef);
-        set(userRef, {
+        push(userRef, {
             userId: assignedUserIds[i]
         });
     }
+}
 
-    // Add follower user Id's
-    const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
+const addTaskFollowers = (taskId, followerIds) => {
+    const followersListRef = ref(db, 'tasks/' + taskId + '/followers');
     for (const i in followerIds) {
         const userRef = push(followersListRef);
         set(userRef, {
             userId: followerIds[i]
         });
     }
-
-    return newTaskRef.key;
-
 }
 
 // Returns 2d array with each element as [taskKey, values]
@@ -203,6 +223,129 @@ const getUserProjects = function getUserProjects(userId, snapshot) {
     return usersProjects;
 }
 
+
+/**
+ * Given the id of a user, updates all of its properties with new data 
+ * from the parameter
+ * @param {string} id 
+ * @param {string} email 
+ * @param {string} firstName 
+ * @param {string} lastName 
+ * @param {*} profileDescription 
+ * @param {*} notificationSetting 
+ * @returns the id of the updated user
+ */
+const updateUser = (id, email, firstName, lastName, profileDescription = "", notificationSetting = "") => {
+    const userListRef = ref(db, 'users/' + id);
+    update(userListRef, {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        profileDescription: profileDescription,
+        notificationSetting: notificationSetting,
+    });
+
+    return userListRef.key;
+}
+
+/**
+ * Updates only the project details
+ * @param {*} id 
+ * @param {*} name 
+ * @param {*} description 
+ * @param {*} status 
+ * @returns id of the updated project details
+ */
+const updateProjectDetails = (id, name, description, status) => {
+    const projectListRef = ref(db, 'projects/' + id);
+
+    update(projectListRef, {
+        name: name,
+        description: description,
+        status: status
+    });
+
+    return projectListRef.key;
+}
+
+/**
+ * Given the id of a project, remove a list of people from being an owner
+ * @param {*} id 
+ * @param {*} exOwnerIds 
+ */
+ const deleteProjectOwners = (id, exOwnerIds) => {
+    exOwnerIds.forEach(owner => {
+        remove(ref(db, "Projects/" + id + "/owners/" + owner))
+        .catch((error) => {
+            console.log(error)
+        })
+    });
+}
+
+/**
+ * Given the id of a project, rmeove a list of people from being a member
+ * @param {*} id 
+ * @param {*} exMemberIds 
+ */
+const deleteProjectMembers = (id, exMemberIds) => {
+    exMemberIds.forEach(memberId => {
+        remove(ref(db, "Projects/" + id + "/members/" + memberId))
+        .catch((error) => {
+            console.log(error)
+        })
+    })
+}
+
+/**
+ * Updates a task detail. This will overwrite all existing data
+ * @param {*} id 
+ * @param {*} projectId 
+ * @param {*} name 
+ * @param {*} description 
+ * @param {*} estimatedTime 
+ * @param {*} status 
+ * @returns 
+ */
+const updateTaskDetails = (id, projectId, name, description, estimatedTime, status) => {
+    const taskListRef = ref(db, 'tasks/'  + id);
+
+    update(taskListRef, {
+        projectId: projectId,
+        name: name,
+        description: description,
+        estimatedTime: estimatedTime,
+        status: status,
+    })
+
+    return taskListRef.key
+}
+
+const deleteTaskOwners = (id, exOwnerIds) => {
+    exOwnerIds.forEach(owner => {
+        remove(ref(db, "tasks/" + id + "/owners/" + owner))
+        .catch((error) => {
+            console.log(error)
+        })
+    })
+}
+
+const deleteTaskAssignedUsers = (id, exAssignedUserIds) => {
+    exAssignedUserIds.forEach(au => {
+        remove(ref(db, "tasks/" + id + "/assignedUsers/" + au))
+        .catch((error) => {
+            console.log(error)
+        })
+    })
+}
+
+const deleteTaskFollowers = (id, exFollowerIds) => {
+    exFollowerIds.forEach(follower => {
+        remove(ref(db, "tasks/" + id + "/followers/" + follower))
+        .catch((error) => {
+            console.log(error)
+        })
+    })
+}
 /*****
  *  
  * Auth functions
@@ -278,12 +421,25 @@ const apiFunctions = {
     createNewUser,
     createNewGroup,
     createNewProject,
+    addProjectOwners,
+    addProjectMemebers,
+    addTaskAssignedUsers,
+    addTaskFollowers,
+    addTaskOwners,
     createNewTask,
     getProjectsTasks,
     getUserProjects,
     tryCreateAccount,
     trySignInAccount,
     signOutAccount,
+    updateUser,
+    updateProjectDetails,
+    deleteProjectOwners,
+    deleteProjectMembers,
+    updateTaskDetails,
+    deleteTaskAssignedUsers,
+    deleteTaskFollowers,
+    deleteTaskOwners,
     db
 };
 
