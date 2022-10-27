@@ -124,14 +124,17 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     // Create basic task
     const taskListRef = ref(db, 'tasks');
     const newTaskRef = push(taskListRef);
+    console.log(ownerIds)
     set(newTaskRef, {
         projectId: projectId,
         name: name,
         description: description,
         estimatedTime: estimatedTime,
         assignedUsers: assignedUserIds,
-        owner: ownerIds,
+        owners: ownerIds,
         status: status,
+        assignedUsers: assignedUserIds,
+        followers: followerIds
     });
 
     // // Add owner user Id's
@@ -157,13 +160,13 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     // }
 
     // Add follower user Id's
-    const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
-    const followers = []
+    // const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
+    // const followers = []
 
-    followerIds.forEach(function(child) {
-        const followerid = getUserid(child)
-        console.log("newUser: " + child + " " + followerid)
-    })
+    // followerIds.forEach(function(child) {
+    //     const followerid = getUserid(child)
+    //     console.log("newUser: " + child + " " + followerid)
+    // })
 
     return newTaskRef.key;
 
@@ -174,30 +177,6 @@ const createNewTask = function createNewTask(projectId, name, description, estim
  * Query functions
  *
 *****/
-
-// Returns project with given id
-async function getProject(id) {
-  onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
-    return snapshot.val();
-  });
-}
-
-// Returns project with given id
-const getUserid = async function getUserid(name) {
-  console.log("looking for " + name)
-  onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-
-    snapshot.forEach(function(child) {
-        const user = child.val()
-        console.log("name: " + name + " " + user.firstName + " " + user.lastName)
-        if (name === user.firstName + " " + user.lastName) {
-          console.log("returning: " + child.key + " " + name)
-          return child.key;
-        }
-    })
-})
-  console.log("error: no user found");
-}
 
 // Returns 2d array with each element as [taskKey, values]
 // call using snapshot of all tasks:
@@ -413,9 +392,7 @@ const apiFunctions = {
     createNewGroup,
     createNewProject,
     createNewTask,
-    getProject,
     getProjectsTasks,
-    getUserid,
     getUsersProjects,
     getUsersAssignedTasks,
     getUsersFollowedTasks,

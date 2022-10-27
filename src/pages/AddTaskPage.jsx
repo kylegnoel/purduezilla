@@ -23,6 +23,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { FollowTheSignsRounded } from "@mui/icons-material";
 
 const theme = createTheme();
 
@@ -30,9 +31,8 @@ const theme = createTheme();
 export default function AddTaskPage() {
     const {id} = useParams();
 
-    const [open, setOpen] = React.useState(false);
-    const [selected, setSelected] = React.useState([]);
-    const [selectedFollower, setSelectedFollower] = React.useState([]);
+    const [selected, setSelected] = useState([]);
+    const [selectedFollower, setSelectedFollower] = useState([]);
     const [name, setName] = useState('');
     const [description, setDesc] = useState('');
     const [assignee, setAssign] = useState('');
@@ -46,16 +46,6 @@ export default function AddTaskPage() {
     const [isLoading, setLoading] = useState(true);
     
     const navigate = useNavigate();
-
-    const handleClickOpen = (event) => {
-        event.preventDefault();
-        setOpen(true);
-    };
-
-    const handleClose = (event) => {
-        event.preventDefault();
-        setOpen(false);
-    };
 
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
@@ -102,27 +92,32 @@ export default function AddTaskPage() {
         event.preventDefault()
         console.log("submitted")
 
+        const followerId = ([]);
+
+        selectedFollower.forEach(function(follower) {
+            followerId.push(follower[1])
+        })
+        console.log("followers: " + followerId)
+
         let createNewTask = await apiFunctions.createNewTask(
-            null, // projectId 
+            project, // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime
-            label, // status
+            selected, // status
             owner, // ownerIds
             assignee, // assignedUserIds
-            selectedFollower, // followerIds
+            followerId, // followerIds
             )
 
         if (createNewTask) {
-            
+            console.log("task created: ");
+            alert("Task Added");
+            navigateToPage()
         } else {
-        
-            
+            console.log("failed to add task: ");
+            alert("Task Failed to Add");
         }
-        console.log("FINISHED");
-        alert("Task Added");
-        
-        navigateToDashboard()
     };
 
     const fetchData = async(event) => {
@@ -171,8 +166,8 @@ export default function AddTaskPage() {
         }
     }
 
-    const navigateToDashboard = () => {
-       // navigate('/home');
+    const navigateToPage = () => {
+        navigate('/project/'+ project);
       }
 
     return(
@@ -219,6 +214,7 @@ export default function AddTaskPage() {
                                                     onChange={selectionChangeHandler}
                                                     label="Label"
                                                     id="label"
+                                                    required
                                                     textOverflow="ellipsis"
                                                     overflow="hidden"
                                                     renderValue={(selected) => (
@@ -342,16 +338,16 @@ export default function AddTaskPage() {
                                         textOverflow="ellipsis"
                                         overflow="hidden"
                                         id="followerSelect"
-                                        renderValue={(selected) => (
+                                        renderValue={(selectedFollower) => (
                                         <div>
-                                            {selected.map((value) => (
-                                            <Chip key={value} label={value} />
+                                            {selectedFollower.map((data) => (
+                                            <Chip key={data[1]} label={data[0].firstName + " " + data[0].lastName} />
                                             ))}
                                         </div>
                                         )}
                                     >
                                         { userList && userList.length != 0 ? userList.map((data) => 
-                                                <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                <MenuItem value={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
                                     <FormHelperText>Select the team members to follow this task..</FormHelperText>

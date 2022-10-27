@@ -4,6 +4,7 @@ import LoadTasks from '../components/LoadTasks';
 import ViewTasks from '../components/TaskDashboard';
 import Activity from '../components/Activity';
 import Projects from '../components/ProjectDashboard'
+import Divider from '@mui/material/Divider';
 import { Typography } from '@mui/material';
 import '../App.css'
 
@@ -20,6 +21,7 @@ const Dashboard = () => {
                 maxWidth={'9em'}
                 marginBottom='-16px'
                 marginLeft='24px'
+                marginTop='24px'
                 noWrap
                 href=""
                 sx={{
@@ -42,6 +44,7 @@ const Dashboard = () => {
                 maxWidth={'9em'}
                 marginBottom='-16px'
                 marginLeft='24px'
+                marginTop='24px'
                 noWrap
                 href=""
                 sx={{

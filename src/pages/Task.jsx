@@ -21,6 +21,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
+import '../App.css';
+
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
@@ -56,14 +58,27 @@ const Task = () => {
             onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
                 console.log("RESULT: " + snapshot.val().name)
                     const val = snapshot.val()
-        
 
                     setName(val.name)
                     setDesc(val.description)
-                    setAssign(val.assignedUsers)
                     setHour(val.estimatedTime)
                     setLabel(val.status)
-                    setOwner(val.owners)
+
+                    //owner
+                    if (val.owner !== "") {
+                        onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
+                            setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
+                        });
+                    }
+
+                    //assignee
+                    if (val.assignedUsers !== "") {
+                        onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
+                            setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
+                        });
+                    }
+                    
+                    
                     // set project name
                     onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
                         setProject(snapshot1.val().name)
@@ -92,94 +107,123 @@ const Task = () => {
             <NavBar></NavBar>
             <ThemeProvider theme={theme}>
                 <Container component="main">
-                <Box component="form" noValidate sx={{ mt: 3 }}>        
-                    <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                    >
-                    <Box sx={{ mt: 6 }}>
-                        <Grid container spacing={2}>
-                        <Grid item xs={50} sm={12}>
-                            <Grid container spacing={2}>
+                    <Box component="form" Validate sx={{ mt: 3 }}>        
+                        <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                        >
+                            <Box sx={{ mt: 6 }}>
+                                <Grid container spacing={2}>
+                                <Grid item xs={50} sm={12}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                            autoComplete="given-name"
+                                            name="taskName"
+                                            fullWidth
+                                            id="taskName"
+                                            value={name}
+                                            disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                            autoComplete="given-name"
+                                            name="label"
+                                            fullWidth
+                                            id="label"
+                                            value={label}
+                                            disabled
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
                                 <Grid item xs={12}>
-                                    <TextField
-                                    autoComplete="given-name"
-                                    name="taskName"
-                                    fullWidth
-                                    id="taskName"
-                                    value={name}
-                                    disabled
-                                    />
+                                    <FormControl fullWidth>
+                                        <TextField
+                                                autoComplete="given-name"
+                                                name="project"
+                                                fullWidth
+                                                id="project"
+                                                value={project}
+                                                disabled
+                                                />
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                    autoComplete="given-name"
-                                    name="label"
+                                    required
                                     fullWidth
-                                    id="label"
-                                    value={label}
+                                    multiline
+                                    disabled
+                                        rows={4}
+                                    id="taskDescription"
+                                    name="taskDescription"
+                                    value={description}
+                                    />
+                                </Grid>
+                                </Grid>
+
+                                <br></br>
+                                <Divider>OWNERSHIP</Divider>
+                                <br></br>
+
+                                <TextField
+                                    autoComplete="given-name"
+                                    name="owner"
+                                    fullWidth
+                                    id="owner"
+                                    value={owner}
                                     disabled
                                     />
+
+                                <br></br>
+                                <br></br>
+                                <Divider>ASSIGN</Divider>
+                                <br></br>
+                                <TextField
+                                    autoComplete="given-name"
+                                    name="assign"
+                                    fullWidth
+                                    id="assign"
+                                    value={assignee}
+                                    disabled
+                                />
+                            </Box>
+                        </Box>
+                    </Box>
+                    <br></br>
+                    <Divider rightAlign>Comment</Divider>
+                    <Box component="form" Validate sx={{ mt: 3 }}>        
+                        <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                        >
+                            <h2>Comment</h2>
+                            <Grid container spacing={2}>
+                                <Grid item xs={50} sm={12} sx={{ mt: 6 }}>
+                                    <Grid container spacing={2}></Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                            required
+                                            fullWidth
+                                            multiline
+                                                rows={4}
+                                            id="commentbox"
+                                            name="commentbox"
+                                            value={description}
+                                            />
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <TextField
-                                        autoComplete="given-name"
-                                        name="project"
-                                        fullWidth
-                                        id="project"
-                                        value={project}
-                                        disabled
-                                        />
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                            required
-                            fullWidth
-                            multiline
-                            disabled
-                                rows={4}
-                            id="taskDescription"
-                            name="taskDescription"
-                            value={description}
-                            />
-                        </Grid>
-                        </Grid>
-
-                        <br></br>
-                        <Divider>OWNERSHIP</Divider>
-                        <br></br>
-
-                        <TextField
-                            autoComplete="given-name"
-                            name="owner"
-                            fullWidth
-                            id="owner"
-                            value={owner}
-                            disabled
-                            />
-
-                        <br></br>
-                        <br></br>
-                        <Divider>ASSIGN</Divider>
-                        <br></br>
-                        <TextField
-                            autoComplete="given-name"
-                            name="assign"
-                            fullWidth
-                            id="assign"
-                            value={owner}
-                            disabled
-                        />
+                        </Box>
                     </Box>
-                    </Box>
-                </Box>
                 </Container>
             </ThemeProvider>
             {/* <LoadTasks></LoadTasks> */}

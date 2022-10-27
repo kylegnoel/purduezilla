@@ -45,37 +45,40 @@ const Projects = () => {
 
     const fetchData = (event) => {
         setTaskListArr([])
-        console.log("fetched hello: ")
+        console.log("fetched hello: " + id)
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        try {
-            onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                const taskTemp = []
-    
-                snapshot.forEach(function(child) {
-                    const task = child.val()
-                    console.log("current value: " + task.name + " " + task.projectId + " " + id)
-                    if (task.projectId === id) {
-                        taskTemp.push([task, child.key])
-                    }
-                })
+        if ( id === null ) {
 
-                setTaskListArr(taskTemp)
-                console.log("snapshot: " + taskListarr.length + " " +  taskTemp.length)
-            })
-
-            // set project name
-            onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
-                setProject(snapshot.val().name)
-            });
-
-            if (taskListarr.length !== 0) {
-                setLoading(false)
-            }
         }
-        catch {
-            // if there is no internet
+        else {
+            try {
+                onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
+                    const taskTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const task = child.val()
+                        if (task.projectId === id) {
+                            taskTemp.push([task, child.key])
+                        }
+                    })
+    
+                    setTaskListArr(taskTemp)
+                })
+    
+                // set project name
+                onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
+                    setProject(snapshot.val().name)
+                });
+    
+                if (taskListarr.length !== 0) {
+                    setLoading(false)
+                }
+            }
+            catch {
+                // if there is no internet
+            }
         }
 
         setLoading(false)
@@ -93,7 +96,7 @@ const Projects = () => {
         }
     }
 
-    if (id === null) {
+    if (id === undefined) {
         return (
             <div>
                 <NavBar></NavBar>
@@ -105,7 +108,6 @@ const Projects = () => {
         return (
             <div> 
                 <NavBar></NavBar>
-                <AddTask></AddTask>
                 <ThemeProvider theme={theme}>
                     <Container component="main">
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
@@ -113,16 +115,16 @@ const Projects = () => {
                                 <Grid item xs={50} sm={12}>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
             flexDirection:"column",}} height={400}>
-                                        <ListSubheader>{project}</ListSubheader>
+                                        <ListSubheader><h2>{project}</h2></ListSubheader>
                                             { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                                 return (
                                                 <div key={data.key}>
-                                                <Button onClick={handleClickOpen} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
                                                             <WorkIcon color="grey"/>
                                                         </ListItemAvatar>
-                                                        <ListItemText primary={data[0].title} secondary={data[0].description}/>
+                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
                                                     </ListItem>
                                                 </Button>
                                                 <Divider />
@@ -145,6 +147,7 @@ const Projects = () => {
                 {/* <LoadTasks></LoadTasks> */}
                 </div>
         );
+        
     }
     
 }
