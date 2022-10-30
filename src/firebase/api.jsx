@@ -172,9 +172,6 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     // })
 
     return newTaskRef.key;
-
-return newTaskRef.key;
-
 }
 
 /*****
