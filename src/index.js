@@ -4,7 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import apiFunctions from './firebase/api';
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, on } from "firebase/database";
+import { orderByChild } from 'firebase/functions';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -26,24 +27,4 @@ apiFunctions.createNewTask("123", "Fix title bug", "The title is showing up twii
 apiFunctions.createNewProject("Create new tracking feature", "This feature will track work", "In progress", ["123", "456"], ["123", "456"]);
 apiFunctions.createNewGroup("Lab 268 Group", ["123", "456"], ["123", "456"]);
 */
-
-
-
-/*****
- *  
- * Example of how to read from db. Must import the following:
- *       import apiFunctions from './firebase/api';
- *       import { ref, onValue } from "firebase/database";
- * Make sure reference path is correct
- * This function returns the entire user's info
- * 
-*****/
-
-// Might have to get new one from db
-const userId = "-ND0gmr6QlvyjUcNCDCI";
-
-onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
-    const user = snapshot.val();
-    // Do whatever with data here
-  });
 
