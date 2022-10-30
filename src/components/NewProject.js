@@ -113,7 +113,7 @@ export default function NewProject() {
     return(
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xm">
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                 <h2 align='center' 
                 sx={{
                     marginTop:10,

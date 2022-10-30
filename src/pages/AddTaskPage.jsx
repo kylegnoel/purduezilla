@@ -175,7 +175,7 @@ export default function AddTaskPage() {
             <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
                     <Container component="main" maxWidth="sm">
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                         <DialogTitle align='center' 
                         sx={{
                             marginTop:-4,

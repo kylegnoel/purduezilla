@@ -183,7 +183,7 @@ export default function AddTask() {
                 </Button>
                 <Dialog open={open}  onClose={handleClose}>
                     <DialogContent>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
                                 marginTop:-4,

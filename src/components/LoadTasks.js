@@ -157,7 +157,7 @@ export default function LoadTasks() {
 
                     <Dialog open={open}  onClose={handleClose}>
                     <DialogContent>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
                                 marginTop:0,
