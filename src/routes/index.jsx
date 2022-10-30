@@ -10,6 +10,9 @@ import Projects from '../pages/Projects';
 import PrivateRoute from './PrivateRoute';
 import apiFunctions from '../firebase/api';
 import NewProject from '../pages/NewProject';
+import Task from '../pages/Task';
+import AddTaskPage from '../pages/AddTaskPage';
+import AddProjectPage from '../pages/AddTaskPage';
 
 const Routing = props => {
     const isLoggedIn = apiFunctions.auth.currentUser != null;
@@ -22,6 +25,10 @@ const Routing = props => {
                 <Route exact path="/project" element={<Projects />} />
                 <Route exact path="/newproject" element={<NewProject />} />
                 <Route exact path="*" element={<NotFound />} />
+                <Route exact path="/project/:id" element={<Projects />} />
+                <Route exact path="/task/:id" element={<Task />} />
+                <Route exact path="/newtask" element={<AddTaskPage />} />
+                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
             </Routes>
         </Router>
     );

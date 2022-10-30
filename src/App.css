@@ -39,3 +39,9 @@
 .flex-child:first-child {
   margin-right: 20px;
 } 
+
+.h2 {
+  text-align: left;
+  color: #282c34;
+  font: 'monospace',
+}

@@ -125,46 +125,54 @@ const createNewProject = function createNewProject(name, description, status, me
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
 const createNewTask = function createNewTask(projectId, name, description, estimatedTime, status, ownerIds, assignedUserIds, followerIds) {
 
-  // Create basic task
-  const taskListRef = ref(db, 'tasks');
-  const newTaskRef = push(taskListRef);
-  set(newTaskRef, {
-    projectId: projectId,
-    name: name,
-    description: description,
-    estimatedTime: estimatedTime,
-    status: status,
-  });
-
-  // Add owner user Id's
-  const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
-  for (const i in ownerIds) {
-    const userRef = push(ownersListRef);
-    set(userRef, {
-      userId: ownerIds[i]
+    // Create basic task
+    const taskListRef = ref(db, 'tasks');
+    const newTaskRef = push(taskListRef);
+    console.log(ownerIds)
+    set(newTaskRef, {
+        projectId: projectId,
+        name: name,
+        description: description,
+        estimatedTime: estimatedTime,
+        assignedUsers: assignedUserIds,
+        owners: ownerIds,
+        status: status,
+        assignedUsers: assignedUserIds,
+        followers: followerIds
     });
-  }
 
-  // Add assigned user Id's
-  const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
-  for (const i in assignedUserIds) {
-    const userRef = push(assignedUserListRef);
-    set(userRef, {
-      userId: assignedUserIds[i]
-    });
-  }
+    // // Add owner user Id's
+    // const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
+    // const userRef = push(ownersListRef);
+    // set(userRef, {
+    //   userId: ownerIds[i]
+    // });
+    // for (const i in ownerIds) {
+    //     const userRef = push(ownersListRef);
+    //     set(userRef, {
+    //         userId: ownerIds[i]
+    //     });
+    // }
 
-  // Add follower user Id's
-  const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
-  for (const i in followerIds) {
-    const userRef = push(followersListRef);
-    set(userRef, {
-      userId: followerIds[i]
-    });
-  }
+    // Add assigned user Id's
+    // const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
+    // for (const i in assignedUserIds) {
+    //     const userRef = push(assignedUserListRef);
+    //     set(userRef, {
+    //         userId: assignedUserIds[i]
+    //     });
+    // }
 
-  return newTaskRef.key;
+    // Add follower user Id's
+    // const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
+    // const followers = []
 
+    // followerIds.forEach(function(child) {
+    //     const followerid = getUserid(child)
+    //     console.log("newUser: " + child + " " + followerid)
+    // })
+
+    return newTaskRef.key;
 }
 
 /*****

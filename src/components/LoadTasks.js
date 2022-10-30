@@ -28,6 +28,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
+import {Route, Link, Routes, useParams} from 'react-router-dom';
+
 const theme = createTheme();
 
 export default function LoadTasks() {
@@ -155,7 +157,7 @@ export default function LoadTasks() {
 
                     <Dialog open={open}  onClose={handleClose}>
                     <DialogContent>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
                                 marginTop:0,
