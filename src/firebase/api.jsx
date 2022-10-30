@@ -139,6 +139,7 @@ const createNewTask = function createNewTask(projectId, name, description, estim
         status: status,
         assignedUsers: assignedUserIds,
         followers: followerIds
+    });
 
     // // Add owner user Id's
     // const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
