@@ -82,9 +82,76 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
       userId: memberIds[i]
     });
   }
-
   return newGroupRef.key;
+}
+//create new comments
+const createNewComment = function createNewComment(body, authorKey, taskKey, taggedKeys) {
+  const taskRef = ref(db, `tasks/${taskKey}/comments`);
+  const newCommentRef = push(taskRef);
+  set(newCommentRef, {
+    body: body,
+    author: authorKey,
+  });
 
+  let newRef;
+  let userRef;
+  const userRefList = ref(db, 'users/');
+  let userRefObjects = {};
+  onValue(userRefList, (snapshot) => {
+    let child1 = snapshot.val();
+    for (var key in child1) {
+      userRefObjects[child1[key].email] = key;
+    }
+  })
+
+
+  taggedKeys.forEach(function (key) {
+    if (userRefObjects[key]) {
+      userRef = ref(db, `users/${key}/tagged`);
+      newRef = push(userRef);
+      set(newRef, {
+        taskKey: taskKey,
+        commentKey: newCommentRef.key,
+        author: authorKey,
+        body: body
+      });
+    }
+  });
+
+
+  return { body: body, author: authorKey };
+}
+
+//get the comments for a task
+const getTaskComments = function getTaskComments(taskKey) {
+  // console.log("called function " + taskKey);
+  const taskRef = ref(db, `tasks/${taskKey}/comments/`);
+  // console.log("called function pt2");
+  const returnedTasks = [];
+  // console.log("iterate");
+  onValue(taskRef, (snapshot) => {
+    let child = snapshot.val();
+    for (var key in child) {
+      returnedTasks.push(child[key]);
+    }
+  });
+  // console.log("finish getting nothing");
+  // console.log(returnedTasks);
+  return returnedTasks;
+
+}
+
+//returns comment key, task key, and body for comments that have tagged the user
+const getTaggedComments = function getTaggedComments(userKey) {
+  const returnedComments = []
+  const commentRef = ref(db, `users/${userKey}/tagged/`);
+  onValue(commentRef, (snapshot) => {
+    let child = snapshot.val();
+    for (var key in child) {
+      returnedComments.push(child[key]);
+    }
+  })
+  return returnedComments;
 }
 
 // Create new project
@@ -133,21 +200,55 @@ const addProjectMemebers = (id, memberIds) => {
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
 const createNewTask = function createNewTask(projectId, name, description, estimatedTime, status, ownerIds, assignedUserIds, followerIds) {
 
-    // Create basic task
-    const taskListRef = ref(db, 'tasks');
-    const newTaskRef = push(taskListRef);
-    console.log(ownerIds)
-    set(newTaskRef, {
-        projectId: projectId,
-        name: name,
-        description: description,
-        estimatedTime: estimatedTime,
-        assignedUsers: assignedUserIds,
-        owners: ownerIds,
-        status: status,
-        assignedUsers: assignedUserIds,
-        followers: followerIds
-    });
+  // Create basic task
+  const taskListRef = ref(db, 'tasks');
+  const newTaskRef = push(taskListRef);
+  console.log(ownerIds)
+  set(newTaskRef, {
+    projectId: projectId,
+    name: name,
+    description: description,
+    estimatedTime: estimatedTime,
+    assignedUsers: assignedUserIds,
+    owners: ownerIds,
+    status: status,
+    assignedUsers: assignedUserIds,
+    followers: followerIds
+  });
+
+
+  // // Add owner user Id's
+  // const ownersListRef = ref(db, 'tasks/' + newTaskRef.key + '/owners');
+  // const userRef = push(ownersListRef);
+  // set(userRef, {
+  //   userId: ownerIds[i]
+  // });
+  // for (const i in ownerIds) {
+  //     const userRef = push(ownersListRef);
+  //     set(userRef, {
+  //         userId: ownerIds[i]
+  //     });
+  // }
+
+  // Add assigned user Id's
+  // const assignedUserListRef = ref(db, 'tasks/' + newTaskRef.key + '/assignedUsers');
+  // for (const i in assignedUserIds) {
+  //     const userRef = push(assignedUserListRef);
+  //     set(userRef, {
+  //         userId: assignedUserIds[i]
+  //     });
+  // }
+
+  // Add follower user Id's
+  // const followersListRef = ref(db, 'tasks/' + newTaskRef.key + '/followers');
+  // const followers = []
+
+  // followerIds.forEach(function(child) {
+  //     const followerid = getUserid(child)
+  //     console.log("newUser: " + child + " " + followerid)
+  // })
+
+  // return newTaskRef.key;
 
     // Add owner user Id's
     addTaskOwners(newTaskRef.key, ownerIds)
@@ -190,6 +291,7 @@ const addTaskFollowers = (taskId, followerIds) => {
             userId: followerIds[i]
         });
     }
+
 }
 
 /*****
@@ -531,6 +633,7 @@ const signOutAccount = () => {
 //context stuff
 
 const FirebaseAuthContext = React.createContext();
+const FireBaseDispatchContext = React.createContext();
 
 const FirebaseAuthProvider = ({ children }) => {
   const [user, setUser] = React.useState(null);
@@ -540,24 +643,32 @@ const FirebaseAuthProvider = ({ children }) => {
     //const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("poopo");
-        console.log(user);
-        console.log("find user");
+        // console.log("poopo");
+        // console.log(user);
+        // console.log("find user");
         const searcher = user.email;
         const userListRef = ref(db, 'users');
         onValue(userListRef, (snapshot) => {
           snapshot.forEach(function (child) {
             const printing = child.val();
+            console.log("key");
+            console.log(child.key);
             // console.log(printing.email);
             // console.log(searcher);
             // console.log(printing.email === searcher);
             if (printing.email === searcher) {
-              setUser(printing);
+              const saved = {
+                info: {
+                  email: printing.email,
+                  firstName: printing.firstName,
+                  profileDescription: printing.profileDescription,
+                  notificationSetting: printing.notificationSetting
+                }, key: child.key
+              };
+              setUser(saved);
             }
           })
         });
-        console.log("set user: ");
-        console.log(user);
       }
       else {
         setUser(null);
@@ -567,7 +678,9 @@ const FirebaseAuthProvider = ({ children }) => {
 
   return (
     <FirebaseAuthContext.Provider value={{ user }}>
-      {children}
+      <FireBaseDispatchContext.Provider value={setUser}>
+        {children}
+      </FireBaseDispatchContext.Provider>
     </FirebaseAuthContext.Provider>
   );
 };
@@ -579,12 +692,18 @@ function useFirebaseAuth() {
       "useFirebaseAuth must be used within a FirebaseAuthProvider"
     );
   }
-  console.log("haha");
-  console.log(context);
+  //console.log("haha");
+  //console.log(context);
   return context.user;
 }
 
-
+function useFirebaseDispatch() {
+  const context = React.useContext(FireBaseDispatchContext);
+  if (context === undefined) {
+    throw new Error('dispatch must be used within Firebase Dispatch');
+  }
+  return context;
+}
 
 
 //wrap all functions up to export all at the same time
@@ -619,7 +738,8 @@ const apiFunctions = {
     deleteTaskOwners,
   db,
   app,
-  FirebaseAuthProvider, useFirebaseAuth,
+  FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,
+  getTaskComments, getTaggedComments, createNewComment,
   auth
 };
 
