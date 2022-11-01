@@ -112,7 +112,7 @@ const createNewProject = function createNewProject(name, description, status, me
  */
 const addProjectOwners = (id, ownerIds) => {
     const ownersListRef = ref(db, 'projects/' + id + '/owners');
-    push().setValue()
+    set(ownersListRef, ownerIds)
 }
 
 /**
