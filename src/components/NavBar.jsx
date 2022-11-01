@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, useNavigate } from "react-router-dom";
+import apiFunctions from '../firebase/api';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,6 +16,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
+
 import Logo from './purduezilla.png';
 
 const pages = ['Login', 'Teams'];
@@ -23,6 +25,8 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -39,13 +43,21 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
+  const handleButtonClick = (setting) => {
+    setAnchorElUser(null);
+    if (setting == 'Logout') {
+      apiFunctions.signOutAccount();
+      navigate('/');
+    }
+  }
+
   return (
     <AppBar position="static" style={{ background: '#CFB991' }}>
-      
+
       <Container maxWidth="xl">
-        
+
         <Toolbar disableGutters>
-        <Typography 
+          <Typography
             component={Link} to="/home"
             variant="h5"
             maxWidth={'9em'}
@@ -53,7 +65,7 @@ const ResponsiveAppBar = () => {
             href=""
             sx={{
               mr: 2,
-              display: { xs: 'flex'},
+              display: { xs: 'flex' },
               flexGrow: 1,
               fontFamily: 'monospace',
               fontWeight: 700,
@@ -64,8 +76,8 @@ const ResponsiveAppBar = () => {
           >
             PURDUEZILLA
           </Typography>
-        
-        <a href='/home'><img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }}/></a>
+
+          <a href='/home'><img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }} /></a>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -125,7 +137,7 @@ const ResponsiveAppBar = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <MenuItem component={Link} to="/project"><h1>
-                <Typography textAlign="center">Projects</Typography></h1>
+              <Typography textAlign="center">Projects</Typography></h1>
             </MenuItem>
           </Box>
 
@@ -152,7 +164,7 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}

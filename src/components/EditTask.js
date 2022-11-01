@@ -58,7 +58,7 @@ export default function EditTask() {
                 </Button>
                 <Dialog open={open}  onClose={handleClose}>
                     <DialogContent component="form" onSubmit={handleSubmit}>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
                                 marginTop:0,
@@ -71,7 +71,7 @@ export default function EditTask() {
                                     alignItems: 'center',
                                 }}
                                 >
-                                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 6 }}>
+                                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 6 }}>
                                     <Grid container spacing={2}>
                                     <Grid item xs={50} sm={12}>
                                         <Grid container spacing={2}>
