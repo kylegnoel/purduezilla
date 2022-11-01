@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Route, Link, Routes, useParams} from 'react-router-dom'; 
+import { Route, Link, Routes, useParams } from 'react-router-dom';
 
 import NavBar from '../components/NavBar';
 import AddTask from '../components/AddTask';
@@ -27,13 +27,13 @@ import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
 const Task = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     console.log("parameters: " + id);
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    
+
     const [name, setName] = useState('');
     const [description, setDesc] = useState('');
     const [assignee, setAssign] = useState('');
@@ -43,11 +43,32 @@ const Task = () => {
     const [project, setProject] = useState('');
     const [projectList, setProjectList] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [newCommentBody, setNewCommentBody] = useState('');
+    // const [taggingBody, setTaggingBody] = useState('');
+
+    const user = apiFunctions.useFirebaseAuth();
 
     useEffect(() => {
-        console.log("reload")
-        fetchData()
+        console.log("reload");
+        fetchData();
     }, []);
+
+    const newCommentSubmit = (event) => {
+        event.preventDefault();
+        if (newCommentBody == '') {
+            return;
+        }
+        let tagged = [];
+        let splitComment = newCommentBody.split(" ");
+        splitComment.forEach((word) => {
+            if (word.charAt(0) == '#') {
+                tagged.push(word);
+            }
+        });
+        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
+        setComments([...comments, newAdded]);
+    };
 
     const fetchData = (event) => {
         console.log("fetched hello: ")
@@ -57,41 +78,46 @@ const Task = () => {
         try {
             onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
                 console.log("RESULT: " + snapshot.val().name)
-                    const val = snapshot.val()
+                const val = snapshot.val()
 
-                    setName(val.name)
-                    setDesc(val.description)
-                    setHour(val.estimatedTime)
-                    setLabel(val.status)
+                setName(val.name)
+                setDesc(val.description)
+                setHour(val.estimatedTime)
+                setLabel(val.status)
 
-                    //owner
-                    if (val.owner !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
-                            setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
-                        });
-                    }
-
-                    //assignee
-                    if (val.assignedUsers !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
-                            setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
-                        });
-                    }
-                    
-                    
-                    // set project name
-                    onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
-                        setProject(snapshot1.val().name)
+                //owner
+                if (val.owner !== "") {
+                    onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
+                        setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
                     });
+                }
 
-                    setUserList(val.description)
+                //assignee
+                if (val.assignedUsers !== "") {
+                    onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
+                        setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
+                    });
+                }
 
-                    console.log(name)
 
-            })
+                // set project name
+                onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
+                    setProject(snapshot1.val().name)
+                });
+
+                setUserList(val.description)
+
+                //console.log(name)
+
+            });
             if (taskListarr.length !== 0) {
                 setLoading(false)
             }
+            //fetch comments as well
+            const settingComments = apiFunctions.getTaskComments(id);
+            console.log("set commnets");
+            console.log(settingComments);
+            setComments(settingComments);
         }
         catch {
             // if there is no internet
@@ -103,68 +129,68 @@ const Task = () => {
     };
 
     return (
-        <div> 
+        <div>
             <NavBar></NavBar>
             <ThemeProvider theme={theme}>
                 <Container component="main">
-                    <Box component="form" Validate sx={{ mt: 3 }}>        
+                    <Box component="form" Validate sx={{ mt: 3 }}>
                         <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
                         >
                             <Box sx={{ mt: 6 }}>
                                 <Grid container spacing={2}>
-                                <Grid item xs={50} sm={12}>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                            autoComplete="given-name"
-                                            name="taskName"
-                                            fullWidth
-                                            id="taskName"
-                                            value={name}
-                                            disabled
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                            autoComplete="given-name"
-                                            name="label"
-                                            fullWidth
-                                            id="label"
-                                            value={label}
-                                            disabled
-                                            />
+                                    <Grid item xs={50} sm={12}>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12}>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="taskName"
+                                                    fullWidth
+                                                    id="taskName"
+                                                    value={name}
+                                                    disabled
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="label"
+                                                    fullWidth
+                                                    id="label"
+                                                    value={label}
+                                                    disabled
+                                                />
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <TextField
+                                    <Grid item xs={12}>
+                                        <FormControl fullWidth>
+                                            <TextField
                                                 autoComplete="given-name"
                                                 name="project"
                                                 fullWidth
                                                 id="project"
                                                 value={project}
                                                 disabled
-                                                />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                    required
-                                    fullWidth
-                                    multiline
-                                    disabled
-                                        rows={4}
-                                    id="taskDescription"
-                                    name="taskDescription"
-                                    value={description}
-                                    />
-                                </Grid>
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            multiline
+                                            disabled
+                                            rows={4}
+                                            id="taskDescription"
+                                            name="taskDescription"
+                                            value={description}
+                                        />
+                                    </Grid>
                                 </Grid>
 
                                 <br></br>
@@ -178,7 +204,7 @@ const Task = () => {
                                     id="owner"
                                     value={owner}
                                     disabled
-                                    />
+                                />
 
                                 <br></br>
                                 <br></br>
@@ -197,28 +223,41 @@ const Task = () => {
                     </Box>
                     <br></br>
                     <Divider rightAlign>Comment</Divider>
-                    <Box component="form" Validate sx={{ mt: 3 }}>        
+                    <Box component="form" Validate sx={{ mt: 3 }}>
                         <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
                         >
                             <h2>Comment</h2>
+                            {comments.map((comment) => (
+                                < div >
+                                    <p> author key: {comment.author}</p>
+                                    <p>body: {comment.body}</p>
+                                </div>
+                            ))}
+
+
                             <Grid container spacing={2}>
                                 <Grid item xs={50} sm={12} sx={{ mt: 6 }}>
                                     <Grid container spacing={2}></Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
+                                    <Grid item xs={12}>
+                                        <TextField
                                             required
                                             fullWidth
                                             multiline
-                                                rows={4}
+                                            rows={4}
                                             id="commentbox"
                                             name="commentbox"
-                                            value={description}
-                                            />
+                                            value={newCommentBody}
+                                            onChange={(e) => setNewCommentBody(e.target.value)}
+                                        />
+                                        <br></br>
+                                        <button onClick={newCommentSubmit}> new Comment </button>
+                                        <br></br>
+                                        <br></br>
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -227,7 +266,7 @@ const Task = () => {
                 </Container>
             </ThemeProvider>
             {/* <LoadTasks></LoadTasks> */}
-            </div>
+        </div >
     );
 }
 
