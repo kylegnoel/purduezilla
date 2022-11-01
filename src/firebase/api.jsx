@@ -57,7 +57,7 @@ const createNewUser = function createNewUser(email, firstName, lastName, profile
 }
 
 // Create new group
-const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
+const createNewGroup = function createNewGroup(name, memberIds, ownerIds, projectIds) {
 
   const groupListRef = ref(db, 'groups');
   const newGroupRef = push(groupListRef);
@@ -66,24 +66,47 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds) {
   });
 
   // Add owner user Id's
-  const ownersListRef = ref(db, 'groups/' + newGroupRef.key + '/owners');
   for (const i in ownerIds) {
-    const userRef = push(ownersListRef);
-    set(userRef, {
-      userId: ownerIds[i]
-    });
+    addNewOwnerToGroup(newGroupRef.key, ownerIds[i])
   }
 
   // Add member user Id's
-  const memberListRef = ref(db, 'groups/' + newGroupRef.key + '/members');
   for (const i in memberIds) {
-    const userRef = push(memberListRef);
-    set(userRef, {
-      userId: memberIds[i]
-    });
+    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
   }
+
+  // Add member user Id's
+  for (const i in projectIds) {
+    addNewProjectToGroup(newGroupRef.key, projectIds[i]);
+  }
+
   return newGroupRef.key;
 }
+
+const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
+  const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
+  const userRef = push(ownersListRef);
+  set(userRef, {
+    userId: userId
+  });  
+}
+
+const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
+  const membersListRef = ref(db, 'groups/' + groupKey + '/members');
+  const userRef = push(membersListRef);
+  set(userRef, {
+    userId: userId
+  });  
+}
+
+const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId) {
+  const ownersListRef = ref(db, 'groups/' + groupKey + '/projects');
+  const projectRef = push(ownersListRef);
+  set(projectRef, {
+    projectId: projectId
+  });  
+}
+
 //create new comments
 const createNewComment = function createNewComment(body, authorKey, taskKey, taggedKeys) {
   const taskRef = ref(db, `tasks/${taskKey}/comments`);
@@ -301,87 +324,116 @@ const addTaskFollowers = (taskId, followerIds) => {
 *****/
 
 // Returns 2d array with each element as [taskKey, values]
-// call using snapshot of all tasks:
-//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
-// getProjectsTasks(projectId, snapshot)
-//  });
-const getProjectsTasks = function getProjectsTasks(projectId, snapshot) {
+const getProjectsTasks = function getProjectsTasks(projectId) {
   const tasksInProject = []
 
-  snapshot.forEach(function (childSnapshot) {
-    if (childSnapshot.val().projectId == projectId) {
-      // Keep track of task key and task's values
-      tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
-    }
-  })
+  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      if (childSnapshot.val().projectId == projectId) {
+        // Keep track of task key and task's values
+        tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
+      }
+    })
+  });
 
   return tasksInProject;
 }
 
 // Returns 2d array with each element as [projectKey, values]
-// call using snapshot of all projects:
-//  onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
-// getUsersProjects(userId, snapshot)
-//  });
-const getUsersProjects = function getUsersProjects(userId, snapshot) {
+const getUsersProjects = function getUsersProjects(userId) {
   const usersProjects = []
 
-  snapshot.forEach(function (projectSnapshot) {
-    onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
-      snapshot2.forEach(function (memberSnapshot) {
-        if (memberSnapshot.val().userId == userId) {
-          // Keep track of key and values
-          usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
-        }
+  onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
+    snapshot.forEach(function (projectSnapshot) {
+      onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
+        snapshot2.forEach(function (memberSnapshot) {
+          if (memberSnapshot.val().userId == userId) {
+            // Keep track of key and values
+            usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
+          }
+        });
       });
-    });
-  })
+    })  
+  });
 
   return usersProjects;
 }
 
 // Returns 2d array with each element as [taskKey, values]
-// call using snapshot of all tasks:
-//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
-// getUsersAssignedTasks(userId, snapshot)
-//  });
-const getUsersAssignedTasks = function getUsersAssignedTasks(userId, snapshot) {
+const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
   const usersAssignedTasks = []
 
-  snapshot.forEach(function (taskSnapshot) {
-    onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
-      snapshot2.forEach(function (userSnapshot) {
-        if (userSnapshot.val().userId == userId) {
-          // Keep track of key and values
-          usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
-        }
+  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+    snapshot.forEach(function (taskSnapshot) {
+      onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
+        snapshot2.forEach(function (userSnapshot) {
+          if (userSnapshot.val().userId == userId) {
+            // Keep track of key and values
+            usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+          }
+        });
       });
-    });
-  })
+    })
+  });
 
   return usersAssignedTasks;
 }
 
 // Returns 2d array with each element as [taskKey, values]
-// call using snapshot of all tasks:
-//  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
-// getUsersFollowedTasks(userId, snapshot)
-//  });
-const getUsersFollowedTasks = function getUsersFollowedTasks(userId, snapshot) {
+const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
   const usersFollowedTasks = []
 
-  snapshot.forEach(function (taskSnapshot) {
-    onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
-      snapshot2.forEach(function (userSnapshot) {
-        if (userSnapshot.val().userId == userId) {
-          // Keep track of key and values
-          usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
-        }
+  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+    snapshot.forEach(function (taskSnapshot) {
+      onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
+        snapshot2.forEach(function (userSnapshot) {
+          if (userSnapshot.val().userId == userId) {
+            // Keep track of key and values
+            usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+          }
+        });
       });
-    });
-  })
+    })
+  });
 
   return usersFollowedTasks;
+}
+
+// Returns 2d array with each element as [projectKey, values]
+const getGroupsProjects = function getGroupsProjects(groupId) {
+  const groupsProjects = []
+
+  onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      groupsProjects.push([childSnapshot.key, childSnapshot.val()]);
+    })
+  });
+
+  return groupsProjects;
+}
+
+const getUserById = function getUserById(userId) {
+  const userInfo = []
+
+  onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
+    userInfo.push([userId, snapshot.val()]);
+  });
+
+  return userInfo;
+}
+
+const getUserByEmail = function getUserByEmail(email) {
+  const userInfo = []
+
+  onValue(ref(apiFunctions.db, 'users'), (snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      if (childSnapshot.val().email == email) {
+        userInfo.push([childSnapshot.key, childSnapshot.val()]);
+      }
+    })
+  });
+
+  return userInfo;
 }
 
 // Returns T/F
@@ -711,31 +763,36 @@ function useFirebaseDispatch() {
 const apiFunctions = {
   createNewUser,
   createNewGroup,
+  addNewOwnerToGroup,
+  addNewProjectToGroup,
   createNewProject,
-    addProjectOwners,
-    addProjectMemebers,
-    addTaskAssignedUsers,
-    addTaskFollowers,
-    addTaskOwners,
+  addProjectOwners,
+  addProjectMemebers,
+  addTaskAssignedUsers,
+  addTaskFollowers,
+  addTaskOwners,
   createNewTask,
+  getGroupsProjects,
   getProjectsTasks,
   getUsersProjects,
   getUsersAssignedTasks,
   getUsersFollowedTasks,
+  getUserById,
+  getUserByEmail,
   isTaskOwner,
   isGroupOwner,
   isProjectOwner,
   tryCreateAccount,
   trySignInAccount,
   signOutAccount,
-    updateUser,
-    updateProjectDetails,
-    deleteProjectOwners,
-    deleteProjectMembers,
-    updateTaskDetails,
-    deleteTaskAssignedUsers,
-    deleteTaskFollowers,
-    deleteTaskOwners,
+  updateUser,
+  updateProjectDetails,
+  deleteProjectOwners,
+  deleteProjectMembers,
+  updateTaskDetails,
+  deleteTaskAssignedUsers,
+  deleteTaskFollowers,
+  deleteTaskOwners,
   db,
   app,
   FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,
