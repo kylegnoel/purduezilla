@@ -62,34 +62,27 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds, projec
   const groupListRef = ref(db, 'groups');
   const newGroupRef = push(groupListRef);
   set(newGroupRef, {
-    name: name
+    name: name,
+    members: memberIds,
+    owners: ownerIds
   });
 
   // Add owner user Id's
-  for (const i in ownerIds) {
-    addNewOwnerToGroup(newGroupRef.key, ownerIds[i])
+  // const ownersListRef = ref(db, 'groups/' + newGroupRef.key + '/owners');
+  // for (const i in ownerIds) {
+  //   const userRef = push(ownersListRef);
+  //   set(userRef, {
+  //     userId: ownerIds[i]
+  //   });
+  // }
+
+  const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
+    const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
+    const userRef = push(ownersListRef);
+    set(userRef, {
+      userId: userId
+    });
   }
-
-  // Add member user Id's
-  for (const i in memberIds) {
-    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
-  }
-
-  // Add member user Id's
-  for (const i in projectIds) {
-    addNewProjectToGroup(newGroupRef.key, projectIds[i]);
-  }
-
-  return newGroupRef.key;
-}
-
-const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
-  const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
-  const userRef = push(ownersListRef);
-  set(userRef, {
-    userId: userId
-  });
-}
 
 const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
   const membersListRef = ref(db, 'groups/' + groupKey + '/members');
@@ -344,6 +337,7 @@ const addProjectHistoryEvent = (projectId, description) => {
  * Query functions
  *
 *****/
+
 
 // Returns 2d array with each element as [taskKey, values]
 const getProjectsTasks = function getProjectsTasks(projectId) {
@@ -773,9 +767,6 @@ const FirebaseAuthProvider = ({ children }) => {
     //const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // console.log("poopo");
-        // console.log(user);
-        // console.log("find user");
         const searcher = user.email;
         const userListRef = ref(db, 'users');
         onValue(userListRef, (snapshot) => {

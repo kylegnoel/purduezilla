@@ -33,10 +33,11 @@ export default function ProjectDashboard() {
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
             console.log("eventid: " + event.currentTarget.id)
-            navigate('/project/'+event.currentTarget.id);
+            window.location.href='/project/'+event.currentTarget.id;
+            //window.location.reload()
         }
         else {
-            navigate('/newproject');
+            window.location.href='/newproject/';
         }
     }
 
@@ -79,7 +80,7 @@ export default function ProjectDashboard() {
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12} lg={'50%'}>
-                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
+                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                             return (  
@@ -89,7 +90,7 @@ export default function ProjectDashboard() {
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[0].name}/>
+                                                    <ListItemText primary={data[0].name} secondary="Content was changed"/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />

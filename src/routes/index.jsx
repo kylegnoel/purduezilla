@@ -13,6 +13,8 @@ import NewProject from '../pages/NewProject';
 import Task from '../pages/Task';
 import AddTaskPage from '../pages/AddTaskPage';
 import AddProjectPage from '../pages/AddTaskPage';
+import NewGroup from '../pages/NewGroup';
+import Groups from '../pages/Groups';
 
 const Routing = props => {
     const isLoggedIn = apiFunctions.auth.currentUser != null;
@@ -22,13 +24,16 @@ const Routing = props => {
                 <Route exact path="/" element={<Login />} />
                 <Route exact path="/home" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><Dashboard /></PrivateRoute>} />
                 <Route exact path="/register" element={<Register />} />
-                <Route exact path="/project" element={<Projects />} />
+                <Route exact path="/myprojects" element={<Projects />} />
                 <Route exact path="/newproject" element={<NewProject />} />
+                <Route exact path="/newgroup" element={<NewGroup />} />
+                <Route exact path="/group/:id" element={<Groups />} />
+                <Route exact path="/mygroups" element={<Groups />} />
                 <Route exact path="*" element={<NotFound />} />
-                <Route exact path="/project/:id" element={<Projects />} />
+                <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
                 <Route exact path="/task/:id" element={<Task />} />
                 <Route exact path="/newtask" element={<AddTaskPage />} />
-                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
+                <Route exact path="/mytasks" element={<Task />} />
             </Routes>
         </Router>
     );
