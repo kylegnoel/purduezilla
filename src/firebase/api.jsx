@@ -88,7 +88,7 @@ const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
   const userRef = push(ownersListRef);
   set(userRef, {
     userId: userId
-  });  
+  });
 }
 
 const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
@@ -141,7 +141,6 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
     }
   });
 
-
   return { body: body, author: authorKey };
 }
 
@@ -189,11 +188,15 @@ const createNewProject = function createNewProject(name, description, status, me
     status: status
   });
 
-    // Add owner user Id's
-    addProjectOwners(newProjectRef.key, ownerIds)
+  // Add owner user Id's
+  for (const i in ownerIds) {
+    addProjectOwner(newProjectRef.key, ownerIds[i])
+  }
 
-    // Add member user Id's
-    addProjectMemebers(newProjectRef.key, memberIds)
+  // Add member user Id's
+  for (const i in memberIds) {
+    addProjectMember(newProjectRef.key, memberIds[i]);
+  }
 
   return newProjectRef.key;
 
@@ -202,19 +205,22 @@ const createNewProject = function createNewProject(name, description, status, me
 /**
  * Adds a list of people as owner of a project
  * @param {*} id of a project
- * @param {*} ownerIds 
+ * @param {*} ownerId 
  */
-const addProjectOwners = (id, ownerIds) => {
+const addProjectOwner = (id, ownerId) => {
     const ownersListRef = ref(db, 'projects/' + id + '/owners');
-    set(ownersListRef, ownerIds)
+    const userRef = push(ownersListRef);
+    set(userRef, {
+        userId: ownerId
+    });
 }
 
 /**
  * Adds a list of people as members of a project
  * @param {*} id 
- * @param {*} memberIds 
+ * @param {*} memberId 
  */
-const addProjectMemebers = (id, memberIds) => {
+const addProjectMember = (id, memberIds) => {
     const memberListRef = ref(db, 'projects/' + id + '/members');
     set(memberListRef, memberIds)
 }
@@ -315,6 +321,22 @@ const addTaskFollowers = (taskId, followerIds) => {
         });
     }
 
+}
+
+const addTaskHistoryEvent = (taskId, description) => {
+  const ref = ref(db, 'tasks/' + taskId + '/history');
+  const newHistoryRef = push(ref);
+    set(newHistoryRef, {
+      description: description
+    });
+}
+
+const addProjectHistoryEvent = (projectId, description) => {
+  const ref = ref(db, 'projects/' + projectId + '/history');
+  const newHistoryRef = push(ref);
+    set(newHistoryRef, {
+      description: description
+    });
 }
 
 /*****
@@ -502,7 +524,7 @@ const isGroupOwner = function isGroupOwner(userId, groupId) {
  * @param {*} notificationSetting 
  * @returns the id of the updated user
  */
-const updateUser = (id, email, firstName, lastName, profileDescription = "", notificationSetting = "") => {
+const updateUser = (id, email, firstName, lastName, profileDescription, notificationSetting = "") => {
     const userListRef = ref(db, 'users/' + id);
     update(userListRef, {
         email: email,
@@ -525,6 +547,24 @@ const updateUser = (id, email, firstName, lastName, profileDescription = "", not
  */
 const updateProjectDetails = (id, name, description, status) => {
     const projectListRef = ref(db, 'projects/' + id);
+
+    onValue(projectListRef, (snapshot) => {
+        const oldName = snapshot.val().name;
+        if (oldName != name) {
+        const historyDescription = "Name updated.\nDate: " + new Date() + "\nPrevious name: " + oldName;
+            addProjectHistoryEvent(id, historyDescription);
+        }
+        const oldDescription = snapshot.val().description;
+        if (oldDescription != description) {
+        const historyDescription = "Description updated.\nDate: " + new Date() + "\nPrevious description: " + oldDescription;
+            addProjectHistoryEvent(id, historyDescription);
+        }
+        const oldStatus = snapshot.val().status;
+        if (oldStatus != status) {
+        const historyDescription = "Status updated.\nDate: " + new Date() + "\nPrevious status: " + oldStatus;
+            addProjectHistoryEvent(id, historyDescription);
+        }
+    });
 
     update(projectListRef, {
         name: name,
@@ -575,6 +615,24 @@ const deleteProjectMembers = (id, exMemberIds) => {
  */
 const updateTaskDetails = (id, projectId, name, description, estimatedTime, status) => {
     const taskListRef = ref(db, 'tasks/'  + id);
+
+    onValue(taskListRef, (snapshot) => {
+        const oldName = snapshot.val().name;
+        if (oldName != name) {
+        const historyDescription = "Name updated.\nDate: " + new Date() + "\nPrevious name: " + oldName;
+            addTaskHistoryEvent(id, historyDescription);
+        }
+        const oldDescription = snapshot.val().description;
+        if (oldDescription != description) {
+        const historyDescription = "Description updated.\nDate: " + new Date() + "\nPrevious description: " + oldDescription;
+            addTaskHistoryEvent(id, historyDescription);
+        }
+        const oldStatus = snapshot.val().status;
+        if (oldStatus != status) {
+        const historyDescription = "Status updated.\nDate: " + new Date() + "\nPrevious status: " + oldStatus;
+            addTaskHistoryEvent(id, historyDescription);
+        }
+    });
 
     update(taskListRef, {
         projectId: projectId,
@@ -766,8 +824,8 @@ const apiFunctions = {
   addNewOwnerToGroup,
   addNewProjectToGroup,
   createNewProject,
-  addProjectOwners,
-  addProjectMemebers,
+  addProjectOwner,
+  addProjectMember,
   addTaskAssignedUsers,
   addTaskFollowers,
   addTaskOwners,
