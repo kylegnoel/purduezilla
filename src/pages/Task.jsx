@@ -40,6 +40,7 @@ const Task = () => {
     const [isLoading, setLoading] = useState(true);
 
     const [name, setName] = useState('');
+    const [newName, setNewName] = useState('');
     const [description, setDesc] = useState('');
     const [assignee, setAssign] = useState('');
     const [hour, setHour] = useState('');
@@ -68,7 +69,7 @@ const Task = () => {
     };
 
     const handleNameChange = event => {
-        setName(event.target.value)
+        setNewName(event.target.value)
     };
 
     const handleDescChange = event => {
@@ -118,6 +119,26 @@ const Task = () => {
         setEditing(false)
     }
 
+    const handleSubmit = async (event) => {
+        //event.preventDefault()
+        console.log("DONE SUBMITTED: " + id + " " + newName + " " + description + " " + selected)
+
+        let updateProjectDetails = await apiFunctions.updateProjectDetails(
+            id, // projectId 
+            newName, // title 
+            description, // description
+            selected, // status
+            )
+
+        if (updateProjectDetails) {
+            console.log("task edited: " + updateProjectDetails);
+            alert("Task Saved! " + updateProjectDetails);
+        } else {
+            console.log("failed to save task: ");
+            alert("Task Failed to Save");
+        }
+    };
+
     useEffect(() => {
         console.log("reload");
         fetchData();
@@ -150,13 +171,19 @@ const Task = () => {
         // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
-                console.log("RESULT: " + snapshot.val().name)
+                console.log("RESULT: " + JSON.stringify(snapshot.val()))
                     const val = snapshot.val()
 
                     setName(val.name)
+                    setNewName(val.name)
                     setDesc(val.description)
                     setHour(val.estimatedTime)
                     setLabel(val.status)
+                    setOwner(val.owner)
+                    setAssign(val.assignee)
+                    val.status.forEach((value) => {
+                        setSelected(value);
+                    })
 
                     //owner
                     if (val.owner !== "") {
@@ -192,6 +219,50 @@ const Task = () => {
             console.log("set commnets");
             console.log(settingComments);
             setComments(settingComments);
+        }
+        catch {
+            // if there is no internet
+        }
+
+        // projects
+        try {
+            onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
+                    const projectTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const project = child.val()
+                        console.log("current value: " + project.name + " " + project.projectId)
+                        projectTemp.push([project, child.key])
+                    })
+
+                    setProjectList(projectTemp)
+                    console.log("snapshot: " + projectList.length)
+            })
+            if (projectList.length !== 0) {
+                setLoading(false)
+            }
+        }
+        catch {
+            // if there is no internet
+        }
+
+        // user
+        try {
+            onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+                    const userTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const user = child.val()
+                        console.log("current value: " + user.name + " " + user.projectId)
+                        userTemp.push([user, child.key])
+                    })
+
+                    setUserList(userTemp)
+                    console.log("snapshot: " + userList.length)
+            })
+            if (userList.length !== 0) {
+                setLoading(false)
+            }
         }
         catch {
             // if there is no internet
@@ -253,7 +324,7 @@ const Task = () => {
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" Validate sx={{ mt: 3 }}>        
+                            <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>        
                                 <Box
                                 sx={{
                                     display: 'flex',
@@ -291,7 +362,7 @@ const Task = () => {
                                                         fullWidth
                                                         id="taskName"
                                                         onChange={handleNameChange}
-                                                        value={name}
+                                                        value={newName}
                                                         />
                                                 </Grid>
                                                 <Grid item xs={12}>
@@ -356,6 +427,7 @@ const Task = () => {
                                             id="taskDescription"
                                             label="Task Description"
                                             name="taskDescription"
+                                            value={description}
                                             />
                                         </Grid>
                                         </Grid>
@@ -371,7 +443,7 @@ const Task = () => {
                                                 id="ownerSelect"
                                                 label="ownerLabel"
                                                 onChange={handleOwnerChange}
-                                                defaultValue={owner[0]}
+                                                value={owner}
                                             >
                                                 { userList && userList.length != 0 ? userList.map((data) => 
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
@@ -391,7 +463,7 @@ const Task = () => {
                                                 id="assignSelect"
                                                 label="assignLabel"
                                                 onChange={handleAssignChange}
-                                                defaultValue={assignee[0]}
+                                                value={assignee}
                                             >
                                                 { userList && userList.length != 0 ? userList.map((data) => 
                                                         <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
@@ -413,28 +485,43 @@ const Task = () => {
                             </Box>
                             <br></br>
                             <Divider rightAlign>Comment</Divider>
-                            <Box component="form" Validate sx={{ mt: 3 }}>        
+                            <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                    }}
                                 >
                                     <h2>Comment</h2>
+                                    {comments.map((comment) => (
+                                        < div >
+                                            <p> author key: {comment.author}</p>
+                                            <p>body: {comment.body}</p>
+                                        </div>
+                                    ))}
+
+
                                     <Grid container spacing={2}>
                                         <Grid item xs={50} sm={12} sx={{ mt: 6 }}>
                                             <Grid container spacing={2}></Grid>
-                                                <Grid item xs={12}>
-                                                    <TextField
+                                            <Grid item xs={12}>
+                                                <TextField
                                                     required
                                                     fullWidth
                                                     multiline
-                                                        rows={4}
+                                                    rows={4}
                                                     id="commentbox"
                                                     name="commentbox"
-                                                    value={description}
-                                                    />
+                                                    value={newCommentBody}
+                                                    onChange={(e) => setNewCommentBody(e.target.value)}
+                                                />
+                                                <br></br>
+                                                <Button 
+                                                    variant="contained"
+                                                    onClick={newCommentSubmit}> new Comment </Button>
+                                                <br></br>
+                                                <br></br>
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -460,7 +547,8 @@ const Task = () => {
                                     alignItems: 'center',
                                 }}
                                 >
-                                    <Box sx={{ mt: 6 }}>
+                                    <h2>{name}</h2>
+                                    <Box sx={{ mt: 2, mb: 2 }}>
                                         <Grid container spacing={2}>
                                         <Grid item xs={50} sm={12}>
                                             <Grid container spacing={2}>

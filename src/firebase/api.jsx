@@ -4,9 +4,6 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
 
-
-
-
 /*****
  *  
  * Configurations
@@ -75,6 +72,8 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds, projec
   //     userId: ownerIds[i]
   //   });
   // }
+  return newGroupRef.key;
+}
 
   const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
     const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
