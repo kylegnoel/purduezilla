@@ -434,6 +434,26 @@ const getGroupsProjects = function getGroupsProjects(groupId) {
   return groupsProjects;
 }
 
+const getProjectById = function getProjectById(projectId) {
+  const projectInfo = []
+
+  onValue(ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
+    projectInfo.push([projectId, snapshot.val()]);
+  });
+
+  return projectInfo;
+}
+
+const getTaskById = function getTaskById(taskId) {
+  const taskInfo = []
+
+  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+    taskInfo.push([taskId, snapshot.val()]);
+  });
+
+  return taskInfo;
+}
+
 const getUserById = function getUserById(userId) {
   const userInfo = []
 
@@ -837,6 +857,8 @@ const apiFunctions = {
   getUsersFollowedTasks,
   getUserById,
   getUserByEmail,
+  getProjectById,
+  getTaskById,
   isTaskOwner,
   isGroupOwner,
   isProjectOwner,
