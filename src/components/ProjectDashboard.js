@@ -80,7 +80,7 @@ export default function ProjectDashboard() {
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12} lg={'50%'}>
-                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
+                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                             return (  

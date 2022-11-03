@@ -23,7 +23,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
   const user = apiFunctions.useFirebaseAuth();
-  console.log("user: " + JSON.stringify(user))
+  //console.log("user: " + JSON.stringify(user))
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -152,7 +152,8 @@ const ResponsiveAppBar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar> {user.info.firstName[0]}</Avatar>
+                <Avatar></Avatar>
+              {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
               </IconButton>
             </Tooltip>
             <Menu

@@ -90,6 +90,7 @@ export default function AddTaskPage() {
     }, []);
 
     const handleSubmit = async (event) => {
+
         event.preventDefault()
         console.log("submitted")
 

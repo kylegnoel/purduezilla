@@ -55,6 +55,7 @@ const Task = () => {
     const [label, setLabel] = useState('');
     const [owner, setOwner] = useState('');
     const [project, setProject] = useState('');
+    const [newProject, setNewProject] = useState('');
     const [projectList, setProjectList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [comments, setComments] = useState([]);
@@ -62,6 +63,8 @@ const Task = () => {
     // const [taggingBody, setTaggingBody] = useState('');
 
     const user = apiFunctions.useFirebaseAuth();
+    console.log(JSON.stringify(user))
+
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
@@ -104,7 +107,7 @@ const Task = () => {
     };
 
     const handleProjectChange = event => {
-        setProject(event.target.value)
+        setNewProject(event.target.value)
     };
 
     const handleAssignChange = event => {
@@ -147,7 +150,7 @@ const Task = () => {
     }
 
     const handleMarkDone = async (event) => {
-        var selectedTemp = ''
+        const selectedTemp = ''
         if (completed) {
             setSelected('Complete');
             setCompleted(false)
@@ -160,13 +163,14 @@ const Task = () => {
             alert('Task Changed!')
             selectedTemp = 'In Progress'
         }
-        
+
+
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
-            null, // projectId 
-            null, // title 
-            null, // description
-            null, //estimated time
+            project, // projectId 
+            newName, // title 
+            description, // description
+            hour, //estimated time
             selectedTemp, // status
             )
 
@@ -189,7 +193,7 @@ const Task = () => {
         
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
-            project, // projectId 
+            newProject, // projectId 
             newName, // title 
             description, // description
             hour, //estimated time
@@ -201,12 +205,7 @@ const Task = () => {
 
         if (updateTaskDetails) {
             console.log("task edited: " + newName + " -" + selected + "-");
-            if (selected === "Complete") {
-                alert("Task Completed! ");
-            }
-            else {
-                alert("Task Saved! " + newName);
-            }
+            alert("Task Saved! " + newName);
             window.location.href='/task/'+id
             
         } else {
@@ -237,6 +236,7 @@ const Task = () => {
     };
 
     const fetchData = (event) => {
+
         console.log("fetched hello: ")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -250,14 +250,13 @@ const Task = () => {
     
                         setName(val.name)
                         setNewName(val.name)
+                        setProject(val.project)
+                        setNewProject(val.project)
                         setDesc(val.description)
                         setHour(val.estimatedTime)
                         setLabel(val.status)
                         setOwner(val.owner)
                         setAssign(val.assignedUsers)
-                        // val.status.forEach((value) => {
-                        //     setSelected(value);
-                        // })
     
                         //owner
                         if (val.owner !== "") {
@@ -304,9 +303,16 @@ const Task = () => {
             }    
         }
         else {
-            const myTasks = apiFunctions.getUsersAssignedTasks(id)
-            console.log(myTasks)
-            setTaskListArr(myTasks)
+            console.log("getting user data")
+            setTaskListArr([])
+            console.log("id: " + user.key)
+            if ( user !== null) {
+                console.log("user: " + JSON.stringify(user.key))
+                console.log("id: " + user.key)
+                const myTasks = apiFunctions.getUsersAssignedTasks(user.key)
+                console.log("mytasks: " + myTasks)
+                setTaskListArr(myTasks)
+            }
         }
         
         // projects
@@ -374,12 +380,12 @@ const Task = () => {
                                         { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                             return (
                                             <div key={data.projectId}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
                                                             <TaskIcon color="grey"/>
                                                         </ListItemAvatar>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
+                                                        <ListItemText primary={data[1].name} secondary={data[1].description}/>
                                                     </ListItem>
                                                 </Button>
                                                 <Divider />
@@ -533,6 +539,7 @@ const Task = () => {
                                                         <MenuItem value={data[1]}>{data[0].name}</MenuItem>
                                                     ): <MenuItem value={0}>New Project</MenuItem> }
                                                 </Select>
+                                                <FormHelperText>Previous values: {project}</FormHelperText>
                                             </FormControl>
                                         </Grid>
                                         <Grid item xs={12}>
@@ -697,7 +704,7 @@ const Task = () => {
                                                 startIcon={<CheckIcon />}
                                                 sx={{ mt: 3, mb: 2 }}
                                                 >
-                                            <b>{completed ? 'Mark as Complete' : 'Mark as In Progress'}</b> 
+                                            <b>{completed ? 'Mark as In Progress' : 'Mark as Complete'}</b> 
                                             </Button>
                                             <br></br>
                                         </Box>       

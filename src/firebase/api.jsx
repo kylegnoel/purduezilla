@@ -234,7 +234,6 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     assignedUsers: assignedUserIds,
     owners: ownerIds,
     status: status,
-    assignedUsers: assignedUserIds,
     followers: followerIds
   });
 
@@ -273,13 +272,13 @@ const createNewTask = function createNewTask(projectId, name, description, estim
   // return newTaskRef.key;
 
     // Add owner user Id's
-    addTaskOwners(newTaskRef.key, ownerIds)
+    //addTaskOwners(newTaskRef.key, ownerIds)
 
     // Add assigned user Id's
-    addTaskAssignedUsers(newTaskRef.key, assignedUserIds)
+    //addTaskAssignedUsers(newTaskRef.key, assignedUserIds)
 
     // Add follower user Id's
-    addTaskFollowers(newTaskRef.key, followerIds)
+    //addTaskFollowers(newTaskRef.key, followerIds)
 
     return newTaskRef.key;
 
@@ -381,13 +380,19 @@ const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
 
   onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
     snapshot.forEach(function (taskSnapshot) {
+      console.log("value of Project: " + JSON.stringify(taskSnapshot.val()))
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
-        snapshot2.forEach(function (userSnapshot) {
-          if (userSnapshot.val().userId == userId) {
-            // Keep track of key and values
-            usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
-          }
-        });
+        console.log("assignedUsers: " + JSON.stringify(snapshot2.val()))
+        if (snapshot2.val() == userId) {
+          usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+        }
+        // snapshot2.forEach(function (userSnapshot) {
+        //   console.log("assignedUsers: " + JSON.stringify(userSnapshot.val()))
+        //   if (userSnapshot.val().userId == userId) {
+        //     // Keep track of key and values
+        //     usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
+        //   }
+        // });
       });
     })
   });
