@@ -4,9 +4,6 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
 
-
-
-
 /*****
  *  
  * Configurations
@@ -62,34 +59,29 @@ const createNewGroup = function createNewGroup(name, memberIds, ownerIds, projec
   const groupListRef = ref(db, 'groups');
   const newGroupRef = push(groupListRef);
   set(newGroupRef, {
-    name: name
+    name: name,
+    members: memberIds,
+    owners: ownerIds
   });
 
   // Add owner user Id's
-  for (const i in ownerIds) {
-    addNewOwnerToGroup(newGroupRef.key, ownerIds[i])
-  }
-
-  // Add member user Id's
-  for (const i in memberIds) {
-    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
-  }
-
-  // Add member user Id's
-  for (const i in projectIds) {
-    addNewProjectToGroup(newGroupRef.key, projectIds[i]);
-  }
-
+  // const ownersListRef = ref(db, 'groups/' + newGroupRef.key + '/owners');
+  // for (const i in ownerIds) {
+  //   const userRef = push(ownersListRef);
+  //   set(userRef, {
+  //     userId: ownerIds[i]
+  //   });
+  // }
   return newGroupRef.key;
 }
 
-const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
-  const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
-  const userRef = push(ownersListRef);
-  set(userRef, {
-    userId: userId
-  });
-}
+  const addNewOwnerToGroup = function addNewOwnerToGroup(groupKey, userId) {
+    const ownersListRef = ref(db, 'groups/' + groupKey + '/owners');
+    const userRef = push(ownersListRef);
+    set(userRef, {
+      userId: userId
+    });
+  }
 
 const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
   const membersListRef = ref(db, 'groups/' + groupKey + '/members');
@@ -99,11 +91,12 @@ const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
   });  
 }
 
-const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId) {
+const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId, projectName) {
   const ownersListRef = ref(db, 'groups/' + groupKey + '/projects');
   const projectRef = push(ownersListRef);
   set(projectRef, {
-    projectId: projectId
+    projectId: projectId,
+    projectName: projectName
   });  
 }
 
@@ -345,6 +338,7 @@ const addProjectHistoryEvent = (projectId, description) => {
  *
 *****/
 
+
 // Returns 2d array with each element as [taskKey, values]
 const getProjectsTasks = function getProjectsTasks(projectId) {
   const tasksInProject = []
@@ -424,12 +418,17 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
 // Returns 2d array with each element as [projectKey, values]
 const getGroupsProjects = function getGroupsProjects(groupId) {
   const groupsProjects = []
+  console.log(groupId)
 
   onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      groupsProjects.push([childSnapshot.key, childSnapshot.val()]);
+      console.log("value: " + childSnapshot.val().projectId)
+      const tempProject = getProjectById(childSnapshot.val().projectId)
+      console.log("tempProject: " + JSON.stringify(tempProject))
+      groupsProjects.push([tempProject[0], tempProject[1]]);
     })
   });
+  console.log(JSON.stringify(groupsProjects))
 
   return groupsProjects;
 }
@@ -773,16 +772,11 @@ const FirebaseAuthProvider = ({ children }) => {
     //const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // console.log("poopo");
-        // console.log(user);
-        // console.log("find user");
         const searcher = user.email;
         const userListRef = ref(db, 'users');
         onValue(userListRef, (snapshot) => {
           snapshot.forEach(function (child) {
             const printing = child.val();
-            console.log("key");
-            console.log(child.key);
             // console.log(printing.email);
             // console.log(searcher);
             // console.log(printing.email === searcher);

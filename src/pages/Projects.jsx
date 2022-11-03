@@ -17,6 +17,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
+import TextField from '@mui/material/TextField';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -25,12 +26,12 @@ import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
     const {id} = useParams();
-    console.log("parameters: " + id);
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const [project, setProject] = useState('');
+    const [description, setDesc] = useState('');
     const navigate = useNavigate();
 
 
@@ -39,17 +40,15 @@ const Projects = () => {
     };
 
     useEffect(() => {
-        console.log("reload")
         fetchData()
     }, []);
 
     const fetchData = (event) => {
         setTaskListArr([])
-        console.log("fetched hello: " + id)
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        if ( id === null ) {
+        if ( id === undefined ) {
 
         }
         else {
@@ -70,6 +69,7 @@ const Projects = () => {
                 // set project name
                 onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
                     setProject(snapshot.val().name)
+                    setDesc(snapshot.val().description)
                 });
     
                 if (taskListarr.length !== 0) {
@@ -82,13 +82,11 @@ const Projects = () => {
         }
 
         setLoading(false)
-        console.log("taskListarr: " + taskListarr.length)
         return true;
     };
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            console.log("eventid: " + event.currentTarget.id)
             navigate('/task/'+event.currentTarget.id);
         }
         else {
@@ -100,6 +98,8 @@ const Projects = () => {
         return (
             <div>
                 <NavBar></NavBar>
+                <br></br>
+                <h2>My Projects</h2>
                 <ProjectDashboard></ProjectDashboard>
             </div>
         );
@@ -110,12 +110,25 @@ const Projects = () => {
                 <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
                     <Container component="main">
+                        <br></br>
+                        <h2>{project}</h2>
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={50} sm={12}>
+                                    <Divider></Divider>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        disabled
+                                        rows={4}
+                                        id="taskDescription"
+                                        label="Task Description"
+                                        name="taskDescription"
+                                        value={description}
+                                        sx={{ mt: 2, mb: 2 }}
+                                        />
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-            flexDirection:"column",}} height={400}>
-                                        <ListSubheader><h2>{project}</h2></ListSubheader>
+            flexDirection:"column", mt:2 }} height={400}>
                                             { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                                 return (
                                                 <div key={data.key}>
@@ -135,7 +148,7 @@ const Projects = () => {
                                                 <ListItemAvatar>
                                                     <AddIcon color="grey"/>
                                                 </ListItemAvatar>
-                                                <ListItemText primary={"Add Task"}/>
+                                                <ListItemText primary={"Create New Task"}/>
                                             </ListItem>
                                         </Button>
                                     </FixedSizeList>
