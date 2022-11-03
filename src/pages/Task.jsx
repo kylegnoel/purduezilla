@@ -64,7 +64,7 @@ const Task = () => {
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
-    
+
     const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
 
@@ -83,7 +83,7 @@ const Task = () => {
     const handleDescChange = event => {
         setDesc(event.target.value)
     };
-    
+
     const handleHourChange = event => {
         setHour(event.target.value)
     };
@@ -106,21 +106,21 @@ const Task = () => {
 
     const handleClickOpen = () => {
         setOpen(true);
-      };
-    
-      const handleClose = () => {
+    };
+
+    const handleClose = () => {
         setOpen(false);
-      };
+    };
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
             console.log("eventid: " + event.currentTarget.id)
             //navigate('/task/'+event.currentTarget.id);
-            window.location.href='/task/'+event.currentTarget.id
+            window.location.href = '/task/' + event.currentTarget.id
         }
         else {
             // navigate('/newtask');
-            window.location.href='/newtask/'
+            window.location.href = '/newtask/'
         }
     }
 
@@ -129,14 +129,14 @@ const Task = () => {
     }
 
     const handleDelete = (event) => {
-        
+
     }
 
     const handleClick = (event) => {
         if (event.detail === 2) {
             console.log('double click');
             setEditing(!isEditing)
-          }
+        }
     }
 
     const handleSubmit = async (event) => {
@@ -150,13 +150,13 @@ const Task = () => {
             description, // description
             hour, //estimated time
             selected, // status
-            )
+        )
 
         if (updateTaskDetails) {
             console.log("task edited: " + newName);
             alert("Task Saved! " + newName);
-            window.location.href='/task/'+id
-            
+            window.location.href = '/task/' + id
+
         } else {
             console.log("failed to save task: ");
             alert("Task Failed to Save");
@@ -170,6 +170,9 @@ const Task = () => {
 
     const newCommentSubmit = (event) => {
         event.preventDefault();
+        const tempCom = comments;
+        console.log(tempCom);
+
         if (newCommentBody == '') {
             return;
         }
@@ -180,8 +183,12 @@ const Task = () => {
                 tagged.push(word);
             }
         });
+
         let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
-        setComments([...comments, newAdded]);
+        window.location.reload();
+        return;
+        // setNewCommentBody("");
+        // setComments([...tempCom, newAdded]);
     };
 
     const fetchData = (event) => {
@@ -192,46 +199,47 @@ const Task = () => {
         try {
             onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
                 console.log("RESULT: " + JSON.stringify(snapshot.val()))
-                    const val = snapshot.val()
+                const val = snapshot.val()
 
-                    setName(val.name)
-                    setNewName(val.name)
-                    setDesc(val.description)
-                    setHour(val.estimatedTime)
-                    setLabel(val.status)
-                    setOwner(val.owner)
-                    setAssign(val.assignee)
-                    // val.status.forEach((value) => {
-                    //     setSelected(value);
-                    // })
+                setName(val.name)
+                setNewName(val.name)
+                setDesc(val.description)
+                setHour(val.estimatedTime)
+                setLabel(val.status)
+                setOwner(val.owner)
+                setAssign(val.assignee)
+                // val.status.forEach((value) => {
+                //     setSelected(value);
+                // })
 
-                    //owner
-                    if (val.owner !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
-                            if (snapshot.val() !== null ) {
-                                setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
-                            }
-                        });
-                    }
-                    console.log("owner: " + owner)
-                    console.log("set hour: " + hour + " " + val.estimatedTime)
-
-                    //assignee
-                    if (val.assignedUsers !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
-                            setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
-                        });
-                    }
-                    
-                    
-                    // set project name
-                    onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
-                        setProject(snapshot1.val().name)
+                //owner
+                if (val.owner !== "") {
+                    onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
+                        if (snapshot.val() !== null) {
+                            setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
+                        }
                     });
+                }
+                console.log("owner: " + owner)
+                console.log("set hour: " + hour + " " + val.estimatedTime)
 
-                    setUserList(val.description)
+                //assignee
+                if (val.assignedUsers !== "") {
+                    onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
+                        setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
+                    });
+                }
 
-                    console.log(name)
+
+                // set project name
+                console.log(val.projectId);
+                onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
+                    setProject(snapshot1.val().name)
+                });
+
+                setUserList(val.description)
+
+                console.log(name)
 
             })
             if (taskListarr.length !== 0) {
@@ -251,16 +259,16 @@ const Task = () => {
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                    const projectTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const project = child.val()
-                        console.log("current value: " + project.name + " " + project.projectId)
-                        projectTemp.push([project, child.key])
-                    })
+                const projectTemp = []
 
-                    setProjectList(projectTemp)
-                    console.log("snapshot: " + projectList.length)
+                snapshot.forEach(function (child) {
+                    const project = child.val()
+                    console.log("current value: " + project.name + " " + project.projectId)
+                    projectTemp.push([project, child.key])
+                })
+
+                setProjectList(projectTemp)
+                console.log("snapshot: " + projectList.length)
             })
             if (projectList.length !== 0) {
                 setLoading(false)
@@ -273,16 +281,16 @@ const Task = () => {
         // user
         try {
             onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                    const userTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const user = child.val()
-                        console.log("current value: " + user.name + " " + user.projectId)
-                        userTemp.push([user, child.key])
-                    })
+                const userTemp = []
 
-                    setUserList(userTemp)
-                    console.log("snapshot: " + userList.length)
+                snapshot.forEach(function (child) {
+                    const user = child.val()
+                    console.log("current value: " + user.name + " " + user.projectId)
+                    userTemp.push([user, child.key])
+                })
+
+                setUserList(userTemp)
+                console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)
@@ -302,53 +310,56 @@ const Task = () => {
             <div>
                 <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="lg">
-                    <br></br>
-                    <h2>My Tasks</h2>
-                    <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={50} sm={12} lg={'50%'}>
-                            <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-        flexDirection:"column",}} height={400}>
-                                        { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                    <Container component="main" maxWidth="lg">
+                        <br></br>
+                        <h2>My Tasks</h2>
+                        <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={50} sm={12} lg={'50%'}>
+                                    <FixedSizeList sx={{
+                                        border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                        flexDirection: "column",
+                                    }} height={400}>
+                                        {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                             return (
-                                            <div key={data.projectId}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <TaskIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                        )}): "There are no tasks!" }
-                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
+                                                <div key={data.projectId}>
+                                                    <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
+                                                        <ListItem>
+                                                            <ListItemAvatar>
+                                                                <TaskIcon color="grey" />
+                                                            </ListItemAvatar>
+                                                            <ListItemText primary={data[0].name} secondary={data[0].description} />
+                                                        </ListItem>
+                                                    </Button>
+                                                    <Divider />
+                                                </div>
+                                            )
+                                        }) : "There are no tasks!"}
+                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
                                             <ListItem>
                                                 <ListItemAvatar>
-                                                    <AddIcon color="grey"/>
+                                                    <AddIcon color="grey" />
                                                 </ListItemAvatar>
-                                                <ListItemText primary={"Create New Task"}/>
+                                                <ListItemText primary={"Create New Task"} />
                                             </ListItem>
                                         </Button>
-                                </FixedSizeList>
+                                    </FixedSizeList>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
-            </ThemeProvider>
+                        </Box>
+                    </Container>
+                </ThemeProvider>
             </div>
         )
     }
     else {
         if (isEditing) {
             return (
-                <div> 
+                <div>
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>        
+                            <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -359,140 +370,140 @@ const Task = () => {
                                         mr: '-60px',
                                         ml: '50.0rem',
                                     }}>
-                                        <Button
-                                            onClick={handleClickOpen}
-                                            variant="outlined"
-                                            startIcon={<DeleteForeverIcon />}
-                                            sx={{ mt: 3, mb: 2 }}
-                                            >
+                                    <Button
+                                        onClick={handleClickOpen}
+                                        variant="outlined"
+                                        startIcon={<DeleteForeverIcon />}
+                                        sx={{ mt: 3, mb: 2 }}
+                                    >
                                         Delete
-                                        </Button>
-                                        <br></br>
-                                    </Box>
+                                    </Button>
+                                    <br></br>
+                                </Box>
                                 <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
-                                > 
-                                 <Box sx={{ mt: 2, mb: 2 }}>
-                                    <h2>Editing:<i> {name}</i></h2>
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Box sx={{ mt: 2, mb: 2 }}>
+                                        <h2>Editing:<i> {name}</i></h2>
                                         <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'left',
-                                            width: '20%',
-                                            mt: '-80px',
-                                        }}>
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'left',
+                                                width: '20%',
+                                                mt: '-80px',
+                                            }}>
                                             <Button
                                                 onClick={handleEditing}
                                                 variant="outlined"
                                                 startIcon={<ArrowBackIcon />}
                                                 sx={{ mt: 3, mb: 2 }}
-                                                >
-                                            Back
+                                            >
+                                                Back
                                             </Button>
                                             <br></br>
                                         </Box>
                                         <Grid container spacing={2}>
-                                        <Grid item xs={50} sm={12}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        autoComplete="given-name"
-                                                        name="taskName"
-                                                        fullWidth
-                                                        id="taskName"
-                                                        onChange={handleNameChange}
-                                                        value={newName}
+                                            <Grid item xs={50} sm={12}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <TextField
+                                                            autoComplete="given-name"
+                                                            name="taskName"
+                                                            fullWidth
+                                                            id="taskName"
+                                                            onChange={handleNameChange}
+                                                            value={newName}
                                                         />
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                        <FormControl xs={8} fullWidth>
+                                                            <InputLabel id="assignLabel">Label</InputLabel>
+                                                            <Select
+                                                                multiple
+                                                                defaultValue={10}
+                                                                value={selected}
+                                                                onChange={selectionChangeHandler}
+                                                                label="Label"
+                                                                id="label"
+                                                                textOverflow="ellipsis"
+                                                                overflow="hidden"
+                                                                renderValue={(selected) => (
+                                                                    <div>
+                                                                        {selected && selected.length !== 0 ? selected.map((value) => (
+                                                                            <Chip key={value} label={value} />
+                                                                        )) : []}
+                                                                    </div>
+                                                                )}
+                                                            >
+                                                                <MenuItem value={'To Do'}>To Do</MenuItem>
+                                                                <MenuItem value={'In Progress'}>In Progress</MenuItem>
+                                                                <MenuItem value={'To Review'}>To Review</MenuItem>
+                                                                <MenuItem value={'In Review'}>In Review</MenuItem>
+                                                                <MenuItem value={'Complete'}>Complete</MenuItem>
+                                                                <MenuItem value={'Saved'}>Saved</MenuItem>
+                                                                <MenuItem value={'Closed'}>Closed</MenuItem>
+                                                                <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                            </Select>
+                                                            <FormHelperText>Previous values: {label}</FormHelperText>
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <Input
+                                                            type="number"
+                                                            autoComplete="given-name"
+                                                            name="estimatedHours"
+                                                            required
+                                                            fullWidth
+                                                            onChange={handleHourChange}
+                                                            id="estimatedHours"
+                                                            label="Estimated Hours"
+                                                            value={hour}
+                                                            autoFocus
+                                                        />
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={8}>
-                                                <FormControl xs={8} fullWidth>
-                                                    <InputLabel id="assignLabel">Label</InputLabel>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="projectLabel">Project</InputLabel>
                                                     <Select
-                                                        multiple
-                                                        defaultValue={10}
-                                                        value={selected}
-                                                        onChange={selectionChangeHandler}
-                                                        label="Label"
-                                                        id="label"
-                                                        textOverflow="ellipsis"
-                                                        overflow="hidden"
-                                                        renderValue={(selected) => (
-                                                        <div>
-                                                            { selected && selected.length !== 0 ? selected.map((value) => (
-                                                            <Chip key={value} label={value} />
-                                                            )): []}
-                                                        </div>
-                                                        )}
+                                                        labelId="projectLabel"
+                                                        id="projectLabel"
+                                                        label="Project"
+                                                        fullWidth
+                                                        defaultValue={id}
+                                                        onChange={handleProjectChange}
                                                     >
-                                                        <MenuItem value={'To Do'}>To Do</MenuItem>
-                                                        <MenuItem value={'In Progress'}>In Progress</MenuItem>
-                                                        <MenuItem value={'To Review'}>To Review</MenuItem>
-                                                        <MenuItem value={'In Review'}>In Review</MenuItem>
-                                                        <MenuItem value={'Complete'}>Complete</MenuItem>
-                                                        <MenuItem value={'Saved'}>Saved</MenuItem>
-                                                        <MenuItem value={'Closed'}>Closed</MenuItem>
-                                                        <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                        {projectList && projectList.length != 0 ? projectList.map((data) =>
+                                                            <MenuItem value={data[1]}>{data[0].name}</MenuItem>
+                                                        ) : <MenuItem value={0}>New Project</MenuItem>}
                                                     </Select>
-                                                    <FormHelperText>Previous values: {label}</FormHelperText>
                                                 </FormControl>
                                             </Grid>
-                                            <Grid item xs={4}>
-                                                <Input
-                                                    type="number"
-                                                    autoComplete="given-name"
-                                                    name="estimatedHours"
+                                            <Grid item xs={12}>
+                                                <TextField
                                                     required
                                                     fullWidth
-                                                    onChange={handleHourChange}
-                                                    id="estimatedHours"
-                                                    label="Estimated Hours"
-                                                    value={hour}
-                                                    autoFocus
-                                                    />
+                                                    multiline
+                                                    onChange={handleDescChange}
+                                                    rows={4}
+                                                    id="taskDescription"
+                                                    label="Task Description"
+                                                    name="taskDescription"
+                                                    value={description}
+                                                />
                                             </Grid>
-                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="projectLabel">Project</InputLabel>
-                                                <Select
-                                                    labelId="projectLabel"
-                                                    id="projectLabel"
-                                                    label="Project"
-                                                    fullWidth
-                                                    defaultValue={id}
-                                                    onChange={handleProjectChange}
-                                                >
-                                                    { projectList && projectList.length != 0 ? projectList.map((data) => 
-                                                        <MenuItem value={data[1]}>{data[0].name}</MenuItem>
-                                                    ): <MenuItem value={0}>New Project</MenuItem> }
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            multiline
-                                            onChange={handleDescChange}
-                                            rows={4}
-                                            id="taskDescription"
-                                            label="Task Description"
-                                            name="taskDescription"
-                                            value={description}
-                                            />
-                                        </Grid>
-                                        </Grid>
-        
+
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
                                         <br></br>
-        
+
                                         <FormControl fullWidth>
                                             <InputLabel id="ownerLabel">Owner</InputLabel>
                                             <Select
@@ -503,13 +514,13 @@ const Task = () => {
                                                 defaultValue={owner}
                                                 value={owner}
                                             >
-                                                { userList && userList.length != 0 ? userList.map((data) => 
+                                                {userList && userList.length != 0 ? userList.map((data) =>
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                                ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
                                             <FormHelperText>Previous values: {owner}</FormHelperText>
                                         </FormControl>
-        
+
                                         <br></br>
                                         <br></br>
                                         <Divider>ASSIGN</Divider>
@@ -523,9 +534,9 @@ const Task = () => {
                                                 onChange={handleAssignChange}
                                                 value={assignee}
                                             >
-                                                { userList && userList.length != 0 ? userList.map((data) => 
-                                                        <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                    ): <MenuItem value={0}>New User</MenuItem> }
+                                                {userList && userList.length != 0 ? userList.map((data) =>
+                                                    <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
                                             <FormHelperText>Previous values: {assignee}</FormHelperText>
                                         </FormControl>
@@ -535,8 +546,8 @@ const Task = () => {
                                             fullWidth
                                             variant="contained"
                                             sx={{ mt: 3, mb: 2 }}
-                                            >
-                                        Save Changes
+                                        >
+                                            Save Changes
                                         </Button>
                                     </Box>
                                 </Box>
@@ -575,7 +586,7 @@ const Task = () => {
                                                     onChange={(e) => setNewCommentBody(e.target.value)}
                                                 />
                                                 <br></br>
-                                                <Button 
+                                                <Button
                                                     variant="contained"
                                                     onClick={newCommentSubmit}> new Comment </Button>
                                                 <br></br>
@@ -595,112 +606,112 @@ const Task = () => {
                         aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">
-                        {"Are you sure you want to delete \'" + name + "\'?"}
+                            {"Are you sure you want to delete \'" + name + "\'?"}
                         </DialogTitle>
                         <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            This action cannot be undone.
-                        </DialogContentText>
+                            <DialogContentText id="alert-dialog-description">
+                                This action cannot be undone.
+                            </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                        <Button onClick={handleDelete}>Close</Button>
-                        <Button onClick={handleClose} autoFocus>
-                            Delete
-                        </Button>
+                            <Button onClick={handleDelete}>Close</Button>
+                            <Button onClick={handleClose} autoFocus>
+                                Delete
+                            </Button>
                         </DialogActions>
                     </Dialog>
                     {/* <LoadTasks></LoadTasks> */}
-                    </div>
+                </div>
             );
         }
         else {
             return (
-                <div> 
+                <div>
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" Validate sx={{ mt: 3 }}>        
+                            <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                    }}
                                 >
                                     <h2>{name}</h2>
                                     <Box sx={{ mt: 2, mb: 2 }}>
                                         <Grid container spacing={2}>
-                                        <Grid item xs={50} sm={12}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="taskName"
-                                                        fullWidth
-                                                        id="taskName"
-                                                        value={name}
-                                                        disabled
-                                                        />
-                                                    </Button>
-                                                </Grid>
-                                                <Grid item xs={8}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="label"
-                                                        fullWidth
-                                                        id="label"
-                                                        value={label}
-                                                        disabled
-                                                        />
-                                                    </Button>
-                                                </Grid>
+                                            <Grid item xs={50} sm={12}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="taskName"
+                                                                fullWidth
+                                                                id="taskName"
+                                                                value={name}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="label"
+                                                                fullWidth
+                                                                id="label"
+                                                                value={label}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
 
-                                                <Grid item xs={4}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="label"
-                                                        fullWidth
-                                                        id="label"
-                                                        value={hour + " hours"}
-                                                        disabled
-                                                        />
-                                                    </Button>
+                                                    <Grid item xs={4}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="label"
+                                                                fullWidth
+                                                                id="label"
+                                                                value={hour + " hours"}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControl fullWidth>
-                                                <Button onClick={handleClick} fullWidth>
-                                                    <TextField
+                                            <Grid item xs={12}>
+                                                <FormControl fullWidth>
+                                                    <Button onClick={handleClick} fullWidth>
+                                                        <TextField
                                                             autoComplete="given-name"
                                                             name="project"
                                                             fullWidth
                                                             id="project"
                                                             value={project}
                                                             disabled
-                                                            />
-                                                        </Button>
-                                            </FormControl>
+                                                        />
+                                                    </Button>
+                                                </FormControl>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        required
+                                                        fullWidth
+                                                        multiline
+                                                        disabled
+                                                        rows={4}
+                                                        id="taskDescription"
+                                                        name="taskDescription"
+                                                        value={description}
+                                                    />
+                                                </Button>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <Button onClick={handleClick} fullWidth>
-                                                <TextField
-                                                required
-                                                fullWidth
-                                                multiline
-                                                disabled
-                                                    rows={4}
-                                                id="taskDescription"
-                                                name="taskDescription"
-                                                value={description}
-                                                />
-                                            </Button>
-                                        </Grid>
-                                        </Grid>
-        
+
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
                                         <br></br>
@@ -712,9 +723,9 @@ const Task = () => {
                                                 id="owner"
                                                 value={owner}
                                                 disabled
-                                                />
+                                            />
                                         </Button>
-        
+
                                         <br></br>
                                         <br></br>
                                         <Divider>ASSIGN</Divider>
@@ -777,12 +788,12 @@ const Task = () => {
                         </Container>
                     </ThemeProvider>
                     {/* <LoadTasks></LoadTasks> */}
-                    </div>
+                </div>
             );
         }
-        
+
     }
-    
+
 }
 
 export default Task;
