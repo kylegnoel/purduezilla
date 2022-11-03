@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, useNavigate, useParams } from "react-router-dom";
+import apiFunctions from '../firebase/api';
+
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,15 +15,25 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { ref, onValue } from "firebase/database";
 
-import apifunctions from "../firebase/api";
+const pages = ['Login', 'Teams'];
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
+  const user = apiFunctions.useFirebaseAuth();
+  const { id } = useParams();
+
+  onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+    const val = snapshot.val()
+    console.log(user)
+  });
+  
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const navigate = navigate();
-
+  const navigate = useNavigate();
+  
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -40,8 +52,12 @@ const ResponsiveAppBar = () => {
   const handleButtonClick = (setting) => {
     setAnchorElUser(null);
     if (setting == 'Logout') {
-      apifunctions.signOutAccount();
+      apiFunctions.signOutAccount();
       navigate('/');
+    }
+    if (setting == 'Profile') {
+      apiFunctions.signOutAccount();
+      navigate('/profile/' + user);
     }
   }
 
@@ -102,10 +118,15 @@ const ResponsiveAppBar = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              
+              {pages.map((page) => (
+                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">{page}</Typography>
+                </MenuItem>
+              ))}
 
             </Menu>
           </Box>
+          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -122,12 +143,12 @@ const ResponsiveAppBar = () => {
               textDecoration: 'none',
             }}
           >
+            LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: '2', md: 'flex' } }}>
-                <MenuItem component={Link} to="/project" key="Project" onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">Project</Typography>
-                </MenuItem>
-
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <MenuItem component={Link} to="/project"><h1>
+              <Typography textAlign="center">Projects</Typography></h1>
+            </MenuItem>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -152,12 +173,11 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem component={Link} to="/profile" key={"profile"} onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">Profile</Typography>
-              </MenuItem>
-              <MenuItem component={Link} to="/" key={"logout"} onClick={apifunctions.signOutAccount}>
-                <Typography textAlign="center">Logout</Typography>
-              </MenuItem>
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>
+              ))}
             </Menu>
           </Box>
         </Toolbar>
