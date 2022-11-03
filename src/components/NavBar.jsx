@@ -136,8 +136,14 @@ const ResponsiveAppBar = () => {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <MenuItem component={Link} to="/project"><h1>
-              <Typography textAlign="center">Projects</Typography></h1>
+            <MenuItem component={Link} to="/mygroups"><h1>
+                <Typography textAlign="center">My Groups</Typography></h1>
+            </MenuItem>
+            <MenuItem component={Link} to="/myprojects"><h1>
+                <Typography textAlign="center">My Projects</Typography></h1>
+            </MenuItem>
+            <MenuItem component={Link} to="/mytasks"><h1>
+                <Typography textAlign="center">My Tasks</Typography></h1>
             </MenuItem>
           </Box>
 
