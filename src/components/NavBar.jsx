@@ -20,7 +20,7 @@ const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const navigate = useNavigate();
+  const navigate = navigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -40,7 +40,7 @@ const ResponsiveAppBar = () => {
   const handleButtonClick = (setting) => {
     setAnchorElUser(null);
     if (setting == 'Logout') {
-      apiFunctions.signOutAccount();
+      apifunctions.signOutAccount();
       navigate('/');
     }
   }
