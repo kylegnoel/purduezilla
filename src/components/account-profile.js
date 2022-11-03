@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -9,13 +10,22 @@ import {
   Typography
 } from '@mui/material';
 
-const user = {
-  avatar: '',
-  jobTitle: 'Job title',
-  name: 'Example name',
-};
+import apiFunctions from '../firebase/api';
+import { ref, onValue } from "firebase/database";
 
-export const AccountProfile = (props) => (
+
+
+
+
+export const AccountProfile = (props) => {
+  const account = apiFunctions.useFirebaseAuth();
+
+  const user = {
+    avatar: '',
+    name: account.info.firstName,
+  };
+  
+  return (
   <Card {...props}>
     <CardContent>
       <Box
@@ -53,4 +63,5 @@ export const AccountProfile = (props) => (
       </Button>
     </CardActions>
   </Card>
-);
+  );
+};

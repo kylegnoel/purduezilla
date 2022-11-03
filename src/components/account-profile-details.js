@@ -18,15 +18,17 @@ import { ref, onValue } from "firebase/database";
 
 
 export const AccountProfileDetails = (props) => {
-  const [isLoading, setLoading] = useState(true);
+  const user = apiFunctions.useFirebaseAuth();
+
+  console.log('USER: ');
+  console.log(user.info.email);
 
   
   const [values, setValues] = useState({
-    name: 'Example name',
-    email: 'Example email',
-    description: 'Example description'
-    
-  });
+    name: user.info.firstName,
+    email: user.info.email,
+    description: user.info.profileDescription
+  }); 
 
   const handleChange = (event) => {
     setValues({
@@ -35,37 +37,11 @@ export const AccountProfileDetails = (props) => {
     });
   };
 
-  const fetchData = (event) => {
-    console.log("hello")
-    // Update the document title using the browser API
-    // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-    // console.log("response: " + response)
-    try {
-        onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                const taskTemp = []
-    
-                snapshot.forEach(function(child) {
-                    const retrievedUser = snapshot.val();
-                    values.push(retrievedUser.name)
-                    taskTemp.push(child.val())
-                })
-  
-        })
-        
-  
-    }
-    catch {
-        // if there is no internet
-    }
-    
-  
-    return true;
+  const myFunction = (event) => {
+    //console.log(user.key + user.info.email + user.info.firstName + user.info.profileDescription + user.info.notificationSetting)
+    apiFunctions.updateUser(user.key, user.info.email, values.name, "", values.description, user.info.notificationSetting)
   };
 
-  useEffect(() => {
-    console.log("reload")
-    fetchData()
-}, []);
 
   return (
     <form
@@ -161,6 +137,7 @@ export const AccountProfileDetails = (props) => {
           <Button
             color="primary"
             variant="contained"
+            onClick={myFunction}
           >
             Save details
           </Button>
