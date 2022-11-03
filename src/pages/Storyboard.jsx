@@ -18,6 +18,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
+import StoryBoard from '../components/storyboard';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -29,6 +30,7 @@ const Storyboard = () => {
     return (
         <div> 
             <NavBar></NavBar>
+            <StoryBoard></StoryBoard>
         </div>
     );
 }
