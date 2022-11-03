@@ -19,11 +19,6 @@ import { ref, onValue } from "firebase/database";
 
 export const AccountProfileDetails = (props) => {
   const user = apiFunctions.useFirebaseAuth();
-
-  console.log('USER: ');
-  console.log(user.info.email);
-
-  
   const [values, setValues] = useState({
     name: user.info.firstName,
     email: user.info.email,
