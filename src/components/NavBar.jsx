@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Link, useNavigate, useParams } from "react-router-dom";
 import apiFunctions from '../firebase/api';
 
@@ -21,13 +21,10 @@ const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
+  var profile = null;
   const user = apiFunctions.useFirebaseAuth();
-  const { id } = useParams();
-
-  onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-    const val = snapshot.val()
-    console.log(user)
-  });
+  //console.log('USER: ');
+  //console.log(user.key);
   
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -57,7 +54,7 @@ const ResponsiveAppBar = () => {
     }
     if (setting == 'Profile') {
       apiFunctions.signOutAccount();
-      navigate('/profile/' + user);
+      navigate('/profile/' + user.key);
     }
   }
 

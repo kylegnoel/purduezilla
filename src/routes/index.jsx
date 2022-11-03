@@ -25,12 +25,11 @@ const Routing = props => {
                 <Route exact path="/register" element={<Register />} />
                 <Route exact path="/project" element={<Projects />} />
                 <Route exact path="/newproject" element={<NewProject />} />
-                <Route exact path="/profile" element={<Profile />} />
+                <Route exact path="/profile/:id" element={<Profile />} />
                 <Route exact path="*" element={<NotFound />} />
                 <Route exact path="/project/:id" element={<Projects />} />
                 <Route exact path="/task/:id" element={<Task />} />
                 <Route exact path="/newtask" element={<AddTaskPage />} />
-                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
             </Routes>
         </Router>
     );

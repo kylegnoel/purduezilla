@@ -822,8 +822,8 @@ function useFirebaseAuth() {
       "useFirebaseAuth must be used within a FirebaseAuthProvider"
     );
   }
-  console.log("haha");
-  console.log(context);
+  //console.log("haha");
+  //console.log(context);
   return context.user;
 }
 
