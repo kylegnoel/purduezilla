@@ -14,6 +14,7 @@ import FixedSizeList from '@mui/material/List';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CheckIcon from '@mui/icons-material/Check';
 
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -67,9 +68,15 @@ const Task = () => {
     
     const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
+    const [completed, setCompleted] = React.useState(false);
 
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
+        console.log("selection: " + event.target.value)
+        if (event.target.value === 'Complete') {
+            console.log("COMPLETED")
+            alert('Task Completed!');
+        }
     };
 
     const handleFollowerChange = (event) => {
@@ -139,10 +146,47 @@ const Task = () => {
           }
     }
 
+    const handleMarkDone = async (event) => {
+        var selectedTemp = ''
+        if (completed) {
+            setSelected('Complete');
+            setCompleted(false)
+            alert('Task Completed!')
+            selectedTemp = 'Complete'
+        }
+        else {
+            setSelected('In Progress');
+            setCompleted(true)
+            alert('Task Changed!')
+            selectedTemp = 'In Progress'
+        }
+        
+        let updateTaskDetails = await apiFunctions.updateTaskDetails(
+            id,
+            null, // projectId 
+            null, // title 
+            null, // description
+            null, //estimated time
+            selectedTemp, // status
+            )
+
+        setLabel(selectedTemp)
+        console.log("selected: " + selectedTemp)
+        
+            if (updateTaskDetails) {
+                //window.location.href='/task/'+id
+                
+            } else {
+                console.log("failed to save task: ");
+                alert("Task Failed to Save");
+            }
+    }
+
+
     const handleSubmit = async (event) => {
         //event.preventDefault()
         console.log("DONE SUBMITTED: " + id + " " + newName + " " + description + " " + selected)
-
+        
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
             project, // projectId 
@@ -152,9 +196,17 @@ const Task = () => {
             selected, // status
             )
 
+        console.log("selected: " + selected)
+
+
         if (updateTaskDetails) {
-            console.log("task edited: " + newName);
-            alert("Task Saved! " + newName);
+            console.log("task edited: " + newName + " -" + selected + "-");
+            if (selected === "Complete") {
+                alert("Task Completed! ");
+            }
+            else {
+                alert("Task Saved! " + newName);
+            }
             window.location.href='/task/'+id
             
         } else {
@@ -189,65 +241,74 @@ const Task = () => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        try {
-            onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
-                console.log("RESULT: " + JSON.stringify(snapshot.val()))
-                    const val = snapshot.val()
 
-                    setName(val.name)
-                    setNewName(val.name)
-                    setDesc(val.description)
-                    setHour(val.estimatedTime)
-                    setLabel(val.status)
-                    setOwner(val.owner)
-                    setAssign(val.assignee)
-                    // val.status.forEach((value) => {
-                    //     setSelected(value);
-                    // })
-
-                    //owner
-                    if (val.owner !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
-                            if (snapshot.val() !== null ) {
-                                setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
-                            }
+        if (id !== undefined) {
+            try {
+                onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
+                    console.log("RESULT: " + JSON.stringify(snapshot.val()))
+                        const val = snapshot.val()
+    
+                        setName(val.name)
+                        setNewName(val.name)
+                        setDesc(val.description)
+                        setHour(val.estimatedTime)
+                        setLabel(val.status)
+                        setOwner(val.owner)
+                        setAssign(val.assignedUsers)
+                        // val.status.forEach((value) => {
+                        //     setSelected(value);
+                        // })
+    
+                        //owner
+                        if (val.owner !== "") {
+                            onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
+                                if (snapshot.val() !== null ) {
+                                    setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
+                                }
+                            });
+                        }
+    
+                        console.log("owner: " + owner)
+                        console.log("set hour: " + hour + " " + val.estimatedTime)
+    
+                        //assignee
+                        if (val.assignedUsers !== "") {
+                            onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
+                                setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
+                            });
+                        }
+                        
+                        
+                        // set project name
+                        onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
+                            setProject(snapshot1.val().name)
                         });
-                    }
-                    console.log("owner: " + owner)
-                    console.log("set hour: " + hour + " " + val.estimatedTime)
-
-                    //assignee
-                    if (val.assignedUsers !== "") {
-                        onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
-                            setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
-                        });
-                    }
-                    
-                    
-                    // set project name
-                    onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
-                        setProject(snapshot1.val().name)
-                    });
-
-                    setUserList(val.description)
-
-                    console.log(name)
-
-            })
-            if (taskListarr.length !== 0) {
-                setLoading(false)
+    
+                        setUserList(val.description)
+    
+                        console.log(name)
+    
+                })
+                if (taskListarr.length !== 0) {
+                    setLoading(false)
+                }
+    
+                //fetch comments as well
+                const settingComments = apiFunctions.getTaskComments(id);
+                console.log("set commnets");
+                console.log(settingComments);
+                setComments(settingComments);
             }
-
-            //fetch comments as well
-            const settingComments = apiFunctions.getTaskComments(id);
-            console.log("set commnets");
-            console.log(settingComments);
-            setComments(settingComments);
+            catch {
+                // if there is no internet
+            }    
         }
-        catch {
-            // if there is no internet
+        else {
+            const myTasks = apiFunctions.getUsersAssignedTasks(id)
+            console.log(myTasks)
+            setTaskListArr(myTasks)
         }
-
+        
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
@@ -348,7 +409,7 @@ const Task = () => {
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>        
+                            <Box component="form" Validate sx={{ mt: 3 }}>        
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -502,12 +563,12 @@ const Task = () => {
                                                 onChange={handleOwnerChange}
                                                 defaultValue={owner}
                                                 value={owner}
+                                                disabled
                                             >
                                                 { userList && userList.length != 0 ? userList.map((data) => 
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                 ): <MenuItem value={0}>New User</MenuItem> }
                                             </Select>
-                                            <FormHelperText>Previous values: {owner}</FormHelperText>
                                         </FormControl>
         
                                         <br></br>
@@ -522,18 +583,18 @@ const Task = () => {
                                                 label="assignLabel"
                                                 onChange={handleAssignChange}
                                                 value={assignee}
+                                                disabled
                                             >
                                                 { userList && userList.length != 0 ? userList.map((data) => 
                                                         <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                     ): <MenuItem value={0}>New User</MenuItem> }
                                             </Select>
-                                            <FormHelperText>Previous values: {assignee}</FormHelperText>
                                         </FormControl>
 
                                         <Button
-                                            type="submit"
                                             fullWidth
                                             variant="contained"
+                                            onClick={handleSubmit}
                                             sx={{ mt: 3, mb: 2 }}
                                             >
                                         Save Changes
@@ -619,7 +680,27 @@ const Task = () => {
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" Validate sx={{ mt: 3 }}>        
+                            <Box component="form" Validate sx={{ mt: 3 }}> 
+                                <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'right',
+                                            width: '26%',
+                                            mb: '-100px',
+                                            mr: '20rem',
+                                            ml: '73%',
+                                        }}>
+                                            <Button
+                                                onClick={handleMarkDone}
+                                                variant="outlined"
+                                                startIcon={<CheckIcon />}
+                                                sx={{ mt: 3, mb: 2 }}
+                                                >
+                                            <b>{completed ? 'Mark as Complete' : 'Mark as In Progress'}</b> 
+                                            </Button>
+                                            <br></br>
+                                        </Box>       
                                 <Box
                                 sx={{
                                     display: 'flex',

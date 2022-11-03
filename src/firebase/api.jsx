@@ -634,6 +634,7 @@ const deleteProjectMembers = (id, exMemberIds) => {
  */
 const updateTaskDetails = (id, projectId, name, description, estimatedTime, status) => {
     const taskListRef = ref(db, 'tasks/'  + id);
+    console.log("updating task")
 
     onValue(taskListRef, (snapshot) => {
         const oldName = snapshot.val().name;
@@ -651,6 +652,7 @@ const updateTaskDetails = (id, projectId, name, description, estimatedTime, stat
         const historyDescription = "Status updated.\nDate: " + new Date() + "\nPrevious status: " + oldStatus;
             addTaskHistoryEvent(id, historyDescription);
         }
+        
     });
 
     update(taskListRef, {
@@ -660,6 +662,8 @@ const updateTaskDetails = (id, projectId, name, description, estimatedTime, stat
         estimatedTime: estimatedTime,
         status: status,
     })
+
+    console.log("finsihed updating")
 
     return taskListRef.key
 }

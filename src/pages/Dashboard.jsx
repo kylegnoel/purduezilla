@@ -1,18 +1,84 @@
-import React, { useState } from 'react';
+import React from 'react';
 import NavBar from '../components/NavBar';
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import LoadTasks from '../components/LoadTasks';
 import ViewTasks from '../components/TaskDashboard';
 import Activity from '../components/Activity';
 import Projects from '../components/ProjectDashboard'
-import Divider from '@mui/material/Divider';
 import { Typography } from '@mui/material';
 import apiFunctions from '../firebase/api';
-import '../App.css'
+import { ref, onValue } from "firebase/database";
 
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import FixedSizeList from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import WorkIcon from '@mui/icons-material/Work';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import { Container } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+
+import '../App.css'
+const theme = createTheme();
 
 const Dashboard = () => {
+    const { id } = useParams();
     const testing = apiFunctions.useFirebaseAuth();
     console.log(testing);
+
+    const [projListarr, setProjListArr] = useState([]);
+    // const taskListarr = []
+    const [isLoading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("reload")
+        fetchData()
+    }, []);
+
+    const handleTask = (event) => {
+        if (event.currentTarget.id !== "addproject") {
+            console.log("eventid: " + event.currentTarget.id)
+            window.location.href='/project/'+event.currentTarget.id;
+            //window.location.reload()
+        }
+        else {
+            window.location.href='/newproject/';
+        }
+    }
+
+    const fetchData = (event) => {
+        console.log("hello")
+        // Update the document title using the browser API
+        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
+        // console.log("response: " + response)
+        try {
+            const settingProjects = apiFunctions.getUsersProjects(id);
+            console.log("set projects");
+            console.log(settingProjects);
+            setProjListArr(settingProjects);
+            if (setProjListArr.length !== 0) {
+                setLoading(false)
+            }
+
+        }
+        catch {
+            // if there is no internet
+        }
+
+        setLoading(false)
+        
+        console.log("taskListarr: " + projListarr.length)
+        return true;
+    };
+
     return (
         <div>
             <NavBar></NavBar>
@@ -71,7 +137,41 @@ const Dashboard = () => {
                     <ViewTasks></ViewTasks>
                 </div>
                 <div class="flex-child">
-                    <Projects></Projects>
+                    <ThemeProvider theme={theme}>
+                    <Container component="main" maxWidth="lg">
+                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={50} sm={12} lg={'50%'}>
+                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
+            flexDirection:"column",}} height={400}>
+                                        { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
+                                                return (  
+                                                <div key={data[1]}>
+                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                    <ListItem>
+                                                        <ListItemAvatar>
+                                                            <WorkIcon color="grey"/>
+                                                        </ListItemAvatar>
+                                                        <ListItemText primary={data[0].name} secondary="Content was changed"/>
+                                                    </ListItem>
+                                                </Button>
+                                                <Divider />
+                                            </div>   
+                                            )}): "There are no Projects!" }
+                                        <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
+                                                <ListItem>
+                                                    <ListItemAvatar>
+                                                        <AddIcon color="grey"/>
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={"Add Project"}/>
+                                                </ListItem>
+                                            </Button>
+                                    </FixedSizeList>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Container>
+                </ThemeProvider>
                 </div>
             </div>
         </div>
