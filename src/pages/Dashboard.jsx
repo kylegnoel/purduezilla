@@ -37,7 +37,7 @@ const Dashboard = () => {
                 textDecoration: 'none',
                 }}
                 >
-            Tasks
+            Tasks Feed
           </Typography>
                 </div>
                 <div style={{marginBottom: '-16px'}}class="flex-child">
@@ -60,7 +60,7 @@ const Dashboard = () => {
                 textDecoration: 'none',
                 }}
                 >
-            Projects
+            Projects Feed
           </Typography>
                 </div>
             </div>

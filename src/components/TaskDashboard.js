@@ -39,13 +39,13 @@ export default function TaskDashboard() {
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
             console.log("eventid: " + event.currentTarget.id)
-            navigate('/task/'+event.currentTarget.id);
+            navigate('/task/' + event.currentTarget.id);
         }
         else {
             navigate('/newtask');
         }
     }
-        
+
 
     const fetchData = (event) => {
         console.log("hello")
@@ -54,16 +54,16 @@ export default function TaskDashboard() {
         // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                    const taskTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const task = child.val()
-                        taskTemp.push([task, child.key])
-                        console.log("key: " + child.key);
-                    })
+                const taskTemp = []
 
-                    setTaskListArr(taskTemp)
-                    console.log("snapshot: " + taskListarr.length + " " +  taskTemp.length)
+                snapshot.forEach(function (child) {
+                    const task = child.val()
+                    taskTemp.push([task, child.key])
+                    console.log("key: " + child.key);
+                })
+
+                setTaskListArr(taskTemp)
+                console.log("snapshot: " + taskListarr.length + " " + taskTemp.length)
             })
             if (taskListarr.length !== 0) {
                 setLoading(false)
@@ -75,47 +75,50 @@ export default function TaskDashboard() {
         }
 
         setLoading(false)
-        
+
         console.log("taskListarr: " + taskListarr.length)
         return true;
     };
 
     return (
         <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="lg">
-                    <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={50} sm={12} lg={'50%'}>
-                            <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-        flexDirection:"column",}} height={400}>
-                                        { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
-                                            return (
-                                            <div key={data.projectId}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <TaskIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                        )}): "There are no tasks!" }
-                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <AddIcon color="grey"/>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={"Add Task"}/>
-                                            </ListItem>
-                                        </Button>
-                                </FixedSizeList>
-                            </Grid>
+            <Container component="main" maxWidth="lg">
+                <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={50} sm={12} lg={'50%'}>
+                            <FixedSizeList sx={{
+                                border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                flexDirection: "column",
+                            }} height={400}>
+                                {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                    return (
+                                        <div key={data.projectId}>
+                                            <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
+                                                <ListItem>
+                                                    <ListItemAvatar>
+                                                        <TaskIcon color="grey" />
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={data[0].name} secondary={data[0].description} />
+                                                </ListItem>
+                                            </Button>
+                                            <Divider />
+                                        </div>
+                                    )
+                                }) : "There are no tasks!"}
+                                <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
+                                    <ListItem>
+                                        <ListItemAvatar>
+                                            <AddIcon color="grey" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={"Add Task"} />
+                                    </ListItem>
+                                </Button>
+                            </FixedSizeList>
                         </Grid>
-                    </Box>
-                </Container>
-            </ThemeProvider>
-        
+                    </Grid>
+                </Box>
+            </Container>
+        </ThemeProvider>
+
     );
 }

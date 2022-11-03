@@ -98,7 +98,7 @@ export default function AddTask() {
         console.log("submitted")
 
         let createNewTask = await apiFunctions.createNewTask(
-            1, // projectId 
+            project, // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime

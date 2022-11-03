@@ -18,6 +18,7 @@ import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import NavBar from '../components/NavBar';
+import Avatar from "@mui/material/Avatar";
 
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -247,6 +248,7 @@ export default function AddTaskPage() {
                                                 onChange={handleHourChange}
                                                 id="estimatedHours"
                                                 label="Estimated Hours"
+                                                value={hour}
                                                 autoFocus
                                                 />
                                         </Grid>
@@ -341,7 +343,11 @@ export default function AddTaskPage() {
                                         renderValue={(selectedFollower) => (
                                         <div>
                                             {selectedFollower.map((data) => (
-                                            <Chip key={data[1]} label={data[0].firstName + " " + data[0].lastName} />
+                                             <Chip 
+                                             key={data[1]} 
+                                             avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
+                                             label={data[0].firstName + " " + data[0].lastName} 
+                                             sx={{marginRight:1,}}/>
                                             ))}
                                         </div>
                                         )}
