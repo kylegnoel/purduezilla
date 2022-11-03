@@ -20,6 +20,7 @@ import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
 import apiFunctions from '../firebase/api';
+import { ref, onValue } from "firebase/database";
 
 const theme = createTheme();
 
@@ -34,6 +35,10 @@ export default function AddTask() {
     const [label, setLabel] = useState('');
     const [owner, setOwner] = useState('');
     const [project, setProject] = useState('');
+    const [projectList, setProjectList] = useState([]);
+    const [userList, setUserList] = useState([]);
+
+    const [isLoading, setLoading] = useState(true);
     
     const navigate = useNavigate();
 
@@ -83,6 +88,11 @@ export default function AddTask() {
         setAssign(event.target.value)
     };
 
+    useEffect(() => {
+        console.log("reload")
+        fetchData()
+    }, []);
+
     const handleSubmit = async (event) => {
         event.preventDefault()
         console.log("submitted")
@@ -111,6 +121,52 @@ export default function AddTask() {
         navigateToDashboard()
     };
 
+    const fetchData = (event) => {
+        // projects
+        try {
+            onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
+                    const projectTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const project = child.val()
+                        console.log("current value: " + project.name + " " + project.projectId)
+                        projectTemp.push([project, child.key])
+                    })
+
+                    setProjectList(projectTemp)
+                    console.log("snapshot: " + projectList.length)
+            })
+            if (projectList.length !== 0) {
+                setLoading(false)
+            }
+        }
+        catch {
+            // if there is no internet
+        }
+
+        // user
+        try {
+            onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+                    const userTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const user = child.val()
+                        console.log("current value: " + user.name + " " + user.projectId)
+                        userTemp.push([user, child.key])
+                    })
+
+                    setUserList(userTemp)
+                    console.log("snapshot: " + userList.length)
+            })
+            if (userList.length !== 0) {
+                setLoading(false)
+            }
+        }
+        catch {
+            // if there is no internet
+        }
+    }
+
     const navigateToDashboard = () => {
         navigate('/home');
       }
@@ -127,7 +183,7 @@ export default function AddTask() {
                 </Button>
                 <Dialog open={open}  onClose={handleClose}>
                     <DialogContent>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <DialogTitle align='center' 
                             sx={{
                                 marginTop:-4,
@@ -210,13 +266,11 @@ export default function AddTask() {
                                                 labelId="projectLabel"
                                                 id="projectLabel"
                                                 label="Project"
-                                                defaultValue={10}
                                                 onChange={handleProjectChange}
                                             >
-                                                <MenuItem value={10}>Project 1</MenuItem>
-                                                <MenuItem value={20}>Project 2</MenuItem>
-                                                <MenuItem value={30}>Project 3</MenuItem>
-                                                <MenuItem value={40}>More</MenuItem>
+                                                { projectList && projectList.length != 0 ? projectList.map((data) => 
+                                                    <MenuItem value={data[0].name} id={data[1]}>{data[0].name}</MenuItem>
+                                                ): <MenuItem value={0}>New Project</MenuItem> }
                                             </Select>
                                         </FormControl>
                                     </Grid>
@@ -239,20 +293,20 @@ export default function AddTask() {
                                     <br></br>
 
                                     <FormControl fullWidth>
-                                            <InputLabel id="ownerLabel">Owner</InputLabel>
-                                            <Select
-                                                labelId="ownerLabelSelect"
-                                                id="ownerSelect"
-                                                label="ownerLabel"
-                                                onChange={handleOwnerChange}
-                                                defaultValue={10}
-                                            >
-                                                <MenuItem value={10}>Me (default)</MenuItem>
-                                                <MenuItem value={20}>User 2</MenuItem>
-                                                <MenuItem value={30}>User 3</MenuItem>
-                                            </Select>
-                                            <FormHelperText>Select the team member who oversees this task.</FormHelperText>
-                                        </FormControl>
+                                        <InputLabel id="ownerLabel">Owner</InputLabel>
+                                        <Select
+                                            labelId="ownerLabelSelect"
+                                            id="ownerSelect"
+                                            label="ownerLabel"
+                                            onChange={handleOwnerChange}
+                                            defaultValue={10}
+                                        >
+                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                                <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                            ): <MenuItem value={0}>New User</MenuItem> }
+                                        </Select>
+                                        <FormHelperText>Select the team member who oversees this task.</FormHelperText>
+                                    </FormControl>
 
                                     <br></br>
                                     <br></br>
@@ -266,9 +320,9 @@ export default function AddTask() {
                                             label="assignLabel"
                                             defaultValue={10}
                                         >
-                                            <MenuItem value={10}>Me (default)</MenuItem>
-                                            <MenuItem value={20}>User 2</MenuItem>
-                                            <MenuItem value={30}>User 3</MenuItem>
+                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                                    <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ): <MenuItem value={0}>New User</MenuItem> }
                                         </Select>
                                         <FormHelperText>Select the team member who is assigned to this task.</FormHelperText>
                                     </FormControl>
@@ -297,9 +351,9 @@ export default function AddTask() {
                                             </div>
                                             )}
                                         >
-                                            <MenuItem value={"Me"}>Me (default)</MenuItem>
-                                            <MenuItem value={"User 2"}>User 2</MenuItem>
-                                            <MenuItem value={"User 3"}>User 3</MenuItem>
+                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                                    <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ): <MenuItem value={0}>New User</MenuItem> }
                                         </Select>
                                         <FormHelperText>Select the team members to follow this task..</FormHelperText>
                                     </FormControl>
