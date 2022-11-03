@@ -21,7 +21,6 @@ const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
-  var profile = null;
   const user = apiFunctions.useFirebaseAuth();
   //console.log('USER: ');
   //console.log(user.key);
@@ -48,14 +47,13 @@ const ResponsiveAppBar = () => {
 
   const handleButtonClick = (setting) => {
     setAnchorElUser(null);
-    if (setting == 'Logout') {
+    if (setting == 'Profile') {
+      navigate('/profile/' + user.key);
+    } else if (setting == 'Logout') {
       apiFunctions.signOutAccount();
       navigate('/');
     }
-    if (setting == 'Profile') {
-      apiFunctions.signOutAccount();
-      navigate('/profile/' + user.key);
-    }
+    
   }
 
   return (
