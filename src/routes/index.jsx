@@ -15,6 +15,7 @@ import AddTaskPage from '../pages/AddTaskPage';
 import AddProjectPage from '../pages/AddTaskPage';
 import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
+import Storyboard from '../pages/Storyboard';
 
 const Routing = props => {
     const isLoggedIn = apiFunctions.auth.currentUser != null;
@@ -31,6 +32,7 @@ const Routing = props => {
                 <Route exact path="/mygroups" element={<Groups />} />
                 <Route exact path="*" element={<NotFound />} />
                 <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
+                <Route exact path="/project/:id/storyboard" forceRefresh={true} element={<Storyboard />} />
                 <Route exact path="/task/:id" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask" element={<AddTaskPage />} />
                 <Route exact path="/mytasks" element={<Task />} />
