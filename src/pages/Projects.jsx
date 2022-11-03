@@ -17,6 +17,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
+import TextField from '@mui/material/TextField';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -30,6 +31,7 @@ const Projects = () => {
     const [taskListarr, setTaskListArr] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const [project, setProject] = useState('');
+    const [description, setDesc] = useState('');
     const navigate = useNavigate();
 
 
@@ -67,6 +69,7 @@ const Projects = () => {
                 // set project name
                 onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
                     setProject(snapshot.val().name)
+                    setDesc(snapshot.val().description)
                 });
     
                 if (taskListarr.length !== 0) {
@@ -112,8 +115,20 @@ const Projects = () => {
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={50} sm={12}>
+                                    <Divider></Divider>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        disabled
+                                        rows={4}
+                                        id="taskDescription"
+                                        label="Task Description"
+                                        name="taskDescription"
+                                        value={description}
+                                        sx={{ mt: 2, mb: 2 }}
+                                        />
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-            flexDirection:"column",}} height={400}>
+            flexDirection:"column", mt:2 }} height={400}>
                                             { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                                 return (
                                                 <div key={data.key}>
@@ -133,7 +148,7 @@ const Projects = () => {
                                                 <ListItemAvatar>
                                                     <AddIcon color="grey"/>
                                                 </ListItemAvatar>
-                                                <ListItemText primary={"Crete New Task"}/>
+                                                <ListItemText primary={"Create New Task"}/>
                                             </ListItem>
                                         </Button>
                                     </FixedSizeList>

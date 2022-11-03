@@ -91,11 +91,12 @@ const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
   });  
 }
 
-const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId) {
+const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId, projectName) {
   const ownersListRef = ref(db, 'groups/' + groupKey + '/projects');
   const projectRef = push(ownersListRef);
   set(projectRef, {
-    projectId: projectId
+    projectId: projectId,
+    projectName: projectName
   });  
 }
 
@@ -417,12 +418,17 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
 // Returns 2d array with each element as [projectKey, values]
 const getGroupsProjects = function getGroupsProjects(groupId) {
   const groupsProjects = []
+  console.log(groupId)
 
   onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      groupsProjects.push([childSnapshot.key, childSnapshot.val()]);
+      console.log("value: " + childSnapshot.val().projectId)
+      const tempProject = getProjectById(childSnapshot.val().projectId)
+      console.log("tempProject: " + JSON.stringify(tempProject))
+      groupsProjects.push([tempProject[0], tempProject[1]]);
     })
   });
+  console.log(JSON.stringify(groupsProjects))
 
   return groupsProjects;
 }
@@ -771,8 +777,6 @@ const FirebaseAuthProvider = ({ children }) => {
         onValue(userListRef, (snapshot) => {
           snapshot.forEach(function (child) {
             const printing = child.val();
-            console.log("key");
-            console.log(child.key);
             // console.log(printing.email);
             // console.log(searcher);
             // console.log(printing.email === searcher);

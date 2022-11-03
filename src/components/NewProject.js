@@ -234,7 +234,7 @@ export default function NewProject() {
                                     )}
                                 >
                                     { userList && userList.length != 0 ? userList.map((data) => 
-                                                <MenuItem value={data.key} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                                 </Select>
                                 <FormHelperText>Select the team members of this project.</FormHelperText>
