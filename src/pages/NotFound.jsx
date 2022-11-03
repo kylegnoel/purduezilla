@@ -9,9 +9,6 @@ const NotFound = () => {
     const navigate = useNavigate();
 
     const fetchData = (event) => {
-        if (user === null) {
-            navigate('/');
-        }
     }
 
     useEffect(() => {

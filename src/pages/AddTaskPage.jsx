@@ -248,6 +248,7 @@ export default function AddTaskPage() {
                                                 onChange={handleHourChange}
                                                 id="estimatedHours"
                                                 label="Estimated Hours"
+                                                value={hour}
                                                 autoFocus
                                                 />
                                         </Grid>
