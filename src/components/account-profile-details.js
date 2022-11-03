@@ -87,6 +87,7 @@ export const AccountProfileDetails = (props) => {
                 name="email"
                 onChange={handleChange}
                 required
+                disabled={true}
                 value={values.email}
                 variant="outlined"
               />
