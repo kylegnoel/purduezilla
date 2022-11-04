@@ -177,7 +177,7 @@ export default function AddTaskPage() {
             <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
                     <Container component="main" maxWidth="sm">
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
                         <DialogTitle align='center' 
                         sx={{
                             marginTop:-4,
@@ -190,7 +190,7 @@ export default function AddTaskPage() {
                                 alignItems: 'center',
                             }}
                             >                                
-                            <Box component="form" sx={{ mt: 4 }}>
+                            <Box sx={{ mt: 4 }}>
                                 <Grid container spacing={2}>
                                 <Grid item xs={50} sm={12}>
                                     <Grid container spacing={2}>

@@ -14,6 +14,7 @@ import FixedSizeList from '@mui/material/List';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CheckIcon from '@mui/icons-material/Check';
 
 import FormControl from '@mui/material/FormControl';
@@ -45,7 +46,9 @@ const Task = () => {
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
+    const [followedTaskListarr, setFollowedTaskList] = useState([]);
     const [isLoading, setLoading] = useState(true);
+    const [showFollow, setFollow] = useState(false);
 
     const [name, setName] = useState('');
     const [newName, setNewName] = useState('');
@@ -68,6 +71,7 @@ const Task = () => {
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
+    const [assign, setAssigned] = useState(false);
     
     const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
@@ -147,6 +151,30 @@ const Task = () => {
             console.log('double click');
             setEditing(!isEditing)
           }
+    }
+
+    const assignToMe = async (event) => {
+
+        const userTemp = apiFunctions.getUserById(user.key)
+        console.log(userTemp)
+        console.log("saving: " + JSON.stringify(userTemp[0][1]))
+        let addTaskAssignedUsers = await apiFunctions.addTaskAssignedUsers(
+            id,
+            userTemp[0][0]
+        )
+        setAssign(userTemp[0][1].firstName + " " + userTemp[0][1].lastName)
+        setAssigned(true)
+        if (addTaskAssignedUsers) {
+            alert("Assigned to Me!");
+        } else {
+            console.log("failed to save task: ");
+            alert("Task Failed to Save");
+        }
+    }
+    
+    const handleShowFollow = (event) => {
+        setFollow(!showFollow)
+        console.log("value of showFollow: " + showFollow)
     }
 
     const handleMarkDone = async (event) => {
@@ -235,8 +263,7 @@ const Task = () => {
         setComments([...comments, newAdded]);
     };
 
-    const fetchData = (event) => {
-
+    const fetchData = async (event) => {
         console.log("fetched hello: ")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -244,50 +271,43 @@ const Task = () => {
 
         if (id !== undefined) {
             try {
-                onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
+                await onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
                     console.log("RESULT: " + JSON.stringify(snapshot.val()))
-                        const val = snapshot.val()
-    
-                        setName(val.name)
-                        setNewName(val.name)
-                        setProject(val.project)
-                        setNewProject(val.project)
-                        setDesc(val.description)
-                        setHour(val.estimatedTime)
-                        setLabel(val.status)
-                        setOwner(val.owner)
-                        setAssign(val.assignedUsers)
-    
-                        //owner
-                        if (val.owner !== "") {
-                            onValue(ref(apiFunctions.db, "users/" + val.owner), (snapshot) => {
-                                if (snapshot.val() !== null ) {
-                                    setOwner(snapshot.val().firstName + " " + snapshot.val().lastName)
-                                }
-                            });
-                        }
-    
-                        console.log("owner: " + owner)
-                        console.log("set hour: " + hour + " " + val.estimatedTime)
-    
-                        //assignee
-                        if (val.assignedUsers !== "") {
-                            onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
-                                setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
-                            });
-                        }
-                        
-                        
-                        // set project name
-                        onValue(ref(apiFunctions.db, "projects/" + val.projectId), (snapshot1) => {
-                            setProject(snapshot1.val().name)
-                        });
-    
-                        setUserList(val.description)
-    
-                        console.log(name)
-    
+                    const val = snapshot.val()
+
+                    setName(val.name)
+                    setNewName(val.name)
+                    setDesc(val.description)
+                    setHour(val.estimatedTime)
+                    setLabel(val.status)
+                    setOwner(val.owners[1].firstName + " " +  val.owners[1].lastName)
+                    setAssign(val.assignedUsers[1].firstName + " " +  val.assignedUsers[1].lastName)
+                    setSelectedFollower(val.followers)
+                    setProject(val.projectId[1].name)
+                    console.log("project: " + val.projectId)
+                    console.log("project: " + val.projectId[1].name)
+                    
+                    console.log("set task")
+
+                    // //owner
+                    // const ownerTemp = apiFunctions.getUserById(val.owner)[1]
+                    // console.log("owner: " + JSON.stringify(ownerTemp))
+                    // console.log("set hour: " + hour + " " + val.estimatedTime)
+
+                    //assignee
+                    // if (val.assignedUsers !== "") {
+                    //     onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
+                    //         setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
+                    //     });
+                    // }
+
+                    console.log(name)
+
+                    console.log("OK HERE" + val.projectId)
+                    setProject(apiFunctions.getProjectById(val.projectId)[0][1].name)
                 })
+                
+
                 if (taskListarr.length !== 0) {
                     setLoading(false)
                 }
@@ -305,14 +325,16 @@ const Task = () => {
         else {
             console.log("getting user data")
             setTaskListArr([])
-            console.log("id: " + user.key)
-            if ( user !== null) {
-                console.log("user: " + JSON.stringify(user.key))
-                console.log("id: " + user.key)
-                const myTasks = apiFunctions.getUsersAssignedTasks(user.key)
-                console.log("mytasks: " + myTasks)
-                setTaskListArr(myTasks)
-            }
+            const taskTemp = apiFunctions.getUsersAssignedTasks(user.key);
+            console.log("set Tasks")
+            console.log(JSON.stringify(taskTemp))
+            setTaskListArr(taskTemp)
+
+            setFollowedTaskList([])
+            const taskFollowedTemp = apiFunctions.getUsersFollowedTasks(user.key);
+            console.log("set Tasks")
+            console.log(JSON.stringify(taskFollowedTemp))
+            setFollowedTaskList(taskFollowedTemp)
         }
         
         // projects
@@ -371,12 +393,51 @@ const Task = () => {
                 <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="lg">
                     <br></br>
-                    <h2>My Tasks</h2>
+                    {showFollow
+                                ? <h2>Assigned Tasks</h2>
+                                : <h2>Followed Tasks</h2>
+                            }
+                    <Divider></Divider>
+                    <br></br>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            width: '40%',
+                            mb: '-100px',
+                            ml: '30%'
+                        }}>
+                            {showFollow
+                                ?   <div>
+                                        <Button
+                                        onClick={handleShowFollow}
+                                        variant="outlined"
+                                        startIcon={<BookmarkIcon />}
+                                        sx={{ mb: 8 }}
+                                        >
+                                        <b>Show Tasks I Follow</b>
+                                        </Button>
+                                    </div>
+                                : 
+                                    <div>
+                                        <Button
+                                        onClick={handleShowFollow}
+                                        variant="outlined"
+                                        startIcon={<BookmarkIcon />}
+                                        sx={{ mb: 8 }}>
+                                            <b>Show Tasks I Am Assigned</b>
+                                        </Button>
+                                     </div>
+                            }
+                            <br></br>
+                        </Box>
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12} lg={'50%'}>
-                            <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-        flexDirection:"column",}} height={400}>
+                            { showFollow
+                                ? <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
+                                flexDirection:"column",}} height={400}>
                                         { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                             return (
                                             <div key={data.projectId}>
@@ -400,6 +461,32 @@ const Task = () => {
                                             </ListItem>
                                         </Button>
                                 </FixedSizeList>
+                                : <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
+                                flexDirection:"column",}} height={400}>
+                                        { followedTaskListarr && followedTaskListarr.length != 0 ? followedTaskListarr.map((data) => {
+                                            return (
+                                            <div key={data.projectId}>
+                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
+                                                    <ListItem>
+                                                        <ListItemAvatar>
+                                                            <TaskIcon color="grey"/>
+                                                        </ListItemAvatar>
+                                                        <ListItemText primary={data[1].name} secondary={data[1].description}/>
+                                                    </ListItem>
+                                                </Button>
+                                                <Divider />
+                                            </div>   
+                                        )}): "There are no tasks!" }
+                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
+                                            <ListItem>
+                                                <ListItemAvatar>
+                                                    <AddIcon color="grey"/>
+                                                </ListItemAvatar>
+                                                <ListItemText primary={"Create New Task"}/>
+                                            </ListItem>
+                                        </Button>
+                                </FixedSizeList> }
+                                
                             </Grid>
                         </Grid>
                     </Box>
@@ -610,7 +697,7 @@ const Task = () => {
                                 </Box>
                             </Box>
                             <br></br>
-                            <Divider rightAlign>Comment</Divider>
+                            <Divider rightAlign><h2>Comment</h2></Divider>
                             <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
                                     sx={{
@@ -619,7 +706,6 @@ const Task = () => {
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <h2>Comment</h2>
                                     {comments.map((comment) => (
                                         < div >
                                             <p> author key: {comment.author}</p>
@@ -806,22 +892,37 @@ const Task = () => {
                                         <br></br>
                                         <br></br>
                                         <Divider>ASSIGN</Divider>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={8}>
+                                            <Button onClick={handleClick} fullWidth>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="assign"
+                                                    fullWidth
+                                                    id="assign"
+                                                    value={assignee}
+                                                    disabled
+                                                />
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <Button
+                                                    onClick={assignToMe}
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    startIcon={<CheckIcon />}
+                                                    sx={{ mt: 1, mb: 2, height: '55px' }}
+                                                    >
+                                                <b>{assign ? 'Assigned to Me' : 'Assign to Me'}</b> 
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
                                         <br></br>
-                                        <Button onClick={handleClick} fullWidth>
-                                            <TextField
-                                                autoComplete="given-name"
-                                                name="assign"
-                                                fullWidth
-                                                id="assign"
-                                                value={assignee}
-                                                disabled
-                                            />
-                                        </Button>
                                     </Box>
                                 </Box>
                             </Box>
                             <br></br>
-                            <Divider rightAlign>Comment</Divider>
+                            <Divider rightAlign><h2>Comment</h2></Divider>
                             <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
                                     sx={{
@@ -830,7 +931,6 @@ const Task = () => {
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <h2>Comment</h2>
                                     {comments.map((comment) => (
                                         < div >
                                             <p> author key: {comment.author}</p>

@@ -34,6 +34,7 @@ const Routing = props => {
                 <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
                 <Route exact path="/task/:id" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
+                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
                 <Route exact path="/mytasks" element={<Task />} />
             </Routes>
         </Router>

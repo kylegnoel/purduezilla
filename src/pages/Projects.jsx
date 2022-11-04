@@ -58,7 +58,7 @@ const Projects = () => {
         
                     snapshot.forEach(function(child) {
                         const task = child.val()
-                        if (task.projectId === id) {
+                        if (task.projectId[0] === id) {
                             taskTemp.push([task, child.key])
                         }
                     })
