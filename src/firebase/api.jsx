@@ -283,14 +283,14 @@ const createNewTask = async function createNewTask(projectId, name, description,
   const newTaskRef = push(taskListRef);
 
   set(newTaskRef, {
-    projectId: getProjectById(projectId)[0],
+    projectId: await getProjectById(projectId)[0],
     name: name,
     description: description,
     estimatedTime: estimatedTime,
     assignedUsers: assignedUserIds,
-    owners: getUserById(ownerIds)[0],
+    owners: await getUserById(ownerIds)[0],
     status: status,
-    assignedUsers: getUserById(assignedUserIds)[0],
+    assignedUsers: await getUserById(assignedUserIds)[0],
     followers: followerIds
   });
     return newTaskRef.key;
