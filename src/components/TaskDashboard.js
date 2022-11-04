@@ -59,11 +59,11 @@ export default function TaskDashboard() {
                 snapshot.forEach(function (child) {
                     const task = child.val()
                     taskTemp.push([task, child.key])
-                    console.log("key: " + child.key);
+                    //console.log("key: " + child.key);
                 })
 
                 setTaskListArr(taskTemp)
-                console.log("snapshot: " + taskListarr.length + " " + taskTemp.length)
+                //console.log("snapshot: " + taskListarr.length + " " + taskTemp.length)
             })
             if (taskListarr.length !== 0) {
                 setLoading(false)
