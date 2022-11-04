@@ -5,6 +5,7 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import NotFound from "../pages/NotFound";
 import Register from "../pages/Register"
+import Profile from "../pages/Profile";
 import NavBar from '../components/NavBar';
 import Projects from '../pages/Projects';
 import PrivateRoute from './PrivateRoute';
@@ -26,6 +27,7 @@ const Routing = props => {
                 <Route exact path="/register" element={<Register />} />
                 <Route exact path="/myprojects" element={<Projects />} />
                 <Route exact path="/newproject" element={<NewProject />} />
+                <Route exact path="/profile/:id" element={<Profile />} />
                 <Route exact path="/newgroup" element={<NewGroup />} />
                 <Route exact path="/group/:id" element={<Groups />} />
                 <Route exact path="/mygroups" element={<Groups />} />
