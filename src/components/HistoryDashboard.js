@@ -39,26 +39,21 @@ export default function TaskDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            console.log("eventid: " + event.currentTarget.id)
             navigate('/task/' + event.currentTarget.id);
         }
     }
 
 
     const fetchData = (event) => {
-        console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
         setHistoryEvents([])
         const historyTemp = apiFunctions.getHistoryEvents;
-        console.log("history events")
-        console.log(JSON.stringify(historyTemp))
         setHistoryEvents(historyTemp)
 
         setLoading(false)
 
-        console.log("taskListarr: " + taskListarr.length)
         return true;
     };
 

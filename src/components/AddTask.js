@@ -95,7 +95,7 @@ export default function AddTask() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        console.log("submitted")
+        // console.log("submitted")
 
         let createNewTask = await apiFunctions.createNewTask(
             project, // projectId 
@@ -115,7 +115,7 @@ export default function AddTask() {
         
             
         }
-        console.log("FINISHED");
+        // console.log("FINISHED");
         alert("Task Added");
         
         navigateToDashboard()
@@ -129,12 +129,12 @@ export default function AddTask() {
         
                     snapshot.forEach(function(child) {
                         const project = child.val()
-                        console.log("current value: " + project.name + " " + project.projectId)
+                        // console.log("current value: " + project.name + " " + project.projectId)
                         projectTemp.push([project, child.key])
                     })
 
                     setProjectList(projectTemp)
-                    console.log("snapshot: " + projectList.length)
+                    // console.log("snapshot: " + projectList.length)
             })
             if (projectList.length !== 0) {
                 setLoading(false)
@@ -151,12 +151,12 @@ export default function AddTask() {
         
                     snapshot.forEach(function(child) {
                         const user = child.val()
-                        console.log("current value: " + user.name + " " + user.projectId)
+                        // console.log("current value: " + user.name + " " + user.projectId)
                         userTemp.push([user, child.key])
                     })
 
                     setUserList(userTemp)
-                    console.log("snapshot: " + userList.length)
+                    // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)

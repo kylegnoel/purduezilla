@@ -182,7 +182,6 @@ const getHistoryEvents = function getHistoryEvents() {
       })
     });
 
-    console.log(history)
     return history
 }
 
@@ -242,7 +241,6 @@ const createNewTask = async function createNewTask(projectId, name, description,
   // Create basic task
   const taskListRef = ref(db, 'tasks');
   const newTaskRef = push(taskListRef);
-  console.log(ownerIds)
   set(newTaskRef, {
     projectId: await getProjectById(projectId)[0],
     name: name,
@@ -259,7 +257,6 @@ const createNewTask = async function createNewTask(projectId, name, description,
 }
 
 const addTaskOwners = (taskId, ownerIds) => {
-  console.log("addTaskOnwers")
     const ownersListRef = ref(db, 'tasks/' + ownerIds + '/owners');
     const userRef = push(ownersListRef);
         push(userRef, {
@@ -268,8 +265,6 @@ const addTaskOwners = (taskId, ownerIds) => {
 }
 
 const addTaskAssignedUsers = async (taskId, assignedUserIds) => {
-  console.log("addTaskAssignedUsers")
-
   const assignedUserListRef = ref(db, 'tasks/' + taskId + '/assignedUsers');
   const userRef = push(assignedUserListRef);
   push(userRef, {
@@ -331,13 +326,10 @@ const getProjectsTasks = function getProjectsTasks(projectId) {
 const getUsersProjects = function getUsersProjects(userId) {
   const usersProjects = []
 
-  console.log("getting projects: " + userId)
-
   onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
     snapshot.forEach(function (projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function (memberSnapshot) {
-          console.log("current value: " + memberSnapshot.val().userId)
           if (memberSnapshot.val().userId == userId) {
             // Keep track of key and values
             usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
@@ -353,11 +345,9 @@ const getUsersProjects = function getUsersProjects(userId) {
 // Returns 2d array with each element as [taskKey, values]
 const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
   const usersAssignedTasks = []
-  console.log("userId: " + userId)
 
   onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
     snapshot.forEach(function (taskSnapshot) {
-      console.log("value of Project: " + JSON.stringify(taskSnapshot.val()))
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
         var found = false
         // snapshot2.forEach(function (userSnapshot) {
@@ -367,7 +357,6 @@ const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
         //     found = true
         //   }
         // });
-        console.log("values for test: " + JSON.stringify(snapshot2.val()[0]) + " " + userId)
         if (snapshot2.val()[0] == userId && found === false)  {
           // Keep track of key and values
           usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
@@ -405,17 +394,13 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
 // Returns 2d array with each element as [projectKey, values]
 const getGroupsProjects = function getGroupsProjects(groupId) {
   const groupsProjects = []
-  console.log(groupId)
 
   onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      console.log("value: " + childSnapshot.val().projectId)
       const tempProject = getProjectById(childSnapshot.val().projectId)
-      console.log("tempProject: " + JSON.stringify(tempProject))
       groupsProjects.push([tempProject[0], tempProject[1]]);
     })
   });
-  console.log(JSON.stringify(groupsProjects))
 
   return groupsProjects;
 }
@@ -621,10 +606,8 @@ const deleteProjectMembers = (id, exMemberIds) => {
  */
 const updateTaskDetails = async (id, projectId, name, description, estimatedTime, status) => {
     const taskListRef = ref(db, 'tasks/'  + id);
-    console.log("updating task " + [id, projectId, name, description, estimatedTime, status])
 
     const taskTemp = getTaskById(id)[0][1];
-    console.log(JSON.stringify(taskTemp.name))
 
     const oldName = taskTemp.name;
     if (oldName != name) {
@@ -649,8 +632,6 @@ const updateTaskDetails = async (id, projectId, name, description, estimatedTime
         estimatedTime: estimatedTime,
         status: status,
     })
-
-    console.log("finsihed updating")
 
     return taskListRef.key
 }

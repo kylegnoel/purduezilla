@@ -46,25 +46,18 @@ const Groups = () => {
 
     const fetchData = (event) => {
         onValue(ref(apiFunctions.db, 'groups/' + id + '/projects'), (snapshot) => {
-            console.log("group name: " + snapshot.val().name)
             setGroup(snapshot.val().name)
 
             const projectListTemp = []
             const projectLi = snapshot.val().projects
 
-            console.log(projectLi)
-
             snapshot.forEach(function (childSnapshot) {
                 const projectID = childSnapshot.val().name
                 projectListTemp.push([projectID, childSnapshot.val()])
-                console.log("value: " + JSON.stringify(childSnapshot.val()))
             })
-            console.log("set project")
-            console.log(projectListTemp)
             setProjectList(projectListTemp)
         })
 
-        console.log("complete")
         return true;
     };
 
@@ -73,7 +66,6 @@ const Groups = () => {
             navigate('/newproject/');
         }
         else {
-            console.log("eventid: " + event.currentTarget.id)
             navigate('/project/'+event.currentTarget.id);
         }
     }

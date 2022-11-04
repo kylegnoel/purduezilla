@@ -28,8 +28,6 @@ const theme = createTheme();
 
 const Dashboard = () => {
     const { id } = useParams();
-    const testing = apiFunctions.useFirebaseAuth();
-    console.log(testing);
     const user = apiFunctions.useFirebaseAuth();
 
     const [projListarr, setProjListArr] = useState([]);
@@ -44,7 +42,6 @@ const Dashboard = () => {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
-            console.log("eventid: " + event.currentTarget.id)
             window.location.href='/project/'+event.currentTarget.id;
             //window.location.reload()
         }
@@ -53,29 +50,18 @@ const Dashboard = () => {
         }
     }
 
-    const fetchData = (event) => {
-        console.log("hello")
+    const fetchData = async (event) => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        try {
-            const settingProjects = apiFunctions.getUsersProjects(user.key);
-            console.log("set projects");
-            console.log(settingProjects);
-            setProjListArr(settingProjects);
+        const settingProjects = apiFunctions.getUsersProjects(user.key);
+        await setProjListArr(settingProjects);
 
-            const settingTasks = apiFunctions.getUsersAssignedTasks(user.key);
-            console.log("set projects");
-            console.log(settingTasks);
-            setTaskListArr(settingTasks);
-        }
-        catch {
-            // if there is no internet
-        }
+        const settingTasks = apiFunctions.getUsersAssignedTasks(user.key);
+        await setTaskListArr(settingTasks);
 
         setLoading(false)
         
-        console.log("taskListarr: " + projListarr.length)
         return true;
     };
 

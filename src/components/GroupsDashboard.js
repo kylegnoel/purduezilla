@@ -50,7 +50,7 @@ export default function GroupsDashboard() {
             // navigate('/newproject/');
         }
         else {
-            console.log("eventid: " + event.currentTarget.id)
+            // console.log("eventid: " + event.currentTarget.id)
             window.location.href='/group/'+event.currentTarget.id;
             // navigate('/group/'+event.currentTarget.id);
         }
@@ -58,16 +58,16 @@ export default function GroupsDashboard() {
 
 
     const fetchData = (event) => {
-        console.log("hello")
+        // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        // // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
                 const groupTemp = []
     
                 snapshot.forEach(function(child) {
-                    console.log("group name: " + child.val().name)
+                    // console.log("group name: " + child.val().name)
                     groupTemp.push([child.val(), child.key])
                 })
 

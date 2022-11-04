@@ -92,14 +92,14 @@ export default function AddTaskPage() {
     const handleSubmit = async (event) => {
 
         event.preventDefault()
-        console.log("submitted")
+        // console.log("submitted")
 
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
             followerId.push(follower[1])
         })
-        console.log("followers: " + followerId)
+        // console.log("followers: " + followerId)
 
         let createNewTask = await apiFunctions.createNewTask(
             project, // projectId 
@@ -113,11 +113,11 @@ export default function AddTaskPage() {
             )
 
         if (createNewTask) {
-            console.log("task created: ");
+            // console.log("task created: ");
             alert("Task Added");
             navigateToPage()
         } else {
-            console.log("failed to add task: ");
+            // console.log("failed to add task: ");
             alert("Task Failed to Add");
         }
     };
@@ -130,12 +130,12 @@ export default function AddTaskPage() {
         
                     snapshot.forEach(function(child) {
                         const project = child.val()
-                        console.log("current value: " + project.name + " " + project.projectId)
+                        // console.log("current value: " + project.name + " " + project.projectId)
                         projectTemp.push([project, child.key])
                     })
 
                     setProjectList(projectTemp)
-                    console.log("snapshot: " + projectList.length)
+                    // console.log("snapshot: " + projectList.length)
             })
             if (projectList.length !== 0) {
                 setLoading(false)
@@ -152,12 +152,12 @@ export default function AddTaskPage() {
         
                     snapshot.forEach(function(child) {
                         const user = child.val()
-                        console.log("current value: " + user.name + " " + user.projectId)
+                        // console.log("current value: " + user.name + " " + user.projectId)
                         userTemp.push([user, child.key])
                     })
 
                     setUserList(userTemp)
-                    console.log("snapshot: " + userList.length)
+                    // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)

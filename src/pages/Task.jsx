@@ -42,7 +42,6 @@ import { ref, onValue } from "firebase/database";
 
 const Task = () => {
     const { id } = useParams();
-    console.log("parameters: " + id);
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
@@ -66,7 +65,6 @@ const Task = () => {
     // const [taggingBody, setTaggingBody] = useState('');
 
     const user = apiFunctions.useFirebaseAuth();
-    console.log(JSON.stringify(user))
 
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
@@ -79,9 +77,7 @@ const Task = () => {
 
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
-        console.log("selection: " + event.target.value)
         if (event.target.value === 'Complete') {
-            console.log("COMPLETED")
             alert('Task Completed!');
         }
     };
@@ -128,12 +124,9 @@ const Task = () => {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            console.log("eventid: " + event.currentTarget.id)
-            //navigate('/task/'+event.currentTarget.id);
             window.location.href='/task/'+event.currentTarget.id
         }
         else {
-            // navigate('/newtask');
             window.location.href='/newtask/'
         }
     }
@@ -148,7 +141,6 @@ const Task = () => {
 
     const handleClick = (event) => {
         if (event.detail === 2) {
-            console.log('double click');
             setEditing(!isEditing)
           }
     }
@@ -156,8 +148,6 @@ const Task = () => {
     const assignToMe = async (event) => {
 
         const userTemp = apiFunctions.getUserById(user.key)
-        console.log(userTemp)
-        console.log("saving: " + JSON.stringify(userTemp[0][1]))
         let addTaskAssignedUsers = await apiFunctions.addTaskAssignedUsers(
             id,
             userTemp[0][0]
@@ -167,14 +157,12 @@ const Task = () => {
         if (addTaskAssignedUsers) {
             alert("Assigned to Me!");
         } else {
-            console.log("failed to save task: ");
             alert("Task Failed to Save");
         }
     }
     
     const handleShowFollow = (event) => {
         setFollow(!showFollow)
-        console.log("value of showFollow: " + showFollow)
     }
 
     const handleMarkDone = async (event) => {
@@ -203,13 +191,11 @@ const Task = () => {
             )
 
         setLabel(selectedTemp)
-        console.log("selected: " + selectedTemp)
         
             if (updateTaskDetails) {
                 //window.location.href='/task/'+id
                 
             } else {
-                console.log("failed to save task: ");
                 alert("Task Failed to Save");
             }
     }
@@ -217,7 +203,6 @@ const Task = () => {
 
     const handleSubmit = async (event) => {
         //event.preventDefault()
-        console.log("DONE SUBMITTED: " + id + " " + newName + " " + description + " " + selected)
         
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
@@ -228,22 +213,17 @@ const Task = () => {
             selected, // status
             )
 
-        console.log("selected: " + selected)
-
-
         if (updateTaskDetails) {
-            console.log("task edited: " + newName + " -" + selected + "-");
             alert("Task Saved! " + newName);
             window.location.href='/task/'+id
             
         } else {
-            console.log("failed to save task: ");
             alert("Task Failed to Save");
         }
     };
 
     useEffect(() => {
-        console.log("reload");
+        // console.log("reload");
         fetchData();
     }, []);
 
@@ -264,15 +244,13 @@ const Task = () => {
     };
 
     const fetchData = async (event) => {
-        console.log("fetched hello: ")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        // // console.log("response: " + response)
 
         if (id !== undefined) {
             try {
                 await onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
-                    console.log("RESULT: " + JSON.stringify(snapshot.val()))
                     const val = snapshot.val()
 
                     setName(val.name)
@@ -284,15 +262,11 @@ const Task = () => {
                     setAssign(val.assignedUsers[1].firstName + " " +  val.assignedUsers[1].lastName)
                     setSelectedFollower(val.followers)
                     setProject(val.projectId[1].name)
-                    console.log("project: " + val.projectId)
-                    console.log("project: " + val.projectId[1].name)
-                    
-                    console.log("set task")
 
                     // //owner
                     // const ownerTemp = apiFunctions.getUserById(val.owner)[1]
-                    // console.log("owner: " + JSON.stringify(ownerTemp))
-                    // console.log("set hour: " + hour + " " + val.estimatedTime)
+                    // // console.log("owner: " + JSON.stringify(ownerTemp))
+                    // // console.log("set hour: " + hour + " " + val.estimatedTime)
 
                     //assignee
                     // if (val.assignedUsers !== "") {
@@ -300,10 +274,6 @@ const Task = () => {
                     //         setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
                     //     });
                     // }
-
-                    console.log(name)
-
-                    console.log("OK HERE" + val.projectId)
                 })
                 
 
@@ -313,8 +283,6 @@ const Task = () => {
     
                 //fetch comments as well
                 const settingComments = apiFunctions.getTaskComments(id);
-                console.log("set commnets");
-                console.log(settingComments);
                 setComments(settingComments);
             }
             catch {
@@ -322,33 +290,26 @@ const Task = () => {
             }    
         }
         else {
-            console.log("getting user data")
             setTaskListArr([])
             const taskTemp = apiFunctions.getUsersAssignedTasks(user.key);
-            console.log("set Tasks")
-            console.log(JSON.stringify(taskTemp))
             setTaskListArr(taskTemp)
 
             setFollowedTaskList([])
             const taskFollowedTemp = apiFunctions.getUsersFollowedTasks(user.key);
-            console.log("set Tasks")
-            console.log(JSON.stringify(taskFollowedTemp))
             setFollowedTaskList(taskFollowedTemp)
         }
         
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                    const projectTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const project = child.val()
-                        console.log("current value: " + project.name + " " + project.projectId)
-                        projectTemp.push([project, child.key])
-                    })
+                const projectTemp = []
+    
+                snapshot.forEach(function(child) {
+                    const project = child.val()
+                    projectTemp.push([project, child.key])
+                })
 
-                    setProjectList(projectTemp)
-                    console.log("snapshot: " + projectList.length)
+                setProjectList(projectTemp)
             })
             if (projectList.length !== 0) {
                 setLoading(false)
@@ -361,16 +322,14 @@ const Task = () => {
         // user
         try {
             onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                    const userTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const user = child.val()
-                        console.log("current value: " + user.name + " " + user.projectId)
-                        userTemp.push([user, child.key])
-                    })
+                const userTemp = []
+    
+                snapshot.forEach(function(child) {
+                    const user = child.val()
+                    userTemp.push([user, child.key])
+                })
 
-                    setUserList(userTemp)
-                    console.log("snapshot: " + userList.length)
+                setUserList(userTemp)
             })
             if (userList.length !== 0) {
                 setLoading(false)
@@ -381,7 +340,6 @@ const Task = () => {
         }
 
         setLoading(false)
-        console.log("taskListarr: " + taskListarr.length)
         return true;
     };
 

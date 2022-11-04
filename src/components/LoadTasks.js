@@ -49,7 +49,7 @@ export default function LoadTasks() {
     };
 
     const handleClick = () => {
-        console.log("Expanding Task");
+        // console.log("Expanding Task");
     };
 
     const handleClose = () => {
@@ -59,14 +59,14 @@ export default function LoadTasks() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('taskName'),
-            password: data.get('label'),
-            project: data.get('projectLabel'),
-            description: data.get('taskDescription'),
-            owner: data.get('ownerSelect'),
-            assign: data.get('assignSelect'),
-        });
+        // console.log({
+        //     email: data.get('taskName'),
+        //     password: data.get('label'),
+        //     project: data.get('projectLabel'),
+        //     description: data.get('taskDescription'),
+        //     owner: data.get('ownerSelect'),
+        //     assign: data.get('assignSelect'),
+        // });
     };
 
     const [taskListarr, setTaskListArr] = useState([]);
@@ -74,27 +74,27 @@ export default function LoadTasks() {
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log("reload")
+        // console.log("reload")
         fetchData()
     }, []);
 
     const fetchData = (event) => {
-        console.log("hello")
+        // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        // // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
                 const taskTemp = []
 
                 snapshot.forEach(function (child) {
                     const task = child.val();
-                    // console.log(task);
+                    // // console.log(task);
                     taskTemp.push(child.val());
                 })
 
                 setTaskListArr(taskTemp)
-                console.log("snapshot: " + taskListarr.length + " " + taskTemp.length)
+                // console.log("snapshot: " + taskListarr.length + " " + taskTemp.length)
             })
             if (taskListarr.length !== 0) {
                 setLoading(false)
@@ -107,7 +107,7 @@ export default function LoadTasks() {
 
         setLoading(false)
 
-        console.log("taskListarr: " + taskListarr.length)
+        // console.log("taskListarr: " + taskListarr.length)
         return true;
     };
 
