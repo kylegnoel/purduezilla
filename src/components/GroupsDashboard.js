@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { Container, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import WorkIcon from '@mui/icons-material/Work';
+import GroupIcon from '@mui/icons-material/Group';
 import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
 import GroupsIcon from '@mui/icons-material/Groups';

@@ -93,7 +93,7 @@ const Task = () => {
     const handleDescChange = event => {
         setDesc(event.target.value)
     };
-    
+
     const handleHourChange = event => {
         setHour(event.target.value)
     };
@@ -116,11 +116,11 @@ const Task = () => {
 
     const handleClickOpen = () => {
         setOpen(true);
-      };
-    
-      const handleClose = () => {
+    };
+
+    const handleClose = () => {
         setOpen(false);
-      };
+    };
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
@@ -136,13 +136,13 @@ const Task = () => {
     }
 
     const handleDelete = (event) => {
-        
+
     }
 
     const handleClick = (event) => {
         if (event.detail === 2) {
             setEditing(!isEditing)
-          }
+        }
     }
 
     const assignToMe = async (event) => {
@@ -211,12 +211,12 @@ const Task = () => {
             description, // description
             hour, //estimated time
             selected, // status
-            )
+        )
 
         if (updateTaskDetails) {
             alert("Task Saved! " + newName);
-            window.location.href='/task/'+id
-            
+            window.location.href = '/task/' + id
+
         } else {
             alert("Task Failed to Save");
         }
@@ -229,6 +229,7 @@ const Task = () => {
 
     const newCommentSubmit = (event) => {
         event.preventDefault();
+
         if (newCommentBody == '') {
             return;
         }
@@ -236,10 +237,14 @@ const Task = () => {
         let splitComment = newCommentBody.split(" ");
         splitComment.forEach((word) => {
             if (word.charAt(0) == '#') {
-                tagged.push(word);
+                tagged.push(word.substring(1));
             }
         });
+
         let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
+        // window.location.reload();
+
+        setNewCommentBody("");
         setComments([...comments, newAdded]);
     };
 
@@ -288,6 +293,7 @@ const Task = () => {
             catch {
                 // if there is no internet
             }    
+
         }
         else {
             setTaskListArr([])
@@ -302,8 +308,7 @@ const Task = () => {
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                const projectTemp = []
-    
+                const projectTemp = []    
                 snapshot.forEach(function(child) {
                     const project = child.val()
                     projectTemp.push([project, child.key])
@@ -322,8 +327,7 @@ const Task = () => {
         // user
         try {
             onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                const userTemp = []
-    
+                const userTemp = []    
                 snapshot.forEach(function(child) {
                     const user = child.val()
                     userTemp.push([user, child.key])
@@ -412,9 +416,9 @@ const Task = () => {
                                         <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
                                             <ListItem>
                                                 <ListItemAvatar>
-                                                    <AddIcon color="grey"/>
+                                                    <AddIcon color="grey" />
                                                 </ListItemAvatar>
-                                                <ListItemText primary={"Create New Task"}/>
+                                                <ListItemText primary={"Create New Task"} />
                                             </ListItem>
                                         </Button>
                                 </FixedSizeList>
@@ -443,23 +447,22 @@ const Task = () => {
                                             </ListItem>
                                         </Button>
                                 </FixedSizeList> }
-                                
+
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Container>
-            </ThemeProvider>
+                        </Box>
+                    </Container>
+                </ThemeProvider>
             </div>
         )
     }
     else {
         if (isEditing) {
             return (
-                <div> 
+                <div>
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" Validate sx={{ mt: 3 }}>        
+                            <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -470,59 +473,107 @@ const Task = () => {
                                         mr: '-60px',
                                         ml: '50.0rem',
                                     }}>
-                                        <Button
-                                            onClick={handleClickOpen}
-                                            variant="outlined"
-                                            startIcon={<DeleteForeverIcon />}
-                                            sx={{ mt: 3, mb: 2 }}
-                                            >
+                                    <Button
+                                        onClick={handleClickOpen}
+                                        variant="outlined"
+                                        startIcon={<DeleteForeverIcon />}
+                                        sx={{ mt: 3, mb: 2 }}
+                                    >
                                         Delete
-                                        </Button>
-                                        <br></br>
-                                    </Box>
+                                    </Button>
+                                    <br></br>
+                                </Box>
                                 <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
-                                > 
-                                 <Box sx={{ mt: 2, mb: 2 }}>
-                                    <h2>Editing:<i> {name}</i></h2>
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Box sx={{ mt: 2, mb: 2 }}>
+                                        <h2>Editing:<i> {name}</i></h2>
                                         <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'left',
-                                            width: '20%',
-                                            mt: '-80px',
-                                        }}>
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'left',
+                                                width: '20%',
+                                                mt: '-80px',
+                                            }}>
                                             <Button
                                                 onClick={handleEditing}
                                                 variant="outlined"
                                                 startIcon={<ArrowBackIcon />}
                                                 sx={{ mt: 3, mb: 2 }}
-                                                >
-                                            Back
+                                            >
+                                                Back
                                             </Button>
                                             <br></br>
                                         </Box>
                                         <Grid container spacing={2}>
-                                        <Grid item xs={50} sm={12}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        autoComplete="given-name"
-                                                        name="taskName"
-                                                        fullWidth
-                                                        id="taskName"
-                                                        onChange={handleNameChange}
-                                                        value={newName}
+                                            <Grid item xs={50} sm={12}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <TextField
+                                                            autoComplete="given-name"
+                                                            name="taskName"
+                                                            fullWidth
+                                                            id="taskName"
+                                                            onChange={handleNameChange}
+                                                            value={newName}
                                                         />
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                        <FormControl xs={8} fullWidth>
+                                                            <InputLabel id="assignLabel">Label</InputLabel>
+                                                            <Select
+                                                                multiple
+                                                                defaultValue={10}
+                                                                value={selected}
+                                                                onChange={selectionChangeHandler}
+                                                                label="Label"
+                                                                id="label"
+                                                                textOverflow="ellipsis"
+                                                                overflow="hidden"
+                                                                renderValue={(selected) => (
+                                                                    <div>
+                                                                        {selected && selected.length !== 0 ? selected.map((value) => (
+                                                                            <Chip key={value} label={value} />
+                                                                        )) : []}
+                                                                    </div>
+                                                                )}
+                                                            >
+                                                                <MenuItem value={'To Do'}>To Do</MenuItem>
+                                                                <MenuItem value={'In Progress'}>In Progress</MenuItem>
+                                                                <MenuItem value={'To Review'}>To Review</MenuItem>
+                                                                <MenuItem value={'In Review'}>In Review</MenuItem>
+                                                                <MenuItem value={'Complete'}>Complete</MenuItem>
+                                                                <MenuItem value={'Saved'}>Saved</MenuItem>
+                                                                <MenuItem value={'Closed'}>Closed</MenuItem>
+                                                                <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                            </Select>
+                                                            <FormHelperText>Previous values: {label}</FormHelperText>
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <Input
+                                                            type="number"
+                                                            autoComplete="given-name"
+                                                            name="estimatedHours"
+                                                            required
+                                                            fullWidth
+                                                            onChange={handleHourChange}
+                                                            id="estimatedHours"
+                                                            label="Estimated Hours"
+                                                            value={hour}
+                                                            autoFocus
+                                                        />
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={8}>
-                                                <FormControl xs={8} fullWidth>
-                                                    <InputLabel id="assignLabel">Label</InputLabel>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="projectLabel">Project</InputLabel>
                                                     <Select
                                                         defaultValue={10}
                                                         value={selected}
@@ -532,32 +583,24 @@ const Task = () => {
                                                         textOverflow="ellipsis"
                                                         overflow="hidden"
                                                     >
-                                                        <MenuItem value={'To Do'}>To Do</MenuItem>
-                                                        <MenuItem value={'In Progress'}>In Progress</MenuItem>
-                                                        <MenuItem value={'To Review'}>To Review</MenuItem>
-                                                        <MenuItem value={'In Review'}>In Review</MenuItem>
-                                                        <MenuItem value={'Complete'}>Complete</MenuItem>
-                                                        <MenuItem value={'Saved'}>Saved</MenuItem>
-                                                        <MenuItem value={'Closed'}>Closed</MenuItem>
-                                                        <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                        {projectList && projectList.length != 0 ? projectList.map((data) =>
+                                                            <MenuItem value={data[1]}>{data[0].name}</MenuItem>
+                                                        ) : <MenuItem value={0}>New Project</MenuItem>}
                                                     </Select>
-                                                    <FormHelperText>Previous values: {label}</FormHelperText>
                                                 </FormControl>
                                             </Grid>
-                                            <Grid item xs={4}>
-                                                <Input
-                                                    type="number"
-                                                    autoComplete="given-name"
-                                                    name="estimatedHours"
+                                            <Grid item xs={12}>
+                                                <TextField
                                                     required
                                                     fullWidth
-                                                    onChange={handleHourChange}
-                                                    id="estimatedHours"
-                                                    label="Estimated Hours"
-                                                    value={hour}
-                                                    autoFocus
-                                                    />
-                                            </Grid>
+                                                    multiline
+                                                    onChange={handleDescChange}
+                                                    rows={4}
+                                                    id="taskDescription"
+                                                    label="Task Description"
+                                                    name="taskDescription"
+                                                    value={description}
+                                                />
                                             </Grid>
                                         </Grid>
                                         <Grid item xs={12}>
@@ -592,11 +635,10 @@ const Task = () => {
                                             />
                                         </Grid>
                                         </Grid>
-        
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
                                         <br></br>
-        
+
                                         <FormControl fullWidth>
                                             <InputLabel id="ownerLabel">Owner</InputLabel>
                                             <Select
@@ -608,12 +650,12 @@ const Task = () => {
                                                 value={owner}
                                                 disabled
                                             >
-                                                { userList && userList.length != 0 ? userList.map((data) => 
+                                                {userList && userList.length != 0 ? userList.map((data) =>
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                                ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
                                         </FormControl>
-        
+
                                         <br></br>
                                         <br></br>
                                         <Divider>ASSIGN</Divider>
@@ -628,9 +670,9 @@ const Task = () => {
                                                 value={assignee}
                                                 disabled
                                             >
-                                                { userList && userList.length != 0 ? userList.map((data) => 
-                                                        <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                    ): <MenuItem value={0}>New User</MenuItem> }
+                                                {userList && userList.length != 0 ? userList.map((data) =>
+                                                    <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
                                         </FormControl>
 
@@ -639,8 +681,8 @@ const Task = () => {
                                             variant="contained"
                                             onClick={handleSubmit}
                                             sx={{ mt: 3, mb: 2 }}
-                                            >
-                                        Save Changes
+                                        >
+                                            Save Changes
                                         </Button>
                                     </Box>
                                 </Box>
@@ -678,7 +720,7 @@ const Task = () => {
                                                     onChange={(e) => setNewCommentBody(e.target.value)}
                                                 />
                                                 <br></br>
-                                                <Button 
+                                                <Button
                                                     variant="contained"
                                                     onClick={newCommentSubmit}> new Comment </Button>
                                                 <br></br>
@@ -698,27 +740,27 @@ const Task = () => {
                         aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">
-                        {"Are you sure you want to delete \'" + name + "\'?"}
+                            {"Are you sure you want to delete \'" + name + "\'?"}
                         </DialogTitle>
                         <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            This action cannot be undone.
-                        </DialogContentText>
+                            <DialogContentText id="alert-dialog-description">
+                                This action cannot be undone.
+                            </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                        <Button onClick={handleDelete}>Close</Button>
-                        <Button onClick={handleClose} autoFocus>
-                            Delete
-                        </Button>
+                            <Button onClick={handleDelete}>Close</Button>
+                            <Button onClick={handleClose} autoFocus>
+                                Delete
+                            </Button>
                         </DialogActions>
                     </Dialog>
                     {/* <LoadTasks></LoadTasks> */}
-                    </div>
+                </div>
             );
         }
         else {
             return (
-                <div> 
+                <div>
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
@@ -744,86 +786,86 @@ const Task = () => {
                                             <br></br>
                                         </Box>       
                                 <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                    }}
                                 >
                                     <h2>{name}</h2>
                                     <Box sx={{ mt: 2, mb: 2 }}>
                                         <Grid container spacing={2}>
-                                        <Grid item xs={50} sm={12}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="taskName"
-                                                        fullWidth
-                                                        id="taskName"
-                                                        value={name}
-                                                        disabled
-                                                        />
-                                                    </Button>
-                                                </Grid>
-                                                <Grid item xs={8}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="label"
-                                                        fullWidth
-                                                        id="label"
-                                                        value={label}
-                                                        disabled
-                                                        />
-                                                    </Button>
-                                                </Grid>
+                                            <Grid item xs={50} sm={12}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="taskName"
+                                                                fullWidth
+                                                                id="taskName"
+                                                                value={name}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="label"
+                                                                fullWidth
+                                                                id="label"
+                                                                value={label}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
 
-                                                <Grid item xs={4}>
-                                                    <Button onClick={handleClick} fullWidth>
-                                                        <TextField
-                                                        autoComplete="given-name"
-                                                        name="label"
-                                                        fullWidth
-                                                        id="label"
-                                                        value={hour + " hours"}
-                                                        disabled
-                                                        />
-                                                    </Button>
+                                                    <Grid item xs={4}>
+                                                        <Button onClick={handleClick} fullWidth>
+                                                            <TextField
+                                                                autoComplete="given-name"
+                                                                name="label"
+                                                                fullWidth
+                                                                id="label"
+                                                                value={hour + " hours"}
+                                                                disabled
+                                                            />
+                                                        </Button>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControl fullWidth>
-                                                <Button onClick={handleClick} fullWidth>
-                                                    <TextField
+                                            <Grid item xs={12}>
+                                                <FormControl fullWidth>
+                                                    <Button onClick={handleClick} fullWidth>
+                                                        <TextField
                                                             autoComplete="given-name"
                                                             name="project"
                                                             fullWidth
                                                             id="project"
                                                             value={project}
                                                             disabled
-                                                            />
-                                                        </Button>
-                                            </FormControl>
+                                                        />
+                                                    </Button>
+                                                </FormControl>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        required
+                                                        fullWidth
+                                                        multiline
+                                                        disabled
+                                                        rows={4}
+                                                        id="taskDescription"
+                                                        name="taskDescription"
+                                                        value={description}
+                                                    />
+                                                </Button>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <Button onClick={handleClick} fullWidth>
-                                                <TextField
-                                                required
-                                                fullWidth
-                                                multiline
-                                                disabled
-                                                    rows={4}
-                                                id="taskDescription"
-                                                name="taskDescription"
-                                                value={description}
-                                                />
-                                            </Button>
-                                        </Grid>
-                                        </Grid>
-        
+
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
                                         <br></br>
@@ -835,9 +877,9 @@ const Task = () => {
                                                 id="owner"
                                                 value={owner}
                                                 disabled
-                                                />
+                                            />
                                         </Button>
-        
+
                                         <br></br>
                                         <br></br>
                                         <Divider>ASSIGN</Divider>
@@ -914,12 +956,12 @@ const Task = () => {
                         </Container>
                     </ThemeProvider>
                     {/* <LoadTasks></LoadTasks> */}
-                    </div>
+                </div>
             );
         }
-        
+
     }
-    
+
 }
 
 export default Task;

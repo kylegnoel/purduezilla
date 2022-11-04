@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { BrowserRouter as Router, Route, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Link, useNavigate, useParams } from "react-router-dom";
 import apiFunctions from '../firebase/api';
 
 import AppBar from '@mui/material/AppBar';
@@ -15,21 +15,19 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-
 import Logo from './purduezilla.png';
+import { ref, onValue } from "firebase/database";
 
 const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
   const user = apiFunctions.useFirebaseAuth();
-  //console.log("user: " + JSON.stringify(user))
-
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const navigate = useNavigate();
-
+  
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -47,10 +45,13 @@ const ResponsiveAppBar = () => {
 
   const handleButtonClick = (setting) => {
     setAnchorElUser(null);
-    if (setting == 'Logout') {
+    if (setting == 'Profile') {
+      navigate('/profile/' + user.key);
+    } else if (setting == 'Logout') {
       apiFunctions.signOutAccount();
       navigate('/');
     }
+    
   }
 
   return (

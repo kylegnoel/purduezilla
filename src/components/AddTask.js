@@ -39,7 +39,7 @@ export default function AddTask() {
     const [userList, setUserList] = useState([]);
 
     const [isLoading, setLoading] = useState(true);
-    
+
     const navigate = useNavigate();
 
     const handleClickOpen = (event) => {
@@ -67,7 +67,7 @@ export default function AddTask() {
     const handleDescChange = event => {
         setDesc(event.target.value)
     };
-    
+
     const handleHourChange = event => {
         setHour(event.target.value)
     };
@@ -107,18 +107,18 @@ export default function AddTask() {
             owner, // ownerIds
             assignee, // assignedUserIds
             selectedFollower, // followerIds
-            )
+        )
 
         if (createNewTask) {
-            
+
         } else {
-        
-            
+
+
         }
         // console.log("FINISHED");
         alert("Task Added");
-        
-        navigateToDashboard()
+
+        navigateToDashboard();
     };
 
     const fetchData = (event) => {
@@ -147,6 +147,7 @@ export default function AddTask() {
         // user
         try {
             onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+
                     const userTemp = []
         
                     snapshot.forEach(function(child) {
@@ -169,123 +170,123 @@ export default function AddTask() {
 
     const navigateToDashboard = () => {
         navigate('/home');
-      }
+    }
 
-    return(
+    return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
                 <Button variant="outlined" onClick={handleClickOpen} sx={{
-                            marginTop:8,
-                            marginBottom:0,
-                            bgcolor: 'background.paper',
-                        }}>
+                    marginTop: 8,
+                    marginBottom: 0,
+                    bgcolor: 'background.paper',
+                }}>
                     New Task
                 </Button>
-                <Dialog open={open}  onClose={handleClose}>
+                <Dialog open={open} onClose={handleClose}>
                     <DialogContent>
                         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                            <DialogTitle align='center' 
-                            sx={{
-                                marginTop:-4,
-                                marginBottom:-5,
-                            }}>New Task</DialogTitle>
-                                <Box
+                            <DialogTitle align='center'
+                                sx={{
+                                    marginTop: -4,
+                                    marginBottom: -5,
+                                }}>New Task</DialogTitle>
+                            <Box
                                 sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                 }}
-                                >                                
+                            >
                                 <Box component="form" sx={{ mt: 4 }}>
                                     <Grid container spacing={2}>
-                                    <Grid item xs={50} sm={12}>
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12}>
-                                                <TextField
-                                                autoComplete="given-name"
-                                                name="taskName"
-                                                onChange={handleNameChange}
-                                                required
-                                                fullWidth
-                                                id="taskName"
-                                                label="Task Name"
-                                                autoFocus
-                                                />
-                                            </Grid>
-                                            <Grid item xs={8}>
-                                                <FormControl xs={8} fullWidth>
-                                                    <InputLabel id="assignLabel">Label</InputLabel>
-                                                    <Select
-                                                        multiple
-                                                        defaultValue={10}
-                                                        value={selected}
-                                                        onChange={selectionChangeHandler}
-                                                        label="Label"
-                                                        id="label"
-                                                        textOverflow="ellipsis"
-                                                        overflow="hidden"
-                                                        renderValue={(selected) => (
-                                                        <div>
-                                                            {selected.map((value) => (
-                                                            <Chip key={value} label={value} />
-                                                            ))}
-                                                        </div>
-                                                        )}
-                                                    >
-                                                        <MenuItem value={'To Do'}>To Do</MenuItem>
-                                                        <MenuItem value={'In Progress'}>In Progress</MenuItem>
-                                                        <MenuItem value={'To Review'}>To Review</MenuItem>
-                                                        <MenuItem value={'In Review'}>In Review</MenuItem>
-                                                        <MenuItem value={'Complete'}>Complete</MenuItem>
-                                                        <MenuItem value={'Saved'}>Saved</MenuItem>
-                                                        <MenuItem value={'Closed'}>Closed</MenuItem>
-                                                        <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
-                                                    </Select>
-                                                    <FormHelperText>Select corresponding labels.</FormHelperText>
-                                                </FormControl>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <Input
-                                                    type="number"
-                                                    autoComplete="given-name"
-                                                    name="estimatedHours"
-                                                    required
-                                                    fullWidth
-                                                    onChange={handleHourChange}
-                                                    id="estimatedHours"
-                                                    label="Estimated Hours"
-                                                    autoFocus
+                                        <Grid item xs={50} sm={12}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        autoComplete="given-name"
+                                                        name="taskName"
+                                                        onChange={handleNameChange}
+                                                        required
+                                                        fullWidth
+                                                        id="taskName"
+                                                        label="Task Name"
+                                                        autoFocus
                                                     />
+                                                </Grid>
+                                                <Grid item xs={8}>
+                                                    <FormControl xs={8} fullWidth>
+                                                        <InputLabel id="assignLabel">Label</InputLabel>
+                                                        <Select
+                                                            multiple
+                                                            defaultValue={10}
+                                                            value={selected}
+                                                            onChange={selectionChangeHandler}
+                                                            label="Label"
+                                                            id="label"
+                                                            textOverflow="ellipsis"
+                                                            overflow="hidden"
+                                                            renderValue={(selected) => (
+                                                                <div>
+                                                                    {selected.map((value) => (
+                                                                        <Chip key={value} label={value} />
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        >
+                                                            <MenuItem value={'To Do'}>To Do</MenuItem>
+                                                            <MenuItem value={'In Progress'}>In Progress</MenuItem>
+                                                            <MenuItem value={'To Review'}>To Review</MenuItem>
+                                                            <MenuItem value={'In Review'}>In Review</MenuItem>
+                                                            <MenuItem value={'Complete'}>Complete</MenuItem>
+                                                            <MenuItem value={'Saved'}>Saved</MenuItem>
+                                                            <MenuItem value={'Closed'}>Closed</MenuItem>
+                                                            <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
+                                                        </Select>
+                                                        <FormHelperText>Select corresponding labels.</FormHelperText>
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <Input
+                                                        type="number"
+                                                        autoComplete="given-name"
+                                                        name="estimatedHours"
+                                                        required
+                                                        fullWidth
+                                                        onChange={handleHourChange}
+                                                        id="estimatedHours"
+                                                        label="Estimated Hours"
+                                                        autoFocus
+                                                    />
+                                                </Grid>
                                             </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <FormControl fullWidth>
-                                            <InputLabel id="projectLabel">Project</InputLabel>
-                                            <Select
-                                                labelId="projectLabel"
-                                                id="projectLabel"
-                                                label="Project"
-                                                onChange={handleProjectChange}
-                                            >
-                                                { projectList && projectList.length != 0 ? projectList.map((data) => 
-                                                    <MenuItem value={data[0].name} id={data[1]}>{data[0].name}</MenuItem>
-                                                ): <MenuItem value={0}>New Project</MenuItem> }
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                        required
-                                        fullWidth
-                                        multiline
-                                        onChange={handleDescChange}
-                                        rows={4}
-                                        id="taskDescription"
-                                        label="Task Description"
-                                        name="taskDescription"
-                                        />
-                                    </Grid>
+                                        <Grid item xs={12}>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="projectLabel">Project</InputLabel>
+                                                <Select
+                                                    labelId="projectLabel"
+                                                    id="projectLabel"
+                                                    label="Project"
+                                                    onChange={handleProjectChange}
+                                                >
+                                                    {projectList && projectList.length != 0 ? projectList.map((data) =>
+                                                        <MenuItem value={data[0].name} id={data[1]}>{data[0].name}</MenuItem>
+                                                    ) : <MenuItem value={0}>New Project</MenuItem>}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                multiline
+                                                onChange={handleDescChange}
+                                                rows={4}
+                                                id="taskDescription"
+                                                label="Task Description"
+                                                name="taskDescription"
+                                            />
+                                        </Grid>
                                     </Grid>
 
                                     <br></br>
@@ -301,9 +302,9 @@ export default function AddTask() {
                                             onChange={handleOwnerChange}
                                             defaultValue={10}
                                         >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                            {userList && userList.length != 0 ? userList.map((data) =>
                                                 <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                            ): <MenuItem value={0}>New User</MenuItem> }
+                                            ) : <MenuItem value={0}>New User</MenuItem>}
                                         </Select>
                                         <FormHelperText>Select the team member who oversees this task.</FormHelperText>
                                     </FormControl>
@@ -320,9 +321,9 @@ export default function AddTask() {
                                             label="assignLabel"
                                             defaultValue={10}
                                         >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
-                                                    <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                            {userList && userList.length != 0 ? userList.map((data) =>
+                                                <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                            ) : <MenuItem value={0}>New User</MenuItem>}
                                         </Select>
                                         <FormHelperText>Select the team member who is assigned to this task.</FormHelperText>
                                     </FormControl>
@@ -344,35 +345,35 @@ export default function AddTask() {
                                             overflow="hidden"
                                             id="followerSelect"
                                             renderValue={(selected) => (
-                                            <div>
-                                                {selected.map((value) => (
-                                                <Chip key={value} label={value} />
-                                                ))}
-                                            </div>
+                                                <div>
+                                                    {selected.map((value) => (
+                                                        <Chip key={value} label={value} />
+                                                    ))}
+                                                </div>
                                             )}
                                         >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
-                                                    <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                            {userList && userList.length != 0 ? userList.map((data) =>
+                                                <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                            ) : <MenuItem value={0}>New User</MenuItem>}
                                         </Select>
                                         <FormHelperText>Select the team members to follow this task..</FormHelperText>
                                     </FormControl>
                                 </Box>
-                                </Box>
-                                <Button
-                                        type="submit"
-                                        fullWidth
-                                        variant="contained"
-                                        sx={{ mt: 3, mb: 2 }}
-                                        >
-                                    Add Task
-                                    </Button>
                             </Box>
-                        </DialogContent>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Add Task
+                            </Button>
+                        </Box>
+                    </DialogContent>
                     <DialogActions>
                     </DialogActions>
                 </Dialog>
             </Container>
-     </ThemeProvider>
+        </ThemeProvider>
     );
 }

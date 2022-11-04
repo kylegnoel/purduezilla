@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -64,6 +64,27 @@ const Dashboard = () => {
         
         return true;
     };
+
+    const [comments, setComments] = useState([]);
+    const user = apiFunctions.useFirebaseAuth();
+    useEffect(() => {
+        setData();
+
+    }, []);
+
+    const setData = () => {
+        try {
+            if (user != null) {
+                // console.log("ran user not null");
+                // console.log(user);
+                let returnedComment = apiFunctions.getTaggedComments(user.user.key);
+                setComments(returnedComment);
+                console.log(returnedComment);
+            }
+        } catch {
+
+        }
+    }
 
     return (
         <div>
@@ -219,8 +240,28 @@ const Dashboard = () => {
                 </ThemeProvider>
                 </div>
             </div>
-        </div>
+            <div>
+                <h1>Tagged comments display: </h1>
+                <div>
+
+                    {comments.map((comment) => (
+                        < div >
+                            <p>task key: {comment.taskKey}</p>
+                            <p>commentKey: {comment.commenKey}</p>
+                            <p>author: {comment.author}</p>
+                            <p>body: {comment.body}</p>
+                            <hr></hr>
+                        </div>
+                    ))}
+
+                </div>
+            </div>
+        </div >
     );
 }
+// taskKey: taskKey,
+//         commentKey: newCommentRef.key,
+//         author: authorKey,
+//         body: body
 
 export default Dashboard;
