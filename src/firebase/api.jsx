@@ -279,7 +279,7 @@ const addProjectMember = (id, memberIds) => {
 const createNewTask = async function createNewTask(projectId, name, description, estimatedTime, status, ownerIds, assignedUserIds, followerIds) {
 
   // Create basic task
-  const taskListRef = ref(db, 'tasks');
+  const taskListRef = ref(db, 'tasks/');
   const newTaskRef = push(taskListRef);
   set(newTaskRef, {
     projectId: await getProjectById(projectId)[0],
