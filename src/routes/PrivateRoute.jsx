@@ -1,16 +1,12 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Navigate, Route } from "react-router-dom";
 import PropTypes from "prop-types";
-//import { useAuthState } from "../contexts/auth";
-
+import apiFunctions from "../firebase/api";
 
 const PrivateRoute = props => {
 
-    if (!props.condition) {
+    if (!apiFunctions.useFirebaseAuth()) 
         return (<Navigate to={props.redirectRoute} />);
-    }
-
-    {/*console.log("gets to here");*/ }
     return (props.children);
 
 }
