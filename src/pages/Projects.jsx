@@ -51,11 +51,11 @@ const Projects = () => {
         console.log(comments);
         apiFunctions.createNewProjectComment(newCommentBody, user.key, id);
         // console.log(comments);
-        // setComments([...comments, { body: newCommentBody, authorKey: user.key }]);
+        setComments([...comments, { body: newCommentBody, authorKey: user.key }]);
         // console.log(comments);
         // console.log(user.key);
-        window.location.reload();
-        // setNewCommentBody("");
+        // window.location.reload();
+        setNewCommentBody("");
 
     }
 
@@ -73,14 +73,14 @@ const Projects = () => {
                     const taskTemp = [];
 
                     snapshot.forEach(function (child) {
-                        const task = child.val()
+                        const task = child.val();
                         if (task.projectId === id) {
                             taskTemp.push([task, child.key]);
                         }
-                    })
+                    });
 
-                    setTaskListArr(taskTemp)
-                })
+                    setTaskListArr(taskTemp);
+                });
 
                 // set project name
                 onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {

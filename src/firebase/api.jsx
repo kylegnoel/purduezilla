@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue, update, child, remove } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, update, child, remove, get } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
@@ -117,7 +117,7 @@ const getProjectComments = function getProjectComments(projectKey) {
     for (var key in child) {
       returnedComments.push(child[key]);
     }
-  });
+  }, { onlyOnce: true });
   return returnedComments;
 }
 
@@ -135,24 +135,28 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   let userRefList = ref(db, 'users/');
   let userRefObjects = {};
   taggedKeys.forEach(function (key) {
-
     userRefObjects[key] = 1;
+    console.log("added below:");
+    console.log(key);
   });
+  let child1;
   onValue(userRefList, (snapshot) => {
-    let child1 = snapshot.val();
-    for (var key in child1) {
-      if (userRefObjects[child1[key].email] == 1) {
-        userRef = ref(db, `users/${key}/tagged`);
-        newRef = push(userRef);
-        set(newRef, {
-          taskKey: taskKey,
-          commentKey: newCommentRef.key,
-          author: authorKey,
-          body: body
-        })
-      }
+    child1 = snapshot.val();
+  }, { onlyOnce: true });
+  for (var key in child1) {
+    console.log(key);
+    if (userRefObjects[child1[key].email] == 1) {
+      console.log("enters the tagging phase");
+      userRef = ref(db, `users/${key}/tagged`);
+      newRef = push(userRef);
+      set(newRef, {
+        taskKey: taskKey,
+        commentKey: newCommentRef.key,
+        author: authorKey,
+        body: body
+      })
     }
-  })
+  }
 
 
   // taggedKeys.forEach(function (key) {
@@ -183,7 +187,7 @@ const getTaskComments = function getTaskComments(taskKey) {
     for (var key in child) {
       returnedTasks.push(child[key]);
     }
-  });
+  }, { onlyOnce: true });
   // console.log("finish getting nothing");
   // console.log(returnedTasks);
   return returnedTasks;
@@ -192,14 +196,16 @@ const getTaskComments = function getTaskComments(taskKey) {
 
 //returns comment key, task key, and body for comments that have tagged the user
 const getTaggedComments = function getTaggedComments(userKey) {
-  let returnedComments = [];
+  const returnedComments = [];
   let commentRef = ref(db, `users/${userKey}/tagged/`);
+  // console.log(userKey);
   onValue(commentRef, (snapshot) => {
     let child = snapshot.val();
     for (var key in child) {
       returnedComments.push(child[key]);
     }
-  })
+  });
+  // console.log(returnedComments);
   return returnedComments;
 }
 

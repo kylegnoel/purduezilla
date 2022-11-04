@@ -170,8 +170,6 @@ const Task = () => {
 
     const newCommentSubmit = (event) => {
         event.preventDefault();
-        const tempCom = comments;
-        console.log(tempCom);
 
         if (newCommentBody == '') {
             return;
@@ -185,10 +183,10 @@ const Task = () => {
         });
 
         let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
-        window.location.reload();
-        return;
-        // setNewCommentBody("");
-        // setComments([...tempCom, newAdded]);
+        // window.location.reload();
+
+        setNewCommentBody("");
+        setComments([...comments, newAdded]);
     };
 
     const fetchData = (event) => {
@@ -247,9 +245,9 @@ const Task = () => {
             }
 
             //fetch comments as well
-            const settingComments = apiFunctions.getTaskComments(id);
-            console.log("set commnets");
-            console.log(settingComments);
+            let settingComments = apiFunctions.getTaskComments(id);
+            // console.log("set commnets");
+            // console.log(settingComments);
             setComments(settingComments);
         }
         catch {
