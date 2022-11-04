@@ -134,26 +134,39 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   let userRef;
   let userRefList = ref(db, 'users/');
   let userRefObjects = {};
+  taggedKeys.forEach(function (key) {
+
+    userRefObjects[key] = 1;
+  });
   onValue(userRefList, (snapshot) => {
     let child1 = snapshot.val();
     for (var key in child1) {
-      userRefObjects[child1[key].email] = key;
+      if (userRefObjects[child1[key].email] == 1) {
+        userRef = ref(db, `users/${key}/tagged`);
+        newRef = push(userRef);
+        set(newRef, {
+          taskKey: taskKey,
+          commentKey: newCommentRef.key,
+          author: authorKey,
+          body: body
+        })
+      }
     }
   })
 
 
-  taggedKeys.forEach(function (key) {
-    if (userRefObjects[key]) {
-      userRef = ref(db, `users/${key}/tagged`);
-      newRef = push(userRef);
-      set(newRef, {
-        taskKey: taskKey,
-        commentKey: newCommentRef.key,
-        author: authorKey,
-        body: body
-      });
-    }
-  });
+  // taggedKeys.forEach(function (key) {
+  //   if (userRefObjects[key]) {
+  //     userRef = ref(db, `users/${key}/tagged`);
+  //     newRef = push(userRef);
+  //     set(newRef, {
+  //       taskKey: taskKey,
+  //       commentKey: newCommentRef.key,
+  //       author: authorKey,
+  //       body: body
+  //     });
+  //   }
+  // });
 
   return { body: body, author: authorKey };
 }
@@ -179,8 +192,8 @@ const getTaskComments = function getTaskComments(taskKey) {
 
 //returns comment key, task key, and body for comments that have tagged the user
 const getTaggedComments = function getTaggedComments(userKey) {
-  let returnedComments = []
-  const commentRef = ref(db, `users/${userKey}/tagged/`);
+  let returnedComments = [];
+  let commentRef = ref(db, `users/${userKey}/tagged/`);
   onValue(commentRef, (snapshot) => {
     let child = snapshot.val();
     for (var key in child) {

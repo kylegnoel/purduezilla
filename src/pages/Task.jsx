@@ -180,7 +180,7 @@ const Task = () => {
         let splitComment = newCommentBody.split(" ");
         splitComment.forEach((word) => {
             if (word.charAt(0) == '#') {
-                tagged.push(word);
+                tagged.push(word.substring(1));
             }
         });
 
