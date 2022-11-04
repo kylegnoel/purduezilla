@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { Container, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import WorkIcon from '@mui/icons-material/Work';
+import GroupIcon from '@mui/icons-material/Group';
 import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -100,7 +100,7 @@ export default function GroupsDashboard() {
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
-                                                            <WorkIcon color="grey"/>
+                                                            <GroupIcon color="grey"/>
                                                         </ListItemAvatar>
                                                         <ListItemText primary={data[0].name}/>
                                                     </ListItem>
