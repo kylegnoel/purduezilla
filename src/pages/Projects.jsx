@@ -51,7 +51,8 @@ const Projects = () => {
         console.log(comments);
         apiFunctions.createNewProjectComment(newCommentBody, user.key, id);
         // console.log(comments);
-        setComments([...comments, { body: newCommentBody, authorKey: user.key }]);
+        console.log(user.key);
+        setComments([...comments, { body: newCommentBody, author: user.key }]);
         // console.log(comments);
         // console.log(user.key);
         // window.location.reload();
