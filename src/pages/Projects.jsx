@@ -131,7 +131,8 @@ const Projects = () => {
                     <Container component="main">
                         <br></br>
                         <h2>{project}</h2>
-                        <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                        <Button component={Link} to={window.location.pathname + "/storyboard"} variant="contained">View Project Storyboard</Button>
+                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={50} sm={12}>
                                     <Divider></Divider>
