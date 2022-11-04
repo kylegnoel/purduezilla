@@ -49,18 +49,18 @@ export default function NewProject() {
 
     const handleMemberChange = (event) => {
         setMember(event.target.value);
-        console.log("finished");
-        console.log("selected id: " + event.currentTarget.id[1]);
+        // console.log("finished");
+        // console.log("selected id: " + event.currentTarget.id[1]);
     };
 
     const handleOwnerChange = (event) => {
         setOwner(event.target.value);
-        console.log("finished");
+        // console.log("finished");
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        console.log("submitted")
+        // console.log("submitted")
 
         const memberId = ([]);
         const ownerId = ([]);
@@ -73,8 +73,8 @@ export default function NewProject() {
             ownerId.push(ownerTemp[1])
         })
 
-        console.log("member: " + memberId)
-        console.log("owner: " + ownerId);
+        // console.log("member: " + memberId)
+        // console.log("owner: " + ownerId);
 
         // convert names into userid 
 
@@ -84,7 +84,7 @@ export default function NewProject() {
 
         const ret = createNewGroup
         if (ret) {
-            console.log("FINISHED: " + ret);
+            // console.log("FINISHED: " + ret);
             alert(name + " Group Created!");
             navigate('/group/'+ ret);
         } else {
@@ -94,7 +94,7 @@ export default function NewProject() {
     };
 
     useEffect(() => {
-        console.log("reload")
+        // console.log("reload")
         fetchData()
     }, []);
 
@@ -107,13 +107,13 @@ export default function NewProject() {
     
                 snapshot.forEach(function(child) {
                     const user = child.val()
-                    console.log(JSON.stringify(user))
-                    console.log("current value: " + user.firstName + " " + user.lastName)
+                    // console.log(JSON.stringify(user))
+                    // console.log("current value: " + user.firstName + " " + user.lastName)
                     userTemp.push([user, child.key])
                 })
 
                 setUserList(userTemp)
-                console.log("snapshot: " + userList.length)
+                // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)

@@ -41,8 +41,8 @@ export default function NewProject() {
 
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
-        console.log("finished");
-        console.log("selected id: " + event.currentTarget.id[1]);
+        // console.log("finished");
+        // console.log("selected id: " + event.currentTarget.id[1]);
         setMemberId(event.currentTarget.currentTarget.id[1]);
     };
 
@@ -55,14 +55,14 @@ export default function NewProject() {
     };
 
     const handleOwnerChange = event => {
-        console.log(event.target.value)
+        // console.log(event.target.value)
         setOwner(event.target.value)
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        console.log("submitted")
-        console.log(memberId)
+        // console.log("submitted")
+        // console.log(memberId)
 
         // convert names into userid 
 
@@ -76,12 +76,12 @@ export default function NewProject() {
         // perform error UI like highlighting textfield to red
             alert("invalid login\n TODO: perform error UI")
         }
-        console.log("FINISHED");
+        // console.log("FINISHED");
         alert("Project Added");
     };
 
     useEffect(() => {
-        console.log("reload")
+        // console.log("reload")
         fetchData()
     }, []);
 
@@ -94,12 +94,12 @@ export default function NewProject() {
     
                 snapshot.forEach(function(child) {
                     const user = child.val()
-                    console.log("current value: " + user.name + " " + user.projectId)
+                    // console.log("current value: " + user.name + " " + user.projectId)
                     userTemp.push([user, child.key])
                 })
 
                 setUserList(userTemp)
-                console.log("snapshot: " + userList.length)
+                // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)

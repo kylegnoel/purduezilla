@@ -12,7 +12,7 @@ const NotFound = () => {
     }
 
     useEffect(() => {
-        console.log("reload")
+        //console.log("reload")
         fetchData()
     }, []);
     

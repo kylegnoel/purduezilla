@@ -32,7 +32,7 @@ export default function ProjectDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
-            console.log("eventid: " + event.currentTarget.id)
+            // console.log("eventid: " + event.currentTarget.id)
             window.location.href='/project/'+event.currentTarget.id;
             //window.location.reload()
         }
@@ -42,10 +42,10 @@ export default function ProjectDashboard() {
     }
 
     const fetchData = (event) => {
-        console.log("hello")
+        // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        // // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
                 const projectTemp = []
@@ -53,11 +53,11 @@ export default function ProjectDashboard() {
                 snapshot.forEach(function(child) {
                     const project = child.val()
                     projectTemp.push([child.val(), child.key])
-                    console.log("key: " + child.key);
+                    // console.log("key: " + child.key);
                 })
 
                 setProjListArr(projectTemp)
-                console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
+                // console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
             })
             if (setProjListArr.length !== 0) {
                 setLoading(false)
@@ -70,7 +70,7 @@ export default function ProjectDashboard() {
 
         setLoading(false)
         
-        console.log("taskListarr: " + projListarr.length)
+        // console.log("taskListarr: " + projListarr.length)
         return true;
     };
 
@@ -80,7 +80,7 @@ export default function ProjectDashboard() {
                     <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12} lg={'50%'}>
-                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
+                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
                                     { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                             return (  

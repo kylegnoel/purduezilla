@@ -16,6 +16,7 @@ import AddTaskPage from '../pages/AddTaskPage';
 import AddProjectPage from '../pages/AddTaskPage';
 import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
+import AddTask from '../components/AddTask';
 
 const Routing = props => {
 
@@ -33,9 +34,10 @@ const Routing = props => {
                 <Route exact path="/mygroups" element={<PrivateRoute redirectRoute="/" ><Groups /></PrivateRoute>} />
                 <Route exact path="*" element={<NotFound />} />
                 <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
-                <Route exact path="/task/:id" element={<Task />} />
-                <Route exact path="/newtask" element={<PrivateRoute redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
-                <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
+                <Route exact path="/task/:id" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><Task /></PrivateRoute>} />
+                <Route exact path="/newtask" element={<PrivateRoute condition={isLoggedIn != null} redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
+                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
+                <Route exact path="/mytasks" element={<Task />} />
             </Routes>
         </Router>
     );

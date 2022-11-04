@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -45,25 +46,18 @@ const Groups = () => {
 
     const fetchData = (event) => {
         onValue(ref(apiFunctions.db, 'groups/' + id + '/projects'), (snapshot) => {
-            console.log("group name: " + snapshot.val().name)
             setGroup(snapshot.val().name)
 
             const projectListTemp = []
             const projectLi = snapshot.val().projects
 
-            console.log(projectLi)
-
             snapshot.forEach(function (childSnapshot) {
                 const projectID = childSnapshot.val().name
                 projectListTemp.push([projectID, childSnapshot.val()])
-                console.log("value: " + JSON.stringify(childSnapshot.val()))
             })
-            console.log("set project")
-            console.log(projectListTemp)
             setProjectList(projectListTemp)
         })
 
-        console.log("complete")
         return true;
     };
 
@@ -72,7 +66,6 @@ const Groups = () => {
             navigate('/newproject/');
         }
         else {
-            console.log("eventid: " + event.currentTarget.id)
             navigate('/project/'+event.currentTarget.id);
         }
     }
