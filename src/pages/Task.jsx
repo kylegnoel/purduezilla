@@ -447,13 +447,13 @@ const Task = () => {
                                             </ListItem>
                                         </Button>
                                 </FixedSizeList> }
-
                             </Grid>
-                        </Box>
+                        </Grid>
+                    </Box>
                     </Container>
                 </ThemeProvider>
             </div>
-        )
+        );
     }
     else {
         if (isEditing) {
@@ -634,11 +634,9 @@ const Task = () => {
                                             value={description}
                                             />
                                         </Grid>
-                                        </Grid>
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
                                         <br></br>
-
                                         <FormControl fullWidth>
                                             <InputLabel id="ownerLabel">Owner</InputLabel>
                                             <Select

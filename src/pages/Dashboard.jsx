@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import NavBar from '../components/NavBar';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -66,7 +66,6 @@ const Dashboard = () => {
     };
 
     const [comments, setComments] = useState([]);
-    const user = apiFunctions.useFirebaseAuth();
     useEffect(() => {
         setData();
 
