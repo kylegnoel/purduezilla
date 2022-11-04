@@ -18,7 +18,7 @@ import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
 
 const Routing = props => {
-    const isLoggedIn = apiFunctions.auth.currentUser != null;
+    const isLoggedIn = apiFunctions.useFirebaseAuth();
     return (
         <Router>
             <Routes>
