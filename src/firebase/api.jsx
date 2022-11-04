@@ -281,15 +281,16 @@ const createNewTask = async function createNewTask(projectId, name, description,
   // Create basic task
   const taskListRef = ref(db, 'tasks/');
   const newTaskRef = push(taskListRef);
+
   set(newTaskRef, {
-    projectId: await getProjectById(projectId)[0],
+    projectId: getProjectById(projectId)[0],
     name: name,
     description: description,
     estimatedTime: estimatedTime,
     assignedUsers: assignedUserIds,
-    owners: await getUserById(ownerIds)[0],
+    owners: getUserById(ownerIds)[0],
     status: status,
-    assignedUsers: await getUserById(assignedUserIds)[0],
+    assignedUsers: getUserById(assignedUserIds)[0],
     followers: followerIds
   });
     return newTaskRef.key;
@@ -463,10 +464,10 @@ const getGroupsProjects = function getGroupsProjects(groupId) {
   return groupsProjects;
 }
 
-const getProjectById = function getProjectById(projectId) {
+const getProjectById = async function getProjectById(projectId) {
   const projectInfo = []
 
-  onValue(ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
+  await onValue(ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
     projectInfo.push([projectId, snapshot.val()]);
   });
 
@@ -483,10 +484,10 @@ const getTaskById = function getTaskById(taskId) {
   return taskInfo;
 }
 
-const getUserById = function getUserById(userId) {
+const getUserById = async function getUserById(userId) {
   const userInfo = []
 
-  onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
+  await onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
     userInfo.push([userId, snapshot.val()]);
   });
 
