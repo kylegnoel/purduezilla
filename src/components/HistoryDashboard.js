@@ -30,6 +30,7 @@ export default function TaskDashboard() {
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [open, setOpen] = React.useState(false);
+    const [history, setHistoryEvents] = React.useState([]);
 
     useEffect(() => {
         console.log("reload")
@@ -40,9 +41,6 @@ export default function TaskDashboard() {
         if (event.currentTarget.id !== "addtask") {
             navigate('/task/' + event.currentTarget.id);
         }
-        else {
-            navigate('/newtask');
-        }
     }
 
 
@@ -50,25 +48,9 @@ export default function TaskDashboard() {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        try {
-            onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                const taskTemp = []
-
-                snapshot.forEach(function (child) {
-                    const task = child.val()
-                    taskTemp.push([task, child.key])
-                })
-
-                setTaskListArr(taskTemp)
-            })
-            if (taskListarr.length !== 0) {
-                setLoading(false)
-            }
-
-        }
-        catch {
-            // if there is no internet
-        }
+        setHistoryEvents([])
+        const historyTemp = apiFunctions.getHistoryEvents;
+        setHistoryEvents(historyTemp)
 
         setLoading(false)
 
@@ -85,29 +67,21 @@ export default function TaskDashboard() {
                                 border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
                                 flexDirection: "column",
                             }} height={400}>
-                                {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                {history && history.length != 0 ? history.map((data) => {
                                     return (
                                         <div key={data.projectId}>
-                                            <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
+                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
                                                 <ListItem>
                                                     <ListItemAvatar>
                                                         <TaskIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[0].name} secondary={data[0].description} />
+                                                    <ListItemText primary={data[1]} secondary={data[2].description} />
                                                 </ListItem>
                                             </Button>
                                             <Divider />
                                         </div>
                                     )
-                                }) : "There are no tasks!"}
-                                <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <AddIcon color="grey" />
-                                        </ListItemAvatar>
-                                        <ListItemText primary={"Add Task"} />
-                                    </ListItem>
-                                </Button>
+                                }) : "There hasn't been any edits!"}
                             </FixedSizeList>
                         </Grid>
                     </Grid>

@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import GroupIcon from '@mui/icons-material/Group';
 import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -49,7 +50,7 @@ export default function GroupsDashboard() {
             // navigate('/newproject/');
         }
         else {
-            console.log("eventid: " + event.currentTarget.id)
+            // console.log("eventid: " + event.currentTarget.id)
             window.location.href='/group/'+event.currentTarget.id;
             // navigate('/group/'+event.currentTarget.id);
         }
@@ -57,16 +58,16 @@ export default function GroupsDashboard() {
 
 
     const fetchData = (event) => {
-        console.log("hello")
+        // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        // // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
                 const groupTemp = []
     
                 snapshot.forEach(function(child) {
-                    console.log("group name: " + child.val().name)
+                    // console.log("group name: " + child.val().name)
                     groupTemp.push([child.val(), child.key])
                 })
 
@@ -100,7 +101,7 @@ export default function GroupsDashboard() {
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
-                                                            <GroupIcon color="grey"/>
+                                                            <GroupsIcon color="grey"/>
                                                         </ListItemAvatar>
                                                         <ListItemText primary={data[0].name}/>
                                                     </ListItem>

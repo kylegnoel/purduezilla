@@ -17,6 +17,7 @@ import AddProjectPage from '../pages/AddTaskPage';
 import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
 import Storyboard from '../pages/Storyboard';
+import AddTask from '../components/AddTask';
 
 const Routing = props => {
 

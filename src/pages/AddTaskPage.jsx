@@ -90,15 +90,21 @@ export default function AddTaskPage() {
     }, []);
 
     const handleSubmit = async (event) => {
+
         event.preventDefault()
-        console.log("submitted")
+        // console.log("submitted")
 
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
             followerId.push(follower[1])
         })
-        console.log("followers: " + followerId)
+        // console.log("followers: " + followerId)
+
+        const projVar = await apiFunctions.getProjectById(project)
+        console.log("projVar: " + projVar + " " + project)
+        const ownerVar = await apiFunctions.getUserById(owner)
+        console.log("ownerVar: " + ownerVar + " " + owner)
 
         let createNewTask = await apiFunctions.createNewTask(
             project, // projectId 
@@ -112,11 +118,11 @@ export default function AddTaskPage() {
             )
 
         if (createNewTask) {
-            console.log("task created: ");
+            // console.log("task created: ");
             alert("Task Added");
             navigateToPage()
         } else {
-            console.log("failed to add task: ");
+            // console.log("failed to add task: ");
             alert("Task Failed to Add");
         }
     };
@@ -129,12 +135,12 @@ export default function AddTaskPage() {
         
                     snapshot.forEach(function(child) {
                         const project = child.val()
-                        console.log("current value: " + project.name + " " + project.projectId)
+                        // console.log("current value: " + project.name + " " + project.projectId)
                         projectTemp.push([project, child.key])
                     })
 
                     setProjectList(projectTemp)
-                    console.log("snapshot: " + projectList.length)
+                    // console.log("snapshot: " + projectList.length)
             })
             if (projectList.length !== 0) {
                 setLoading(false)
@@ -151,12 +157,12 @@ export default function AddTaskPage() {
         
                     snapshot.forEach(function(child) {
                         const user = child.val()
-                        console.log("current value: " + user.name + " " + user.projectId)
+                        // console.log("current value: " + user.name + " " + user.projectId)
                         userTemp.push([user, child.key])
                     })
 
                     setUserList(userTemp)
-                    console.log("snapshot: " + userList.length)
+                    // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)
@@ -176,7 +182,7 @@ export default function AddTaskPage() {
             <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
                     <Container component="main" maxWidth="sm">
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
                         <DialogTitle align='center' 
                         sx={{
                             marginTop:-4,
@@ -189,7 +195,7 @@ export default function AddTaskPage() {
                                 alignItems: 'center',
                             }}
                             >                                
-                            <Box component="form" sx={{ mt: 4 }}>
+                            <Box sx={{ mt: 4 }}>
                                 <Grid container spacing={2}>
                                 <Grid item xs={50} sm={12}>
                                     <Grid container spacing={2}>
@@ -207,24 +213,14 @@ export default function AddTaskPage() {
                                         </Grid>
                                         <Grid item xs={8}>
                                             <FormControl xs={8} fullWidth>
-                                                <InputLabel id="assignLabel">Label</InputLabel>
+                                                <InputLabel id="assignLabel">Status</InputLabel>
                                                 <Select
-                                                    multiple
                                                     defaultValue={10}
                                                     value={selected}
                                                     onChange={selectionChangeHandler}
-                                                    label="Label"
+                                                    label="Status"
                                                     id="label"
                                                     required
-                                                    textOverflow="ellipsis"
-                                                    overflow="hidden"
-                                                    renderValue={(selected) => (
-                                                    <div>
-                                                        {selected.map((value) => (
-                                                        <Chip key={value} label={value} />
-                                                        ))}
-                                                    </div>
-                                                    )}
                                                 >
                                                     <MenuItem value={'To Do'}>To Do</MenuItem>
                                                     <MenuItem value={'In Progress'}>In Progress</MenuItem>
@@ -235,7 +231,7 @@ export default function AddTaskPage() {
                                                     <MenuItem value={'Closed'}>Closed</MenuItem>
                                                     <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
                                                 </Select>
-                                                <FormHelperText>Select corresponding labels.</FormHelperText>
+                                                <FormHelperText>Select corresponding status.</FormHelperText>
                                             </FormControl>
                                         </Grid>
                                         <Grid item xs={4}>

@@ -71,12 +71,12 @@ const Projects = () => {
         else {
             try {
                 onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                    const taskTemp = [];
-
-                    snapshot.forEach(function (child) {
-                        const task = child.val();
-                        if (task.projectId === id) {
-                            taskTemp.push([task, child.key]);
+                    const taskTemp = []
+        
+                    snapshot.forEach(function(child) {
+                        const task = child.val()
+                        if (task.projectId[0] === id) {
+                            taskTemp.push([task, child.key])
                         }
                     });
 
