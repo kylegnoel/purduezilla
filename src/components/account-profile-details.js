@@ -9,7 +9,11 @@ import {
   Grid,
   TextField
 } from '@mui/material';
-
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import FixedSizeList from '@mui/material/List';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import GroupIcon from '@mui/icons-material/Group';
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
@@ -19,11 +23,31 @@ import { ref, onValue } from "firebase/database";
 
 export const AccountProfileDetails = (props) => {
   const user = apiFunctions.useFirebaseAuth();
+  const [groupList, setGroupList] = useState([]);
+  const [isLoading, setLoading] = useState(true);
   const [values, setValues] = useState({
     name: user.info.firstName,
     email: user.info.email,
     description: user.info.profileDescription
   }); 
+
+  useEffect(() => {
+    console.log("reload")
+    fetchData()
+}, []);
+
+const handleTask = (event) => {
+  if (event.currentTarget.id === "addgroup") {
+      window.location.href='/newgroup/';
+  }
+  if (event.currentTarget.id === "addproject") {
+      window.location.href='/newproject/';
+  }
+  else {
+      console.log("eventid: " + event.currentTarget.id)
+      window.location.href='/group/'+event.currentTarget.id;
+  }
+}
 
   const handleChange = (event) => {
     setValues({
@@ -32,10 +56,33 @@ export const AccountProfileDetails = (props) => {
     });
   };
 
-  const myFunction = (event) => {
+  const update = (event) => {
     //console.log(user.key + user.info.email + user.info.firstName + user.info.profileDescription + user.info.notificationSetting)
     apiFunctions.updateUser(user.key, user.info.email, values.name, "", values.description, user.info.notificationSetting)
   };
+
+  const fetchData = (event) => {
+    try {
+        onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
+            const groupTemp = []
+
+            snapshot.forEach(function(child) {
+                console.log("group name: " + child.val().name)
+                groupTemp.push([child.val(), child.key])
+            })
+
+            setGroupList(groupTemp)
+        })
+
+    }
+    catch {
+        // if there is no internet
+    }
+
+    setLoading(false)
+
+    return true;
+};
 
 
   return (
@@ -46,8 +93,7 @@ export const AccountProfileDetails = (props) => {
     >
       <Card>
         <CardHeader
-          subheader="The information can be edited"
-          title="Profile"
+          title="Profile information"
         />
         <Divider />
         <CardContent>
@@ -123,6 +169,26 @@ export const AccountProfileDetails = (props) => {
           </Grid>
         </CardContent>
         <Divider />
+        <CardHeader
+          title="Groups"
+        />
+        <FixedSizeList sx={{maxHeight:600, overflowY:'auto',flexGrow: 1,
+        flexDirection:"column",}} height={400}>
+                                        { groupList && groupList.length != 0 ? groupList.map((data) => {
+                                            return (
+                                            <div key={data[1]}>
+                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <ListItemAvatar>
+                                                            <GroupIcon color="grey"/>
+                                                        </ListItemAvatar>
+                                                    <ListItem>
+                                                        <ListItemText primary={data[0].name}/>
+                                                    </ListItem>
+                                                </Button>
+                                                <Divider />
+                                            </div>   
+                                        )}): "You aren't in any groups!" }
+                                </FixedSizeList>
         <Box
           sx={{
             display: 'flex',
@@ -133,12 +199,13 @@ export const AccountProfileDetails = (props) => {
           <Button
             color="primary"
             variant="contained"
-            onClick={myFunction}
+            onClick={update}
           >
             Save details
           </Button>
         </Box>
       </Card>
+      
     </form>
   );
 };

@@ -407,7 +407,6 @@ const Task = () => {
                                                         id="taskName"
                                                         onChange={handleNameChange}
                                                         value={newName}
-                                                        inputProps={fontColor}
                                                         />
                                                 </Grid>
                                                 <Grid item xs={8}>
