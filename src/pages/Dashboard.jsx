@@ -41,12 +41,12 @@ const Dashboard = () => {
     }, []);
 
     const handleTask = (event) => {
-        if (event.currentTarget.id !== "addproject") {
+        if (event.currentTarget.id !== "addtask") {
             window.location.href='/project/'+event.currentTarget.id;
             //window.location.reload()
         }
         else {
-            window.location.href='/newproject/';
+            window.location.href='/newtask/';
         }
     }
 

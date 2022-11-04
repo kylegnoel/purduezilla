@@ -101,6 +101,11 @@ export default function AddTaskPage() {
         })
         // console.log("followers: " + followerId)
 
+        const projVar = await apiFunctions.getProjectById(project)
+        console.log("projVar: " + projVar + " " + project)
+        const ownerVar = await apiFunctions.getUserById(owner)
+        console.log("ownerVar: " + ownerVar + " " + owner)
+
         let createNewTask = await apiFunctions.createNewTask(
             project, // projectId 
             name, // title 

@@ -24,7 +24,7 @@ const firebaseConfig = {
 // Initialze firebase
 const app = initializeApp(firebaseConfig);
 // Initialize analytics
-const analytics = getAnalytics(app);
+//const analytics = getAnalytics(app);
 //initialize db
 const db = getDatabase(app);
 //auth
@@ -279,21 +279,21 @@ const addProjectMember = (id, memberIds) => {
 const createNewTask = async function createNewTask(projectId, name, description, estimatedTime, status, ownerIds, assignedUserIds, followerIds) {
 
   // Create basic task
-  const taskListRef = ref(db, 'tasks/');
+  const taskListRef = ref(db, 'tasks');
   const newTaskRef = push(taskListRef);
 
   set(newTaskRef, {
-    projectId: await getProjectById(projectId)[0],
+    projectId: await apiFunctions.getProjectById(projectId),
     name: name,
     description: description,
     estimatedTime: estimatedTime,
     assignedUsers: assignedUserIds,
-    owners: await getUserById(ownerIds)[0],
+    owners: await apiFunctions.getUserById(ownerIds),
     status: status,
-    assignedUsers: await getUserById(assignedUserIds)[0],
     followers: followerIds
   });
-    return newTaskRef.key;
+  
+  return newTaskRef.key;
 }
 
 const addTaskOwners = (taskId, ownerIds) => {
@@ -467,8 +467,9 @@ const getGroupsProjects = function getGroupsProjects(groupId) {
 const getProjectById = async function getProjectById(projectId) {
   const projectInfo = []
 
-  await onValue(ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
+  await onValue(await ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
     projectInfo.push([projectId, snapshot.val()]);
+    console.log("value: " + [projectId, snapshot.val()]);
   });
 
   return projectInfo;
@@ -487,7 +488,7 @@ const getTaskById = function getTaskById(taskId) {
 const getUserById = async function getUserById(userId) {
   const userInfo = []
 
-  await onValue(ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
+  await onValue(await ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
     userInfo.push([userId, snapshot.val()]);
   });
 

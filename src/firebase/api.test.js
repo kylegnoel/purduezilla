@@ -83,30 +83,30 @@ test("Inserts and reads new project into db correctly", () => {
 });
 
 
-test("Inserts and reads new task into db correctly", () => {
-  const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"], ["25", "50"]);
+// test("Inserts and reads new task into db correctly", () => {
+//   const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"], ["25", "50"]);
 
-  const inputTask = {
-    "tasks": {
-      taskId: {
-        "assignedUsers": ["11", "88"],
-        "description": "Task description",
-        "estimatedTime": 2,
-        "followers": ["25", "50"],
-        "owners": ["123", "456"],
-        "permittedUsers": ["22", "99"],
-        "projectId": "1234",
-        "status": "Planned",
-        "title": "Task Title"
-      }
-    }
-  }
+//   const inputTask = {
+//     "tasks": {
+//       taskId: {
+//         "assignedUsers": ["11", "88"],
+//         "description": "Task description",
+//         "estimatedTime": 2,
+//         "followers": ["25", "50"],
+//         "owners": ["123", "456"],
+//         "permittedUsers": ["22", "99"],
+//         "projectId": "1234",
+//         "status": "Planned",
+//         "title": "Task Title"
+//       }
+//     }
+//   }
 
-  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
-    const retrievedTask = snapshot.val();
-    expect(retrievedTask).toMatch(inputTask);
-  });
-});
+//   onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+//     const retrievedTask = snapshot.val();
+//     expect(retrievedTask).toMatch(inputTask);
+//   });
+// });
 
 // /*****
 //  *
@@ -316,52 +316,52 @@ test("Correctly deletes a project member", () => {
 //   });
 // });
 
-test("Correctly deletes an assigned user from task", () => {
-  const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"]);
-  apiFunctions.deleteTaskAssignedUsers(taskId, ["123"])
+// test("Correctly deletes an assigned user from task", () => {
+//   const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"]);
+//   apiFunctions.deleteTaskAssignedUsers(taskId, ["123"])
 
-  const inputTask = {
-    "tasks": {
-      taskId: {
-        "assignedUsers": ["456"],
-        "description": "New description",
-        "estimatedTime": 4,
-        "followers": ["11", "88"],
-        "owners": ["22", "99"],
-        "projectId": "12345",
-        "status": "Completed",
-        "title": "Task Title Update"
-      }
-    }
-  }
+//   const inputTask = {
+//     "tasks": {
+//       taskId: {
+//         "assignedUsers": ["456"],
+//         "description": "New description",
+//         "estimatedTime": 4,
+//         "followers": ["11", "88"],
+//         "owners": ["22", "99"],
+//         "projectId": "12345",
+//         "status": "Completed",
+//         "title": "Task Title Update"
+//       }
+//     }
+//   }
 
-  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
-    const retrievedTask = snapshot.val();
-    expect(retrievedTask).toMatch(inputTask);
-  });
-});
+//   onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+//     const retrievedTask = snapshot.val();
+//     expect(retrievedTask).toMatch(inputTask);
+//   });
+// });
 
-test("Correctly deletes an owner from task", () => {
-  const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"]);
-  apiFunctions.deleteTaskOwners(taskId, ["99"])
+// test("Correctly deletes an owner from task", () => {
+//   const taskId = apiFunctions.createNewTask("1234", "Task Title", "Task description.", 2, "Planned", ["22", "99"], ["123", "456"], ["11", "88"]);
+//   apiFunctions.deleteTaskOwners(taskId, ["99"])
 
-  const inputTask = {
-    "tasks": {
-      taskId: {
-        "assignedUsers": ["123", "456"],
-        "description": "New description",
-        "estimatedTime": 4,
-        "followers": ["11", "88"],
-        "owners": ["22"],
-        "projectId": "12345",
-        "status": "Completed",
-        "title": "Task Title Update"
-      }
-    }
-  }
+//   const inputTask = {
+//     "tasks": {
+//       taskId: {
+//         "assignedUsers": ["123", "456"],
+//         "description": "New description",
+//         "estimatedTime": 4,
+//         "followers": ["11", "88"],
+//         "owners": ["22"],
+//         "projectId": "12345",
+//         "status": "Completed",
+//         "title": "Task Title Update"
+//       }
+//     }
+//   }
 
-  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
-    const retrievedTask = snapshot.val();
-    expect(retrievedTask).toMatch(inputTask);
-  });
-});
+//   onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+//     const retrievedTask = snapshot.val();
+//     expect(retrievedTask).toMatch(inputTask);
+//   });
+// });

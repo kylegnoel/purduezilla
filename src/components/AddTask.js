@@ -98,15 +98,14 @@ export default function AddTask() {
         // console.log("submitted")
 
         let createNewTask = await apiFunctions.createNewTask(
-            project, // projectId 
+            apiFunctions.getProjectById(project)[0], // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime
             label, // status
-            selectedFollower, // permiteedUserIds
+            apiFunctions.getUserById(owner)[0], // permiteedUserIds
             owner, // ownerIds
             assignee, // assignedUserIds
-            selectedFollower, // followerIds
         )
 
         if (createNewTask) {
