@@ -18,24 +18,24 @@ import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
 
 const Routing = props => {
-    const isLoggedIn = apiFunctions.auth.currentUser != null;
+
     return (
         <Router>
             <Routes>
                 <Route exact path="/" element={<Login />} />
-                <Route exact path="/home" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><Dashboard /></PrivateRoute>} />
+                <Route exact path="/home" element={<PrivateRoute redirectRoute="/" ><Dashboard /></PrivateRoute>} />
                 <Route exact path="/register" element={<Register />} />
-                <Route exact path="/myprojects" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><Projects /></PrivateRoute>} />
+                <Route exact path="/myprojects" element={<PrivateRoute redirectRoute="/" ><Projects /></PrivateRoute>} />
                 <Route exact path="/newproject" element={<NewProject />} />
                 <Route exact path="/profile/:id" element={<Profile />} />
-                <Route exact path="/newgroup" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><NewGroup /></PrivateRoute>} />
+                <Route exact path="/newgroup" element={<PrivateRoute redirectRoute="/" ><NewGroup /></PrivateRoute>} />
                 <Route exact path="/group/:id" element={<Groups />} />
-                <Route exact path="/mygroups" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><Groups /></PrivateRoute>} />
+                <Route exact path="/mygroups" element={<PrivateRoute redirectRoute="/" ><Groups /></PrivateRoute>} />
                 <Route exact path="*" element={<NotFound />} />
                 <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
                 <Route exact path="/task/:id" element={<Task />} />
-                <Route exact path="/newtask" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
-                <Route exact path="/mytasks" element={<PrivateRoute condition={isLoggedIn} redirectRoute="/" ><Task /></PrivateRoute>} />
+                <Route exact path="/newtask" element={<PrivateRoute redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
+                <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
             </Routes>
         </Router>
     );
