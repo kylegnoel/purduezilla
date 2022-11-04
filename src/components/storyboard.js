@@ -50,6 +50,10 @@ export default function SimpleCard() {
     const [description, setDesc] = useState('');
     const navigate = useNavigate();
 
+    const [toDo, setToDo] = useState([]);
+    const [inProgress, setInProgress] = useState([]);
+    const [inTesting, setInTesting] = useState([]);
+    const [completed, setCompleted] = useState([]);
 
     const handleClickOpen = () => {
 
@@ -70,16 +74,31 @@ export default function SimpleCard() {
         else {
             try {
                 onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                    const taskTemp = []
+                    const todoTemp = []
+                    const inprogressTemp = []
+                    const intestingTemp = []
+                    const completedTemp = []
         
                     snapshot.forEach(function(child) {
                         const task = child.val()
-                        if (task.projectId === id) {
-                            taskTemp.push([task, child.key])
+                        if (task.status === "To Do") {
+                            todoTemp.push([task, child.key])
+                        }
+                        else if (task.status === "In Progress") {
+                            inprogressTemp.push([task, child.key])
+                        }
+                        else if (task.status === "In Testing") {
+                            intestingTemp.push([task, child.key])
+                        }
+                        else if (task.status === "Completed") {
+                            completedTemp.push([task, child.key])
                         }
                     })
     
-                    setTaskListArr(taskTemp)
+                    setToDo(todoTemp)
+                    setInProgress(inprogressTemp)
+                    setInTesting(intestingTemp)
+                    setCompleted(completedTemp)
                 })
     
                 // set project name
@@ -128,12 +147,12 @@ export default function SimpleCard() {
                         <h2>{project}</h2>
                         
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                            <Grid container spacing={2} alignItems="center" direction={'row'}>
-                                <Grid item>
+                            <Grid container spacing={2} direction="row" alignItems="stretch" >
+                                <Grid item sm={3}>
                                     <Typography><h3>To Do</h3></Typography>
                                     <Divider></Divider>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 10, flexDirection:"column", mt:2 }} height={400}>
-                                            { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                    <FixedSizeList fullWidth sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 10, flexDirection:"column", mt:2 }} height={400}>
+                                            { toDo && toDo.length != 0 ? toDo.map((data) => {
                                                 return (
                                                 <div key={data.key}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
@@ -143,14 +162,14 @@ export default function SimpleCard() {
                                                 </Button>
                                                 <Divider />
                                             </div>   
-                                            )}): "There are no tasks!" }
+                                            )}): "" }
                                     </FixedSizeList>                          
                                 </Grid>
-                                <Grid item>
+                                <Grid item sm={3}>
                                     <Typography><h3>In Progress</h3></Typography>
                                     <Divider></Divider>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                            { inProgress && inProgress.length != 0 ? inProgress.map((data) => {
                                                 return (
                                                 <div key={data.key}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
@@ -160,14 +179,14 @@ export default function SimpleCard() {
                                                 </Button>
                                                 <Divider />
                                             </div>   
-                                            )}): "There are no tasks!" }
+                                            )}): "" }
                                     </FixedSizeList>   
                                 </Grid>
-                                <Grid item>
+                                <Grid item sm={3}>
                                     <Typography><h3>In Testing</h3></Typography>
                                     <Divider></Divider>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                            { inTesting && inTesting.length != 0 ? inTesting.map((data) => {
                                                 return (
                                                 <div key={data.key}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
@@ -177,14 +196,14 @@ export default function SimpleCard() {
                                                 </Button>
                                                 <Divider />
                                             </div>   
-                                            )}): "There are no tasks!" }
+                                            )}): "" }
                                     </FixedSizeList>   
                                 </Grid>
-                                <Grid item>
+                                <Grid item sm={3}>
                                     <Typography><h3>Completed</h3></Typography>
                                     <Divider></Divider>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                            { completed && completed.length != 0 ? completed.map((data) => {
                                                 return (
                                                 <div key={data.key}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
@@ -194,7 +213,7 @@ export default function SimpleCard() {
                                                 </Button>
                                                 <Divider />
                                             </div>   
-                                            )}): "There are no tasks!" }
+                                            )}): "" }
                                     </FixedSizeList>   
                                 </Grid>                  
                             </Grid>
