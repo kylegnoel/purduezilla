@@ -36,9 +36,10 @@ const Routing = props => {
                 <Route exact path="*" element={<NotFound />} />
                 <Route exact path="/project/:id" forceRefresh={true} element={<Projects />} />
                 <Route exact path="/project/:id/storyboard" forceRefresh={true} element={<Storyboard />} />
-                <Route exact path="/task/:id" element={<Task />} />
+                <Route exact path="/task/:id" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask" element={<PrivateRoute redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
                 <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
+                <Route exact path="/newtask/:id" element={<AddTaskPage />} />
             </Routes>
         </Router>
     );
