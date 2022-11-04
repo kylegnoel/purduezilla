@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";

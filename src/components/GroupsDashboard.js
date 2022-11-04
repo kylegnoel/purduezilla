@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import WorkIcon from '@mui/icons-material/Work';
 import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -100,7 +101,7 @@ export default function GroupsDashboard() {
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
-                                                            <WorkIcon color="grey"/>
+                                                            <GroupsIcon color="grey"/>
                                                         </ListItemAvatar>
                                                         <ListItemText primary={data[0].name}/>
                                                     </ListItem>

@@ -180,13 +180,13 @@ const Task = () => {
     const handleMarkDone = async (event) => {
         const selectedTemp = ''
         if (completed) {
-            setSelected('Complete');
+            setLabel('Complete');
             setCompleted(false)
             alert('Task Completed!')
             selectedTemp = 'Complete'
         }
         else {
-            setSelected('In Progress');
+            setLabel('In Progress');
             setCompleted(true)
             alert('Task Changed!')
             selectedTemp = 'In Progress'
@@ -304,7 +304,6 @@ const Task = () => {
                     console.log(name)
 
                     console.log("OK HERE" + val.projectId)
-                    setProject(apiFunctions.getProjectById(val.projectId)[0][1].name)
                 })
                 
 
@@ -567,21 +566,13 @@ const Task = () => {
                                                 <FormControl xs={8} fullWidth>
                                                     <InputLabel id="assignLabel">Label</InputLabel>
                                                     <Select
-                                                        multiple
                                                         defaultValue={10}
                                                         value={selected}
                                                         onChange={selectionChangeHandler}
-                                                        label="Label"
+                                                        label="Status"
                                                         id="label"
                                                         textOverflow="ellipsis"
                                                         overflow="hidden"
-                                                        renderValue={(selected) => (
-                                                        <div>
-                                                            { selected && selected.length !== 0 ? selected.map((value) => (
-                                                            <Chip key={value} label={value} />
-                                                            )): []}
-                                                        </div>
-                                                        )}
                                                     >
                                                         <MenuItem value={'To Do'}>To Do</MenuItem>
                                                         <MenuItem value={'In Progress'}>In Progress</MenuItem>

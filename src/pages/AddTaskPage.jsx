@@ -208,24 +208,14 @@ export default function AddTaskPage() {
                                         </Grid>
                                         <Grid item xs={8}>
                                             <FormControl xs={8} fullWidth>
-                                                <InputLabel id="assignLabel">Label</InputLabel>
+                                                <InputLabel id="assignLabel">Status</InputLabel>
                                                 <Select
-                                                    multiple
                                                     defaultValue={10}
                                                     value={selected}
                                                     onChange={selectionChangeHandler}
-                                                    label="Label"
+                                                    label="Status"
                                                     id="label"
                                                     required
-                                                    textOverflow="ellipsis"
-                                                    overflow="hidden"
-                                                    renderValue={(selected) => (
-                                                    <div>
-                                                        {selected.map((value) => (
-                                                        <Chip key={value} label={value} />
-                                                        ))}
-                                                    </div>
-                                                    )}
                                                 >
                                                     <MenuItem value={'To Do'}>To Do</MenuItem>
                                                     <MenuItem value={'In Progress'}>In Progress</MenuItem>
@@ -236,7 +226,7 @@ export default function AddTaskPage() {
                                                     <MenuItem value={'Closed'}>Closed</MenuItem>
                                                     <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
                                                 </Select>
-                                                <FormHelperText>Select corresponding labels.</FormHelperText>
+                                                <FormHelperText>Select corresponding status.</FormHelperText>
                                             </FormControl>
                                         </Grid>
                                         <Grid item xs={4}>
