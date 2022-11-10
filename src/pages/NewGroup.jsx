@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Link, CssBaseline, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
@@ -12,30 +12,23 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
-import Input from '@mui/material/Input';
 import NavBar from '../components/NavBar';
 import { useNavigate } from "react-router-dom";
-import ClearIcon from '@mui/icons-material/Clear';
 import Avatar from '@mui/material/Avatar';
 
 import { ref, onValue } from "firebase/database";
 
 import apiFunctions from '../firebase/api';
-import { Navigate } from "react-router-dom";
 
 const theme = createTheme();
 
 export default function NewProject() {
-    const [selectedFollower, setSelectedFollower] = React.useState([]);
     const [name, setName] = useState('');
     const [description, setDesc] = useState('');
     const [owner, setOwner] = React.useState([]);
     const [member, setMember] = React.useState([]);
-    const [memberId, setMemberId] = React.useState([]);
-    const [ownerId, setOwnerId] = React.useState([]);
 
     const [userList, setUserList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const handleNameChange = event => {
@@ -72,10 +65,6 @@ export default function NewProject() {
         owner.forEach(function(ownerTemp) {
             ownerId.push(ownerTemp[1])
         })
-
-        // console.log("member: " + memberId)
-        // console.log("owner: " + ownerId);
-
         // convert names into userid 
 
         let createNewGroup = await apiFunctions.createNewGroup(
@@ -98,7 +87,7 @@ export default function NewProject() {
         fetchData()
     }, []);
 
-    const fetchData = (event) => {
+    const fetchData = () => {
 
         // user
         try {
@@ -115,9 +104,6 @@ export default function NewProject() {
                 setUserList(userTemp)
                 // console.log("snapshot: " + userList.length)
             })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
@@ -201,7 +187,7 @@ export default function NewProject() {
                                             </div>
                                             )}
                                         >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                            { userList && userList.length !== 0 ? userList.map((data) => 
                                                         <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                     ): <MenuItem value={0}>New User</MenuItem> }
                                         </Select>
@@ -236,7 +222,7 @@ export default function NewProject() {
                                                 </div>
                                             )}
                                         >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
+                                            { userList && userList.length !== 0 ? userList.map((data) => 
                                                         <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                     ): <MenuItem value={0}>New User</MenuItem> }
                                         </Select>

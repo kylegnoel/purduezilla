@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Link, Routes, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
-import NavBar from '../components/NavBar';
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -24,10 +24,8 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
-import { useNavigate } from "react-router-dom";
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -35,8 +33,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+// components import
+import NavBar from '../components/NavBar';
+
 import '../App.css';
 
+// db imports
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
@@ -46,7 +48,6 @@ const Task = () => {
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
     const [followedTaskListarr, setFollowedTaskList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const [showFollow, setFollow] = useState(false);
 
     const [name, setName] = useState('');
@@ -67,11 +68,9 @@ const Task = () => {
     const user = apiFunctions.useFirebaseAuth();
 
     const [isEditing, setEditing] = useState(false);
-    const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
     const [assign, setAssigned] = useState(false);
     
-    const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
 
@@ -80,10 +79,6 @@ const Task = () => {
         if (event.target.value === 'Complete') {
             alert('Task Completed!');
         }
-    };
-
-    const handleFollowerChange = (event) => {
-        setSelectedFollower(event.target.value);
     };
 
     const handleNameChange = event => {
@@ -96,10 +91,6 @@ const Task = () => {
 
     const handleHourChange = event => {
         setHour(event.target.value)
-    };
-
-    const handleLabelChange = event => {
-        setLabel(event.target.value)
     };
 
     const handleOwnerChange = event => {
@@ -166,7 +157,7 @@ const Task = () => {
     }
 
     const handleMarkDone = async (event) => {
-        const selectedTemp = ''
+        var selectedTemp = ''
         if (completed) {
             setLabel('Complete');
             setCompleted(false)
@@ -183,7 +174,7 @@ const Task = () => {
 
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
-            project, // projectId 
+            await apiFunctions.getProjectById(newProject)[0], // projectId 
             newName, // title 
             description, // description
             hour, //estimated time
@@ -192,12 +183,12 @@ const Task = () => {
 
         setLabel(selectedTemp)
         
-            if (updateTaskDetails) {
-                //window.location.href='/task/'+id
-                
-            } else {
-                alert("Task Failed to Save");
-            }
+        if (updateTaskDetails) {
+            //window.location.href='/task/'+id
+            
+        } else {
+            alert("Task Failed to Save");
+        }
     }
 
 
@@ -230,13 +221,13 @@ const Task = () => {
     const newCommentSubmit = (event) => {
         event.preventDefault();
 
-        if (newCommentBody == '') {
+        if (newCommentBody === '') {
             return;
         }
         let tagged = [];
         let splitComment = newCommentBody.split(" ");
         splitComment.forEach((word) => {
-            if (word.charAt(0) == '#') {
+            if (word.charAt(0) === '#') {
                 tagged.push(word.substring(1));
             }
         });
@@ -248,14 +239,14 @@ const Task = () => {
         setComments([...comments, newAdded]);
     };
 
-    const fetchData = async (event) => {
+    const fetchData = () => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // // console.log("response: " + response)
 
         if (id !== undefined) {
             try {
-                await onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
+                onValue(ref(apiFunctions.db, 'tasks/' + id), (snapshot) => {
                     const val = snapshot.val()
 
                     setName(val.name)
@@ -265,26 +256,8 @@ const Task = () => {
                     setLabel(val.status)
                     setOwner(val.owners[1].firstName + " " +  val.owners[1].lastName)
                     setAssign(val.assignedUsers[1].firstName + " " +  val.assignedUsers[1].lastName)
-                    setSelectedFollower(val.followers)
                     setProject(val.projectId[1].name)
-
-                    // //owner
-                    // const ownerTemp = apiFunctions.getUserById(val.owner)[1]
-                    // // console.log("owner: " + JSON.stringify(ownerTemp))
-                    // // console.log("set hour: " + hour + " " + val.estimatedTime)
-
-                    //assignee
-                    // if (val.assignedUsers !== "") {
-                    //     onValue(ref(apiFunctions.db, "users/" + val.assignedUsers), (snapshot) => {
-                    //         setAssign(snapshot.val().firstName + " " + snapshot.val().lastName)
-                    //     });
-                    // }
                 })
-                
-
-                if (taskListarr.length !== 0) {
-                    setLoading(false)
-                }
     
                 //fetch comments as well
                 const settingComments = apiFunctions.getTaskComments(id);
@@ -316,9 +289,6 @@ const Task = () => {
 
                 setProjectList(projectTemp)
             })
-            if (projectList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
@@ -335,15 +305,11 @@ const Task = () => {
 
                 setUserList(userTemp)
             })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
         }
 
-        setLoading(false)
         return true;
     };
 
@@ -399,7 +365,7 @@ const Task = () => {
                             { showFollow
                                 ? <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
                                 flexDirection:"column",}} height={400}>
-                                        { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                        { taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
                                             return (
                                             <div key={data.projectId}>
                                                 <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
@@ -424,7 +390,7 @@ const Task = () => {
                                 </FixedSizeList>
                                 : <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
                                 flexDirection:"column",}} height={400}>
-                                        { followedTaskListarr && followedTaskListarr.length != 0 ? followedTaskListarr.map((data) => {
+                                        { followedTaskListarr && followedTaskListarr.length !== 0 ? followedTaskListarr.map((data) => {
                                             return (
                                             <div key={data.projectId}>
                                                 <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
@@ -527,7 +493,6 @@ const Task = () => {
                                                         <FormControl xs={8} fullWidth>
                                                             <InputLabel id="assignLabel">Label</InputLabel>
                                                             <Select
-                                                                multiple
                                                                 defaultValue={10}
                                                                 value={selected}
                                                                 onChange={selectionChangeHandler}
@@ -535,13 +500,6 @@ const Task = () => {
                                                                 id="label"
                                                                 textOverflow="ellipsis"
                                                                 overflow="hidden"
-                                                                renderValue={(selected) => (
-                                                                    <div>
-                                                                        {selected && selected.length !== 0 ? selected.map((value) => (
-                                                                            <Chip key={value} label={value} />
-                                                                        )) : []}
-                                                                    </div>
-                                                                )}
                                                             >
                                                                 <MenuItem value={'To Do'}>To Do</MenuItem>
                                                                 <MenuItem value={'In Progress'}>In Progress</MenuItem>
@@ -572,23 +530,23 @@ const Task = () => {
                                                 </Grid>
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <FormControl fullWidth>
-                                                    <InputLabel id="projectLabel">Project</InputLabel>
-                                                    <Select
-                                                        defaultValue={10}
-                                                        value={selected}
-                                                        onChange={selectionChangeHandler}
-                                                        label="Status"
-                                                        id="label"
-                                                        textOverflow="ellipsis"
-                                                        overflow="hidden"
-                                                    >
-                                                        {projectList && projectList.length != 0 ? projectList.map((data) =>
-                                                            <MenuItem value={data[1]}>{data[0].name}</MenuItem>
-                                                        ) : <MenuItem value={0}>New Project</MenuItem>}
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="projectLabel">Project</InputLabel>
+                                                <Select
+                                                    labelId="projectLabel"
+                                                    id="projectLabel"
+                                                    label="Project"
+                                                    fullWidth
+                                                    defaultValue={id}
+                                                    onChange={handleProjectChange}
+                                                >
+                                                    { projectList && projectList.length !== 0 ? projectList.map((data) => 
+                                                        <MenuItem value={data[1]}>{data[0].name}</MenuItem>
+                                                    ): <MenuItem value={0}>New Project</MenuItem> }
+                                                </Select>
+                                                <FormHelperText>Previous values: {project}</FormHelperText>
+                                            </FormControl>
+                                        </Grid>
                                             <Grid item xs={12}>
                                                 <TextField
                                                     required
@@ -602,37 +560,6 @@ const Task = () => {
                                                     value={description}
                                                 />
                                             </Grid>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="projectLabel">Project</InputLabel>
-                                                <Select
-                                                    labelId="projectLabel"
-                                                    id="projectLabel"
-                                                    label="Project"
-                                                    fullWidth
-                                                    defaultValue={id}
-                                                    onChange={handleProjectChange}
-                                                >
-                                                    { projectList && projectList.length != 0 ? projectList.map((data) => 
-                                                        <MenuItem value={data[1]}>{data[0].name}</MenuItem>
-                                                    ): <MenuItem value={0}>New Project</MenuItem> }
-                                                </Select>
-                                                <FormHelperText>Previous values: {project}</FormHelperText>
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            multiline
-                                            onChange={handleDescChange}
-                                            rows={4}
-                                            id="taskDescription"
-                                            label="Task Description"
-                                            name="taskDescription"
-                                            value={description}
-                                            />
                                         </Grid>
                                         <br></br>
                                         <Divider>OWNERSHIP</Divider>
@@ -648,7 +575,7 @@ const Task = () => {
                                                 value={owner}
                                                 disabled
                                             >
-                                                {userList && userList.length != 0 ? userList.map((data) =>
+                                                {userList && userList.length !== 0 ? userList.map((data) =>
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                 ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
@@ -668,7 +595,7 @@ const Task = () => {
                                                 value={assignee}
                                                 disabled
                                             >
-                                                {userList && userList.length != 0 ? userList.map((data) =>
+                                                {userList && userList.length !== 0 ? userList.map((data) =>
                                                     <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                                 ) : <MenuItem value={0}>New User</MenuItem>}
                                             </Select>
@@ -738,7 +665,7 @@ const Task = () => {
                         aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">
-                            {"Are you sure you want to delete \'" + name + "\'?"}
+                            {"Are you sure you want to delete '" + name + "'?"}
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">

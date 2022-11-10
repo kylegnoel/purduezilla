@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import {useParams} from 'react-router-dom'; 
 
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -17,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 const theme = createTheme();
 
 const Login = () => {
-    const {id} = useParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();

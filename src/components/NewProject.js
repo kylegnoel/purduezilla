@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
+
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Link, CssBaseline, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -16,16 +14,14 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
-import Input from '@mui/material/Input';
 
+//db imports 
 import { ref, onValue } from "firebase/database";
-
 import apiFunctions from '../firebase/api';
 
 const theme = createTheme();
 
 export default function NewProject() {
-    const [selectedFollower, setSelectedFollower] = React.useState([]);
     const [name, setName] = useState('');
     const [description, setDesc] = useState('');
     const [owner, setOwner] = useState('');
@@ -33,7 +29,6 @@ export default function NewProject() {
     const [selected, setSelected] = React.useState([]);
     const [status, setStatus] = React.useState([]);
     const [userList, setUserList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
 
     const handleNameChange = event => {
         setName(event.target.value)
@@ -85,7 +80,7 @@ export default function NewProject() {
         fetchData()
     }, []);
 
-    const fetchData = (event) => {
+    const fetchData = () => {
 
         // user
         try {
@@ -101,9 +96,6 @@ export default function NewProject() {
                 setUserList(userTemp)
                 // console.log("snapshot: " + userList.length)
             })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
@@ -203,7 +195,7 @@ export default function NewProject() {
                                 onChange={handleOwnerChange}
                                 defaultValue={10}
                             >
-                                { userList && userList.length != 0 ? userList.map((data) => 
+                                { userList && userList.length !== 0 ? userList.map((data) => 
                                                 <MenuItem value={data[0].firstName + " " + data[0].lastName} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                             </Select>
@@ -233,7 +225,7 @@ export default function NewProject() {
                                     </div>
                                     )}
                                 >
-                                    { userList && userList.length != 0 ? userList.map((data) => 
+                                    { userList && userList.length !== 0 ? userList.map((data) => 
                                                 <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                                 </Select>

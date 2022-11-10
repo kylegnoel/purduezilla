@@ -18,13 +18,9 @@ import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
 
-
-
-
 export const AccountProfileDetails = (props) => {
   const user = apiFunctions.useFirebaseAuth();
   const [groupList, setGroupList] = useState([]);
-  const [isLoading, setLoading] = useState(true);
   const [values, setValues] = useState({
     name: user.info.firstName,
     email: user.info.email,
@@ -61,7 +57,7 @@ const handleTask = (event) => {
     apiFunctions.updateUser(user.key, user.info.email, values.name, "", values.description, user.info.notificationSetting)
   };
 
-  const fetchData = (event) => {
+  const fetchData = () => {
     try {
         onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
             const groupTemp = []
@@ -78,8 +74,6 @@ const handleTask = (event) => {
     catch {
         // if there is no internet
     }
-
-    setLoading(false)
 
     return true;
 };
@@ -174,7 +168,7 @@ const handleTask = (event) => {
         />
         <FixedSizeList sx={{maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                        { groupList && groupList.length != 0 ? groupList.map((data) => {
+                                        { groupList && groupList.length !== 0 ? groupList.map((data) => {
                                             return (
                                             <div key={data[1]}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>

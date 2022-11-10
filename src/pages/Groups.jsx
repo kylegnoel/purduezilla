@@ -8,21 +8,18 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import ListSubheader from '@mui/material/ListSubheader';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
-import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 
 import GroupsDashboard from '../components/GroupsDashboard';
-import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 
 const Groups = () => {
     const {id} = useParams();
@@ -30,14 +27,11 @@ const Groups = () => {
     const theme = createTheme();
     const [group, setGroup] = useState('');
     const [projectListArr, setProjectList] = useState([]);
-    const [taskListArr, setTaskListArr] = useState([]);
 
     const navigate = useNavigate();
     const user = apiFunctions.useFirebaseAuth();
 
     console.log(user);
-
-    const [groupList, setGroupList] = useState([]);
 
     useEffect(() => {
         console.log("reload")
@@ -49,7 +43,6 @@ const Groups = () => {
             setGroup(snapshot.val().name)
 
             const projectListTemp = []
-            const projectLi = snapshot.val().projects
 
             snapshot.forEach(function (childSnapshot) {
                 const projectID = childSnapshot.val().name
@@ -91,7 +84,7 @@ const Groups = () => {
                                 <Grid item xs={50} sm={12}>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
             flexDirection:"column",}} height={400}>
-                                            { projectListArr && projectListArr.length != 0 ? projectListArr.map((data) => {
+                                            { projectListArr && projectListArr.length !== 0 ? projectListArr.map((data) => {
                                                 return (
                                                 <div key={data[0]}>
                                                 <Button onClick={handleTask} id={data[1].projectId} sx={{ height: '100%', width: '100%'}}>

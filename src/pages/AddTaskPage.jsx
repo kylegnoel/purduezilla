@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Link, CssBaseline, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,17 +17,16 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
-import NavBar from '../components/NavBar';
 import Avatar from "@mui/material/Avatar";
 
-import { useNavigate, useParams } from "react-router-dom";
+// component imports
+import NavBar from '../components/NavBar';
 
+// db imports
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import { FollowTheSignsRounded } from "@mui/icons-material";
 
 const theme = createTheme();
-
 
 export default function AddTaskPage() {
     const {id} = useParams();
@@ -38,13 +37,10 @@ export default function AddTaskPage() {
     const [description, setDesc] = useState('');
     const [assignee, setAssign] = useState('');
     const [hour, setHour] = useState('');
-    const [label, setLabel] = useState('');
     const [owner, setOwner] = useState('');
     const [project, setProject] = useState(id);
     const [projectList, setProjectList] = useState([]);
     const [userList, setUserList] = useState([]);
-
-    const [isLoading, setLoading] = useState(true);
     
     const navigate = useNavigate();
 
@@ -66,10 +62,6 @@ export default function AddTaskPage() {
     
     const handleHourChange = event => {
         setHour(event.target.value)
-    };
-
-    const handleLabelChange = event => {
-        setLabel(event.target.value)
     };
 
     const handleOwnerChange = event => {
@@ -127,7 +119,7 @@ export default function AddTaskPage() {
         }
     };
 
-    const fetchData = async(event) => {
+    const fetchData = async() => {
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
@@ -142,9 +134,6 @@ export default function AddTaskPage() {
                     setProjectList(projectTemp)
                     // console.log("snapshot: " + projectList.length)
             })
-            if (projectList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
@@ -164,9 +153,6 @@ export default function AddTaskPage() {
                     setUserList(userTemp)
                     // console.log("snapshot: " + userList.length)
             })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
         }
         catch {
             // if there is no internet
@@ -260,7 +246,7 @@ export default function AddTaskPage() {
                                             defaultValue={id}
                                             onChange={handleProjectChange}
                                         >
-                                            { projectList && projectList.length != 0 ? projectList.map((data) => 
+                                            { projectList && projectList.length !== 0 ? projectList.map((data) => 
                                                 <MenuItem value={data[1]}>{data[0].name}</MenuItem>
                                             ): <MenuItem value={0}>New Project</MenuItem> }
                                         </Select>
@@ -293,7 +279,7 @@ export default function AddTaskPage() {
                                         onChange={handleOwnerChange}
                                         defaultValue={10}
                                     >
-                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                        { userList && userList.length !== 0 ? userList.map((data) => 
                                             <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                         ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
@@ -313,7 +299,7 @@ export default function AddTaskPage() {
                                         onChange={handleAssignChange}
                                         defaultValue={10}
                                     >
-                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                        { userList && userList.length !== 0 ? userList.map((data) => 
                                                 <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
@@ -348,7 +334,7 @@ export default function AddTaskPage() {
                                         </div>
                                         )}
                                     >
-                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                        { userList && userList.length !== 0 ? userList.map((data) => 
                                                 <MenuItem value={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
