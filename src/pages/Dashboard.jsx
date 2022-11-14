@@ -23,6 +23,8 @@ import { Container } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TaskIcon from '@mui/icons-material/Task';
 
+import { useTour } from '@reactour/tour';
+
 import '../App.css'
 const theme = createTheme();
 
@@ -84,9 +86,10 @@ const Dashboard = () => {
 
         }
     }
-
+    const { setIsOpen } = useTour();
     return (
         <div>
+            <button onClick={() => setIsOpen(true)} id="start-tour" hidden>Open Tour</button>
             <NavBar></NavBar>
             <div class="flex-container">
 <div style={{marginBottom: '-16px'}}class="flex-child">

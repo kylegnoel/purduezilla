@@ -75,6 +75,7 @@ const ResponsiveAppBar = () => {
               color: 'inherit',
               textDecoration: 'none',
             }}
+            className='first-step'
           >
             PURDUEZILLA
           </Typography>
@@ -137,7 +138,7 @@ const ResponsiveAppBar = () => {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} className="second-step">
             <MenuItem component={Link} to="/mygroups"><h1>
                 <Typography textAlign="center">My Groups</Typography></h1>
             </MenuItem>
@@ -151,7 +152,7 @@ const ResponsiveAppBar = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton className="third-step" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar></Avatar>
               {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
               </IconButton>
