@@ -63,7 +63,7 @@ export default function SimpleCard() {
         fetchData()
     }, []);
 
-    const fetchData = (event) => {
+    const fetchData = () => {
         setTaskListArr([])
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))

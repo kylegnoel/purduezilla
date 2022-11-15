@@ -10,20 +10,17 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
 export default function ProjectDashboard() {
     const [projListarr, setProjListArr] = useState([]);
     // const taskListarr = []
-    const [isLoading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("reload")
@@ -41,7 +38,7 @@ export default function ProjectDashboard() {
         }
     }
 
-    const fetchData = (event) => {
+    const fetchData = () => {
         // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -51,7 +48,6 @@ export default function ProjectDashboard() {
                 const projectTemp = []
     
                 snapshot.forEach(function(child) {
-                    const project = child.val()
                     projectTemp.push([child.val(), child.key])
                     // console.log("key: " + child.key);
                 })
@@ -59,16 +55,11 @@ export default function ProjectDashboard() {
                 setProjListArr(projectTemp)
                 // console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
             })
-            if (setProjListArr.length !== 0) {
-                setLoading(false)
-            }
 
         }
         catch {
             // if there is no internet
         }
-
-        setLoading(false)
         
         // console.log("taskListarr: " + projListarr.length)
         return true;
@@ -82,7 +73,7 @@ export default function ProjectDashboard() {
                             <Grid item xs={50} sm={12} lg={'50%'}>
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                    { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
+                                    { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
                                             return (  
                                             <div key={data[1]}>
                                             <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>

@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, push, onValue, update, child, remove, get } from "firebase/database";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
 
@@ -145,7 +144,7 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   }, { onlyOnce: true });
   for (var key in child1) {
     console.log(key);
-    if (userRefObjects[child1[key].email] == 1) {
+    if (userRefObjects[child1[key].email] === 1) {
       console.log("enters the tagging phase");
       userRef = ref(db, `users/${key}/tagged`);
       newRef = push(userRef);
@@ -371,7 +370,7 @@ const getProjectsTasks = function getProjectsTasks(projectId) {
 
   onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      if (childSnapshot.val().projectId == projectId) {
+      if (childSnapshot.val().projectId === projectId) {
         // Keep track of task key and task's values
         tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
       }
@@ -389,7 +388,7 @@ const getUsersProjects = function getUsersProjects(userId) {
     snapshot.forEach(function (projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function (memberSnapshot) {
-          if (memberSnapshot.val().userId == userId) {
+          if (memberSnapshot.val().userId === userId) {
             // Keep track of key and values
             usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
           }
@@ -410,13 +409,13 @@ const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/assignedUsers'), (snapshot2) => {
         var found = false
         // snapshot2.forEach(function (userSnapshot) {
-        //   if (userSnapshot.val()[1].userId == userId && found === false)  {
+        //   if (userSnapshot.val()[1].userId === userId && found === false)  {
         //     // Keep track of key and values
         //     usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
         //     found = true
         //   }
         // });
-        if (snapshot2.val()[0] == userId && found === false)  {
+        if (snapshot2.val()[0] === userId && found === false)  {
           // Keep track of key and values
           usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
           found = true
@@ -437,7 +436,7 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
         var found = false
         snapshot2.forEach(function (userSnapshot) {
-          if (userSnapshot.val().userId == userId && found === false)  {
+          if (userSnapshot.val().userId === userId && found === false)  {
             // Keep track of key and values
             usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
             found = true
@@ -500,7 +499,7 @@ const getUserByEmail = function getUserByEmail(email) {
 
   onValue(ref(apiFunctions.db, 'users'), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      if (childSnapshot.val().email == email) {
+      if (childSnapshot.val().email === email) {
         userInfo.push([childSnapshot.key, childSnapshot.val()]);
       }
     })
@@ -515,13 +514,13 @@ const isTaskOwner = function isTaskOwner(userId, taskId) {
 
   onValue(ref(apiFunctions.db, "tasks/" + taskId + '/owners'), (snapshot) => {
     snapshot.forEach(function (userSnapshot) {
-      if (userSnapshot.val().userId == userId) {
+      if (userSnapshot.val().userId === userId) {
         isOwner.push(1);
       }
     });
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;
@@ -533,13 +532,13 @@ const isProjectOwner = function isProjectOwner(userId, projectId) {
 
   onValue(ref(apiFunctions.db, "projects/" + projectId + '/owners'), (snapshot) => {
     snapshot.forEach(function (userSnapshot) {
-      if (userSnapshot.val().userId == userId) {
+      if (userSnapshot.val().userId === userId) {
         isOwner.push(1);
       }
     });
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;
@@ -551,13 +550,13 @@ const isGroupOwner = function isGroupOwner(userId, groupId) {
 
   onValue(ref(apiFunctions.db, "groups/" + groupId + '/owners'), (snapshot) => {
     snapshot.forEach(function (userSnapshot) {
-      if (userSnapshot.val().userId == userId) {
+      if (userSnapshot.val().userId === userId) {
         isOwner.push(1);
       }
     });
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;
@@ -700,7 +699,8 @@ const updateTaskDetails = async (id, projectId, name, description, estimatedTime
     }
 
     update(taskListRef, {
-        projectId: await getProjectById(projectId)[0],
+        id: id,
+        projectId: projectId,
         name: name,
         description: description,
         estimatedTime: estimatedTime,
