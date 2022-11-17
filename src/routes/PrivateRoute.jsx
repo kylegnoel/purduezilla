@@ -1,6 +1,8 @@
-import React, {useContext} from "react";
-import { Navigate, Route } from "react-router-dom";
+import React from "react";
+import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
+
+// db imports
 import apiFunctions from "../firebase/api";
 
 const PrivateRoute = props => {

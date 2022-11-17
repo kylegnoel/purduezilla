@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -11,11 +10,6 @@ import {
 } from '@mui/material';
 
 import apiFunctions from '../firebase/api';
-import { ref, onValue } from "firebase/database";
-
-
-
-
 
 export const AccountProfile = (props) => {
   const account = apiFunctions.useFirebaseAuth();

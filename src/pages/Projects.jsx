@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Link, Routes, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
-import NavBar from '../components/NavBar';
-import AddTask from '../components/AddTask';
-import LoadTasks from '../components/LoadTasks';
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import ListSubheader from '@mui/material/ListSubheader';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -19,17 +16,19 @@ import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 
+// db import
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+
+// components import
+import NavBar from '../components/NavBar';
 import ProjectDashboard from '../components/ProjectDashboard';
-import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
     const { id } = useParams();
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const [project, setProject] = useState('');
     const [description, setDesc] = useState('');
     const navigate = useNavigate();
@@ -37,10 +36,6 @@ const Projects = () => {
     const [newCommentBody, setNewCommentBody] = useState("");
 
     const user = apiFunctions.useFirebaseAuth();
-
-    const handleClickOpen = () => {
-
-    };
 
     useEffect(() => {
         fetchData()
@@ -60,7 +55,7 @@ const Projects = () => {
 
     }
 
-    const fetchData = (event) => {
+    const fetchData = () => {
         setTaskListArr([]);
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -88,10 +83,6 @@ const Projects = () => {
                     setProject(snapshot.val().name);
                     setDesc(snapshot.val().description);
                 });
-
-                if (taskListarr.length !== 0) {
-                    setLoading(false);
-                }
                 // console.log("is this happening");
                 setComments(apiFunctions.getProjectComments(id));
             }
@@ -100,7 +91,6 @@ const Projects = () => {
             }
         }
 
-        setLoading(false)
         return true;
     };
 
@@ -151,7 +141,7 @@ const Projects = () => {
                                         border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
                                         flexDirection: "column", mt: 2
                                     }} height={400}>
-                                        {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                                        {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
                                             return (
                                                 <div key={data.key}>
                                                     <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
