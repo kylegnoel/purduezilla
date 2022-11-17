@@ -24,6 +24,8 @@ import History from '../components/HistoryDashboard';
 import apiFunctions from '../firebase/api';
 
 // stylesheet
+import { useTour } from '@reactour/tour';
+
 import '../App.css'
 
 const theme = createTheme();
@@ -77,9 +79,10 @@ const Dashboard = () => {
 
         }
     }
-
+    const { setIsOpen } = useTour();
     return (
         <div>
+            <button onClick={() => setIsOpen(true)} id="start-tour" hidden>Open Tour</button>
             <NavBar></NavBar>
             <div class="flex-container">
 <div style={{marginBottom: '-16px'}}class="flex-child">
