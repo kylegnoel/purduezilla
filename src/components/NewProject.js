@@ -64,11 +64,27 @@ export default function NewProject() {
         // console.log("submitted")
         // console.log(memberId)
 
-        // convert names into userid 
+        // convert member names into userid 
+        const membersTemp = []
+        selected.forEach(function (selectedTemp) {
+            userList.forEach(function(userTemp) {
+                if (selectedTemp === userTemp[0].firstName + " " + userTemp[0].lastName) {
+                    membersTemp.push (userTemp[1])
+                }
+            })
+        })
 
+        // convert owner names into userid 
+        const ownersTemp = []
+        userList.forEach(function(userTemp) {
+            if (owner === userTemp[0].firstName + " " + userTemp[0].lastName) {
+                ownersTemp.push (userTemp[1])
+            }
+        })
+
+        console.log("members: " + membersTemp)
         let createNewProject = await apiFunctions.createNewProject(
-            name, description, status, memberId, owner
-            )
+            name, description, membersTemp, ownersTemp)
 
         if (createNewProject) {
             
@@ -155,38 +171,6 @@ export default function NewProject() {
                                 label="Project Description"
                                 name="projectDescription"
                                 />
-                            </Grid>
-                            <Grid item xs={12}>
-                            <FormControl xs={8} fullWidth>
-                                <InputLabel id="assignLabel">Status</InputLabel>
-                                <Select
-                                    multiple
-                                    defaultValue={10}
-                                    value={status}
-                                    onChange={statusChangeHandler}
-                                    label="Status"
-                                    id="status"
-                                    textOverflow="ellipsis"
-                                    overflow="hidden"
-                                    renderValue={(selected) => (
-                                    <div>
-                                        {selected.map((value) => (
-                                        <Chip key={value} label={value} />
-                                        ))}
-                                    </div>
-                                    )}
-                                >
-                                    <MenuItem value={'To Do'}>To Do</MenuItem>
-                                    <MenuItem value={'In Progress'}>In Progress</MenuItem>
-                                    <MenuItem value={'To Review'}>To Review</MenuItem>
-                                    <MenuItem value={'In Review'}>In Review</MenuItem>
-                                    <MenuItem value={'Complete'}>Complete</MenuItem>
-                                    <MenuItem value={'Saved'}>Saved</MenuItem>
-                                    <MenuItem value={'Closed'}>Closed</MenuItem>
-                                    <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
-                                </Select>
-                                <FormHelperText>Select corresponding status.</FormHelperText>
-                            </FormControl>
                             </Grid>
                         </Grid>
 

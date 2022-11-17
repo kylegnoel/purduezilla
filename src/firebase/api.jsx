@@ -207,28 +207,55 @@ const getTaggedComments = function getTaggedComments(userKey) {
 
 // Create new project
 // To get all tasks associated with project, query 'tasks' by project id
-const createNewProject = function createNewProject(name, description, status, memberIds, ownerId, taskIds) {
+const createNewProject = function createNewProject(name, description, memberIds, ownerIds) {
 
   const projectListRef = ref(db, 'projects');
   const newProjectRef = push(projectListRef);
   set(newProjectRef, {
     name: name,
-    ownerId: ownerId,
     description: description,
-    status: status
+    creationDate: new Date(),
+    status: "Active"
   });
+
+  // Add owner user Id's
+  for (const i in ownerIds) {
+    addProjectOwner(newProjectRef.key, ownerIds[i])
+  }
 
   // Add member user Id's
   for (const i in memberIds) {
     addProjectMember(newProjectRef.key, memberIds[i]);
   }
 
-  for (const i in taskIds) {
-    addTaskToProject(newProjectRef.key, taskIds[i]);
-  }
-
   return newProjectRef.key;
 
+}
+
+/**
+ * Adds a list of people as owner of a project
+ * @param {*} id of a project
+ * @param {*} ownerId 
+ */
+const addProjectOwner = (id, ownerId) => {
+  const ownersListRef = ref(db, 'projects/' + id + '/owners');
+  const userRef = push(ownersListRef);
+  set(userRef, {
+    userId: ownerId
+  });
+}
+
+/**
+ * Adds a list of people as members of a project
+ * @param {*} id 
+ * @param {*} memberId 
+ */
+const addProjectMember = (id, memberIds) => {
+  const ownersListRef = ref(db, 'projects/' + id + '/members');
+  const userRef = push(ownersListRef);
+  set(userRef, {
+    userId: memberIds
+  });
 }
 
 /**
@@ -241,19 +268,6 @@ const changeProjectOwner = (id, ownerId) => {
   update(projectRef, {
     ownerId: ownerId
   });
-}
-
-/**
- * Adds a user as member of a project
- * @param {*} id 
- * @param {*} memberId 
- */
-const addProjectMember = (id, memberId) => {
-  const memberListRef = ref(db, 'projects/' + id + '/members');
-  const memberRef = push(memberListRef);
-      set(memberRef, {
-          userId: memberId
-      });
 }
 
 const addTaskToProject = (projectId, taskId) => {
