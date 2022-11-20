@@ -174,11 +174,11 @@ export default function EditTask() {
         
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
-            newProject, // projectId 
-            newName, // title 
-            description, // description
-            hour, //estimated time
-            selected, // status
+            newName,
+            description,
+            hour,
+            label, // description
+            user.key, // status
         )
 
         if (updateTaskDetails) {

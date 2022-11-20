@@ -46,29 +46,9 @@ export default function ProjectDashboard() {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // // console.log("response: " + response)
-        try {
-            onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                const projectTemp = []; //apiFunctions.getUsersProjects(id);
-    
-                snapshot.forEach(function(child) {
-                    const project = child.val()
-                    projectTemp.push([child.val(), child.key])
-                    // console.log("key: " + child.key);
-                })
-
-                setProjListArr(projectTemp)
-                // console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
-            })
-            if (setProjListArr.length !== 0) {
-                setLoading(false)
-            }
-
-        }
-        catch {
-            // if there is no internet
-        }
-
-        setLoading(false)
+        const projectTemp = apiFunctions.getUsersProjects(user.key);
+        console.log("value: " + JSON.stringify(projectTemp))
+        setProjListArr(projectTemp)
         
         // console.log("taskListarr: " + projListarr.length)
         return true;
@@ -85,12 +65,12 @@ export default function ProjectDashboard() {
                                     { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                             return (  
                                             <div key={data[1]}>
-                                            <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItem>
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[0].name} secondary="Content was changed"/>
+                                                    <ListItemText primary={data[1].name} secondary="Content was changed"/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />

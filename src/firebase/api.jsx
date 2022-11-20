@@ -422,15 +422,17 @@ const getUsersProjects = function getUsersProjects(userId) {
     snapshot.forEach(function (projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function (memberSnapshot) {
-          if (memberSnapshot.val().userId == userId) {
+          console.log("id: " + userId + " " + memberSnapshot.val().userId)
+          if (memberSnapshot.val().userId === userId) {
             // Keep track of key and values
-            usersProjects.push(projectSnapshot.key);
+            usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
           }
         });
       });
     })
   });
 
+  console.log("returning: " + JSON.stringify(usersProjects))
   return usersProjects;
 }
 
@@ -480,7 +482,7 @@ const getGroupsProjects = function getGroupsProjects(groupId) {
 
   onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      groupsProjects.push(childSnapshot.val().projectId);
+      groupsProjects.push([childSnapshot.key, childSnapshot.val().projectId]);
     })
   });
 
