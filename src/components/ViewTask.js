@@ -5,6 +5,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -22,15 +24,15 @@ import '../App.css';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import TaskDashboard from '../components/TaskDashboard';
 
-export default function EditTask() {
+
+export default function ViewTask() {
     const { id } = useParams();
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
     const [followedTaskListarr, setFollowedTaskList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
+    const [assignedToMe, setAssignedToMe] = useState(false);
     const [showFollow, setFollow] = useState(false);
 
     const [name, setName] = useState('');
@@ -53,13 +55,16 @@ export default function EditTask() {
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
-    const [assign, setAssigned] = useState(false);
     
     const [selectedFollower, setSelectedFollower] = useState([]);
+    const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
 
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
+        if (event.target.value === 'Complete') {
+            alert('Task Completed!');
+        }
     };
 
     const handleFollowerChange = (event) => {
@@ -94,6 +99,14 @@ export default function EditTask() {
         setAssign(event.target.value)
     };
 
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
             window.location.href='/task/'+event.currentTarget.id
@@ -107,6 +120,10 @@ export default function EditTask() {
         setEditing(false)
     }
 
+    const handleDelete = (event) => {
+
+    }
+
     const handleClick = (event) => {
         if (event.detail === 2) {
             setEditing(!isEditing)
@@ -114,19 +131,33 @@ export default function EditTask() {
     }
 
     const assignToMe = async (event) => {
-
-        const userTemp = apiFunctions.getUserById(user.key)
-        let addTaskAssignedUsers = await apiFunctions.addTaskAssignedUsers(
-            id,
-            userTemp[0][0]
-        )
-        setAssign(userTemp[0][1].firstName + " " + userTemp[0][1].lastName)
-        setAssigned(true)
-        if (addTaskAssignedUsers) {
-            alert("Assigned to Me!");
+        if (!assignedToMe) {
+            const curUser = (await apiFunctions.getUserById(user.key))[0]
+            console.log("assigningTask: " + id + " " + user.key)
+            let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
+                id,
+                user.key
+            )
+            console.log("current user key: " + user.key + " ")
+            setAssign(curUser[1].firstName + " " + curUser[1].lastName)
+            setAssignedToMe(true)
+            if (addTaskAssignedUsers) {
+                alert("Assigned to Me!");
+            } 
         } else {
-            alert("Task Failed to Save");
+            // assigned to me, remove designation
+            let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
+                id,
+                "undefined"
+            )
+            console.log("current user key: " + user.key + " ")
+            setAssign("Task Not Assigned To Anyone")
+            setAssignedToMe(false)
+            if (addTaskAssignedUsers) {
+                alert("Task Assignee Removed!");
+            }
         }
+        
     }
     
     const handleShowFollow = (event) => {
@@ -134,38 +165,32 @@ export default function EditTask() {
     }
 
     const handleMarkDone = async (event) => {
-        const selectedTemp = ''
+        var selectedTemp = ''
         if (completed) {
             setLabel('Complete');
             setCompleted(false)
-            alert('Task Completed!')
             selectedTemp = 'Complete'
         }
         else {
             setLabel('In Progress');
             setCompleted(true)
-            alert('Task Changed!')
             selectedTemp = 'In Progress'
         }
 
-
-        let updateTaskDetails = await apiFunctions.updateTaskDetails(
+        let changeTask = await apiFunctions.changeTaskStatus(
             id,
-            project, // projectId 
-            newName, // title 
-            description, // description
-            hour, //estimated time
-            selectedTemp, // status
-            )
-
-        setLabel(selectedTemp)
-        
-            if (updateTaskDetails) {
-                //window.location.href='/task/'+id
-                
-            } else {
-                alert("Task Failed to Save");
+            selectedTemp
+        )
+        if (changeTask) {
+        }
+        else {
+            if (selectedTemp === "Complete") {
+                alert("Task Completed!");
             }
+            else {
+                alert("Task Marked As In Progress!");
+            }
+        }   
     }
 
 
@@ -225,28 +250,36 @@ export default function EditTask() {
         if (id !== undefined) {
             try {
                 const curTask = (await apiFunctions.getTaskById(id))[0]
-                console.log("values: " + JSON.stringify(curTask))
+                console.log("recieved Task: " + JSON.stringify(curTask))
                 setName(curTask[1].name)
                 setNewName(curTask[1].name)
                 setDesc(curTask[1].description)
                 setHour(curTask[1].estimatedTime)
                 setLabel(curTask[1].status)
-                setSelectedFollower(curTask[1].followers)
-
-                const curProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
-                console.log(JSON.stringify(curProject))
-                setProject(curProject[1].name)
-
+                
+                // set parent project name
+                const parentProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
+                console.log("parentProject: " + JSON.stringify(parentProject))
+                setProject(parentProject[1].name)
                 // set owner field
                 const ownerTemp = (await apiFunctions.getUserById(curTask[1].ownerId))[0]
                 setOwner(ownerTemp[1].firstName + " " + ownerTemp[1].lastName)
-
-                // set assignee field
-                const assignTemp = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
-                setAssign(assignTemp[1].firstName + " " + assignTemp[1].lastName)
                 // set assignee field
 
-
+                if (curTask[1].assignedUserId === user.key) {
+                    console.log("currently assigned to me")
+                    const assignee = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
+                    setAssign(assignee[1].firstName + " " + assignee[1].lastName)
+                    setAssignedToMe(true);
+                }
+                else if (curTask[1].assignedUserId === "undefined") {
+                    setAssign("Task Not Assigned To Anyone")
+                }
+                else {
+                    const assignee = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
+                    setAssign(assignee[1].firstName + " " + assignee[1].lastName)
+                }
+    
                 //fetch comments as well
                 const settingComments = apiFunctions.getTaskComments(id);
                 setComments(settingComments);
@@ -256,17 +289,15 @@ export default function EditTask() {
             }    
 
         }
-    
+        
         // projects
         const projectTemp = await apiFunctions.getProjectById("")
-        console.log("projectTemp: " + JSON.stringify(projectTemp))
         setProjectList(projectTemp)
 
         // users
         const userTemp = await apiFunctions.getUserById("")
         setUserList(userTemp)
 
-        setLoading(false)
         return true;
     };
 
@@ -274,18 +305,7 @@ export default function EditTask() {
         <div>
             <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="sm">
-                    <Box component="form" Validate sx={{ mt: 3 }}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'right',
-                                width: '20%',
-                                mr: '-60px',
-                                ml: '50.0rem',
-                            }}>
-                            <br></br>
-                        </Box>
+                    <Box component="form" Validate sx={{ mt: 3 }}>      
                         <Box
                             sx={{
                                 display: 'flex',
@@ -298,132 +318,117 @@ export default function EditTask() {
                                     <Grid item xs={50} sm={12}>
                                         <Grid container spacing={2}>
                                             <Grid item xs={12}>
-                                                <TextField
-                                                    autoComplete="given-name"
-                                                    name="taskName"
-                                                    fullWidth
-                                                    id="taskName"
-                                                    onChange={handleNameChange}
-                                                    value={newName}
-                                                />
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        autoComplete="given-name"
+                                                        name="taskName"
+                                                        fullWidth
+                                                        id="taskName"
+                                                        value={name}
+                                                        disabled
+                                                    />
+                                                </Button>
                                             </Grid>
                                             <Grid item xs={8}>
-                                                <FormControl xs={8} fullWidth>
-                                                    <InputLabel id="assignLabel">{label}</InputLabel>
-                                                    <Select
-                                                        defaultValue={10}
-                                                        value={selected}
-                                                        onChange={selectionChangeHandler}
-                                                        label="Status"
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        autoComplete="given-name"
+                                                        name="label"
+                                                        fullWidth
                                                         id="label"
-                                                        required
-                                                    >
-                                                        <MenuItem value={'To Do'}>To Do</MenuItem>
-                                                        <MenuItem value={'In Progress'}>In Progress</MenuItem>
-                                                        <MenuItem value={'To Review'}>To Review</MenuItem>
-                                                        <MenuItem value={'In Review'}>In Review</MenuItem>
-                                                        <MenuItem value={'Complete'}>Complete</MenuItem>
-                                                        <MenuItem value={'Saved'}>Saved</MenuItem>
-                                                        <MenuItem value={'Closed'}>Closed</MenuItem>
-                                                        <MenuItem value={"Won't Do"}>Won't Do</MenuItem>
-                                                    </Select>
-                                                    <FormHelperText>Previous values: {label}</FormHelperText>
-                                                </FormControl>
+                                                        value={label}
+                                                        disabled
+                                                    />
+                                                </Button>
                                             </Grid>
+
                                             <Grid item xs={4}>
-                                                <Input
-                                                    type="number"
-                                                    autoComplete="given-name"
-                                                    name="estimatedHours"
-                                                    required
-                                                    fullWidth
-                                                    onChange={handleHourChange}
-                                                    id="estimatedHours"
-                                                    label="Estimated Hours"
-                                                    value={hour}
-                                                    autoFocus
-                                                />
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        autoComplete="given-name"
+                                                        name="label"
+                                                        fullWidth
+                                                        id="label"
+                                                        value={hour + " hours"}
+                                                        disabled
+                                                    />
+                                                </Button>
                                             </Grid>
                                         </Grid>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <FormControl fullWidth>
-                                            <InputLabel id="projectLabel">{project}</InputLabel>
-                                            <Select
-                                                defaultValue={10}
-                                                onChange={handleProjectChange}
-                                                label={"Project"}
-                                                id="label"
-                                                textOverflow="ellipsis"
-                                                overflow="hidden"
-                                            >
-                                                {projectList && projectList.length != 0 ? projectList.map((data) =>
-                                                    <MenuItem value={data[0]}>{data[1].name}</MenuItem>
-                                                ) : <MenuItem value={0}>New Project</MenuItem>}
-                                            </Select>
+                                            <Button onClick={handleClick} fullWidth>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="project"
+                                                    fullWidth
+                                                    id="project"
+                                                    value={project}
+                                                    disabled
+                                                />
+                                            </Button>
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            multiline
-                                            onChange={handleDescChange}
-                                            rows={4}
-                                            id="taskDescription"
-                                            label="Task Description"
-                                            name="taskDescription"
-                                            value={description}
-                                        />
+                                        <Button onClick={handleClick} fullWidth>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                multiline
+                                                disabled
+                                                rows={4}
+                                                id="taskDescription"
+                                                name="taskDescription"
+                                                value={description}
+                                            />
+                                        </Button>
                                     </Grid>
                                 </Grid>
+
                                 <br></br>
                                 <Divider>OWNERSHIP</Divider>
                                 <br></br>
-                                <FormControl fullWidth>
-                                    <InputLabel id="ownerLabel">{owner}</InputLabel>
-                                    <Select
-                                        labelId="ownerLabelSelect"
-                                        id="ownerSelect"
-                                        label="ownerLabel"
-                                        onChange={handleOwnerChange}
-                                        defaultValue={owner}
+                                <Button onClick={handleClick} fullWidth>
+                                    <TextField
+                                        autoComplete="given-name"
+                                        name="owner"
+                                        fullWidth
+                                        id="owner"
                                         value={owner}
-                                    >
-                                        {userList && userList.length != 0 ? userList.map((data) =>
-                                            <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
-                                        ) : <MenuItem value={0}>New User</MenuItem>}
-                                    </Select>
-                                </FormControl>
+                                        disabled
+                                    />
+                                </Button>
 
                                 <br></br>
                                 <br></br>
                                 <Divider>ASSIGN</Divider>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={8}>
+                                    <Button onClick={handleClick} fullWidth>
+                                        <TextField
+                                            autoComplete="given-name"
+                                            name="assign"
+                                            fullWidth
+                                            id="assign"
+                                            value={assignee}
+                                            disabled
+                                        />
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <Button
+                                            onClick={assignToMe}
+                                            variant="outlined"
+                                            fullWidth
+                                            startIcon={assignedToMe ? <ClearIcon/> : <CheckIcon />}
+                                            sx={{ mt: 1, mb: 2, height: '55px' }}
+                                            >
+                                        <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b> 
+                                        </Button>
+                                    </Grid>
+                                </Grid>
                                 <br></br>
-                                <FormControl fullWidth>
-                                    <InputLabel id="assignLabel">{assignee}</InputLabel>
-                                    <Select
-                                        labelId="assignLabelSelect"
-                                        id="assignSelect"
-                                        label="assignLabel"
-                                        onChange={handleAssignChange}
-                                        value={assignee}
-                                        defaultValue={assignee}
-                                    >
-                                        {userList && userList.length != 0 ? userList.map((data) =>
-                                            <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
-                                        ) : <MenuItem value={0}>New User</MenuItem>}
-                                    </Select>
-                                </FormControl>
-
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    onClick={handleSubmit}
-                                    sx={{ mt: 3, mb: 2 }}
-                                >
-                                    Save Changes
-                                </Button>
                             </Box>
                         </Box>
                     </Box>
@@ -460,9 +465,7 @@ export default function EditTask() {
                                             onChange={(e) => setNewCommentBody(e.target.value)}
                                         />
                                         <br></br>
-                                        <Button
-                                            variant="contained"
-                                            onClick={newCommentSubmit}> new Comment </Button>
+                                        <button onClick={newCommentSubmit}> new Comment </button>
                                         <br></br>
                                         <br></br>
                                     </Grid>
@@ -472,9 +475,8 @@ export default function EditTask() {
                     </Box>
                 </Container>
             </ThemeProvider>
-
-            
             {/* <LoadTasks></LoadTasks> */}
         </div>
     );
+
 }

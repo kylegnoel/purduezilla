@@ -24,7 +24,7 @@ import AddTask from './AddTask';
 
 const theme = createTheme();
 
-export default function TaskDashboard() {
+export default function HistoryDashboard() {
     const [taskListarr, setTaskListArr] = useState([]);
     const [task, setTask] = useState([]);
     const [isLoading, setLoading] = useState(true);

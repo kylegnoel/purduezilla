@@ -55,19 +55,17 @@ const createNewUser = function createNewUser(email, username, firstName, lastNam
 }
 
 // Create new group
-const createNewGroup = function createNewGroup(name, memberIds, ownerId) {
+const createNewGroup = function createNewGroup(name, description, ownerIds, memberIds, viewerIds) {
 
   const groupListRef = ref(db, 'groups');
   const newGroupRef = push(groupListRef);
   set(newGroupRef, {
     name: name,
-    ownerId: ownerId
+    description, description,
+    ownerId: ownerIds,
+    memberId: memberIds,
+    viewerId: viewerIds,
   });
-
-  // Add member user Id's
-  for (const i in memberIds) {
-    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
-  }
 
   return newGroupRef.key;
 }
@@ -280,13 +278,14 @@ const addTaskToProject = (projectId, taskId) => {
 
 // Create new task
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
-const createNewTask = function createNewTask(name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
+const createNewTask = function createNewTask(projectId, name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
 
   // Create basic task
   const taskListRef = ref(db, 'tasks');
   const newTaskRef = push(taskListRef);
 
   set(newTaskRef, {
+    projectId: projectId,
     name: name,
     description: description,
     estimatedTime: estimatedTime,
@@ -304,16 +303,28 @@ const createNewTask = function createNewTask(name, description, estimatedTime, s
 }
 
 const changeTaskOwner = (id, ownerId) => {
-  const taskRef = ref(db, 'task/' + id);
+  const taskRef = ref(db, 'tasks/' + id);
   update(taskRef, {
     ownerId: ownerId
   });
 }
 
 const changeTaskAssignedUser = (id, assignedUserId) => {
-  const taskRef = ref(db, 'task/' + id);
+  const taskRef = ref(db, 'tasks/' + id);
   update(taskRef, {
     assignedUserId: assignedUserId
+  });
+}
+
+/**
+ * Changes task status
+ * @param {*} id of a project
+ * @param {*} status 
+ */
+ const changeTaskStatus = (id, status) => {
+  const taskRef = ref(db, 'tasks/' + id);
+  update(taskRef, {
+    status: status
   });
 }
 
@@ -379,19 +390,28 @@ const getProjectHistory = (projectId) => {
 }
 
 // Returns array of task keys
-const getProjectsTasks = function getProjectsTasks(projectId) {
-  const tasksInProject = []
+const getProjectsTasks = async function getProjectsTasks(projectId) {
 
-  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
-    snapshot.forEach(function (childSnapshot) {
-      if (childSnapshot.val().projectId == projectId) {
-        // Keep track of task key and task's values
-        tasksInProject.push(childSnapshot.key);
-      }
-    })
-  });
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, `tasks`))
+    var tasksInProject = []
+    if (snapshot.exists()) {
+      snapshot.forEach(function (childSnapshot) {
+        if (childSnapshot.val().projectId === projectId) {
+          // Keep track of task key and task's values
+          tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
+        }
+      })
+      console.log("returning: " + tasksInProject)
+      return tasksInProject;
+    } else {
+      console.log("No project tasks");
+    }
+  }
+  catch (err) {
 
-  return tasksInProject;
+  }
 }
 
 // Returns array of project keys
@@ -420,8 +440,11 @@ const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
 
   onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
     snapshot.forEach(function (taskSnapshot) {
-      if (taskSnapshot.val().assignedUserId == userId) {
-        usersAssignedTasks.push(taskSnapshot.key);
+      console.log("user Id: " + userId)
+      console.log("snapshot value: " + taskSnapshot.val().assignedUserId)
+      if (taskSnapshot.val().assignedUserId === userId) {
+        console.log("current key: ")
+        usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
       }
     })
   });
@@ -440,7 +463,7 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
         snapshot2.forEach(function (userSnapshot) {
           if (userSnapshot.val().userId == userId && found === false)  {
             // Keep track of key and values
-            usersFollowedTasks.push(taskSnapshot.key);
+            usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
             found = true
           }
         });
@@ -464,23 +487,44 @@ const getGroupsProjects = function getGroupsProjects(groupId) {
   return groupsProjects;
 }
 
+// returns the value of the project in an array
 const getProjectById = async function getProjectById(projectId) {
   const projectInfo = []
 
-  await onValue(await ref(apiFunctions.db, 'projects/' + projectId), (snapshot) => {
-    projectInfo.push(snapshot.val());
-    console.log("value: " + [projectId, snapshot.val()]);
-  });
+  if (projectId === "") {
+    const dbRef = ref(db);
+    await get(child(dbRef, `projects/`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        projectInfo.push([childSnapshot.key, childSnapshot.val()]);
+      })
+    });
+  } else {
+    const dbRef = ref(db);
+    await get(child(dbRef, `projects/` + projectId)).then((snapshot) => {
+      projectInfo.push([snapshot.key, snapshot.val()]);
+    });
+  }
 
   return projectInfo;
 }
 
-const getTaskById = function getTaskById(taskId) {
-  const taskInfo = []
 
-  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
-    taskInfo.push(snapshot.val());
-  });
+const getTaskById = async function getTaskById(taskId) {
+  const taskInfo = []
+  
+  if (taskId === "") {
+    const dbRef = ref(db);
+    await get(child(dbRef, `tasks/`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        taskInfo.push([childSnapshot.key, childSnapshot.val()]);
+      })
+    });
+  } else {
+    const dbRef = ref(db);
+    await get(child(dbRef, `tasks/` + taskId)).then((snapshot) => {
+      taskInfo.push([snapshot.key, snapshot.val()]);
+    });
+  }
 
   return taskInfo;
 }
@@ -488,9 +532,19 @@ const getTaskById = function getTaskById(taskId) {
 const getUserById = async function getUserById(userId) {
   const userInfo = []
 
-  await onValue(await ref(apiFunctions.db, 'users/' + userId), (snapshot) => {
-    userInfo.push(snapshot.val());
-  });
+  if (userId === "") {
+    const dbRef = ref(db);
+    await get(child(dbRef, `users/`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        userInfo.push([childSnapshot.key, childSnapshot.val()]);
+      })
+    });
+  } else {
+    const dbRef = ref(db);
+    await get(child(dbRef, `users/` + userId)).then((snapshot) => {
+      userInfo.push([snapshot.key, snapshot.val()]);
+    });
+  }
 
   return userInfo;
 }
@@ -838,6 +892,7 @@ const apiFunctions = {
   addTaskToProject,
   addProjectMember,
   changeTaskAssignedUser,
+  changeTaskStatus,
   addTaskFollowers,
   changeTaskOwner,
   createNewTask,

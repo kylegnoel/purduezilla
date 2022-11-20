@@ -31,8 +31,11 @@ export default function NewProject() {
     const [description, setDesc] = useState('');
     const [owner, setOwner] = React.useState([]);
     const [member, setMember] = React.useState([]);
+    const [viewer, setViewer] = React.useState([]);
+
     const [memberId, setMemberId] = React.useState([]);
     const [ownerId, setOwnerId] = React.useState([]);
+    const [viewerId, setViewerId] = React.useState([]);
 
     const [userList, setUserList] = useState([]);
     const [isLoading, setLoading] = useState(true);
@@ -46,16 +49,16 @@ export default function NewProject() {
         setDesc(event.target.value)
     };
 
-
     const handleMemberChange = (event) => {
         setMember(event.target.value);
-        // console.log("finished");
-        // console.log("selected id: " + event.currentTarget.id[1]);
     };
 
     const handleOwnerChange = (event) => {
         setOwner(event.target.value);
-        // console.log("finished");
+    };
+
+    const handleViewerChange = (event) => {
+        setViewer(event.target.value);
     };
 
     const handleSubmit = async (event) => {
@@ -73,18 +76,16 @@ export default function NewProject() {
             ownerId.push(ownerTemp[1])
         })
 
-        // console.log("member: " + memberId)
-        // console.log("owner: " + ownerId);
-
-        // convert names into userid 
+        viewer.forEach(function(viewerTemp) {
+            viewerId.push(viewerTemp[1])
+        })
 
         let createNewGroup = await apiFunctions.createNewGroup(
-            name, memberId, ownerId
+            name, description, ownerId, memberId, viewerId
             )
 
         const ret = createNewGroup
         if (ret) {
-            // console.log("FINISHED: " + ret);
             alert(name + " Group Created!");
             navigate('/group/'+ ret);
         } else {
@@ -98,26 +99,26 @@ export default function NewProject() {
         fetchData()
     }, []);
 
-    const fetchData = (event) => {
+    const fetchData = async(event) => {
 
         // user
         try {
-            onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
+            
+            await onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
                 const userTemp = []
     
                 snapshot.forEach(function(child) {
                     const user = child.val()
-                    // console.log(JSON.stringify(user))
                     // console.log("current value: " + user.firstName + " " + user.lastName)
                     userTemp.push([user, child.key])
                 })
 
                 setUserList(userTemp)
-                // console.log("snapshot: " + userList.length)
             })
             if (userList.length !== 0) {
                 setLoading(false)
             }
+            console.log("userList: " + userList)
         }
         catch {
             // if there is no internet
@@ -178,70 +179,105 @@ export default function NewProject() {
                                 <Divider>OWNERS</Divider>
                                 <br></br>
 
-                                    <FormControl xs={12} fullWidth>
-                                        <InputLabel id="memberLabel">Owners</InputLabel>
-                                        <Select
-                                            multiple
-                                            defaultValue={10}
-                                            value={owner}
-                                            onChange={handleOwnerChange}
-                                            label="ownerLabel"
-                                            textOverflow="ellipsis"
-                                            overflow="hidden"
-                                            id="ownerLabel"
-                                            renderValue={(owner) => (
-                                            <div>
-                                                {owner.map((data) => (
-                                                  <Chip 
-                                                  key={data[1]} 
-                                                  avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
-                                                  label={data[0].firstName + " " + data[0].lastName} 
-                                                  sx={{marginRight:1,}}/>
-                                                ))}
-                                            </div>
-                                            )}
-                                        >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
-                                                        <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                    ): <MenuItem value={0}>New User</MenuItem> }
-                                        </Select>
-                                        <FormHelperText>Select the team owners of this project.</FormHelperText>
-                                    </FormControl>
+                                <FormControl xs={12} fullWidth>
+                                    <InputLabel id="memberLabel">Owners</InputLabel>
+                                    <Select
+                                        multiple
+                                        defaultValue={10}
+                                        value={owner}
+                                        onChange={handleOwnerChange}
+                                        label="ownerLabel"
+                                        textOverflow="ellipsis"
+                                        overflow="hidden"
+                                        id="ownerLabel"
+                                        renderValue={(owner) => (
+                                        <div>
+                                            {owner.map((data) => (
+                                                <Chip 
+                                                key={data[1]} 
+                                                avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
+                                                label={data[0].firstName + " " + data[0].lastName} 
+                                                sx={{marginRight:1,}}/>
+                                            ))}
+                                        </div>
+                                        )}
+                                    >
+                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                                    <MenuItem value={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                    </Select>
+                                    <FormHelperText>Select the team owners of this project.</FormHelperText>
+                                </FormControl>
 
-                                    <br></br>
-                                    <br></br>
+                                <br></br>
+                                <br></br>
                                 <Divider>MEMBERS</Divider>
                                 <br></br>
 
-                                    <FormControl xs={12} fullWidth>
-                                        <InputLabel id="memberLabel">Follower</InputLabel>
-                                        <Select
-                                            multiple
-                                            defaultValue={10}
-                                            value={member}
-                                            onChange={handleMemberChange}
-                                            label="memberLabel"
-                                            textOverflow="ellipsis"
-                                            overflow="hidden"
-                                            id="memberLabel"
-                                            renderValue={(member) => (
-                                                <div>
-                                                {member.map((data) => (
-                                                  <Chip 
-                                                  key={data[1]} 
-                                                  avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
-                                                  label={data[0].firstName + " " + data[0].lastName} 
-                                                  sx={{marginRight:1,}}/>
-                                                ))}
-                                                </div>
-                                            )}
-                                        >
-                                            { userList && userList.length != 0 ? userList.map((data) => 
-                                                        <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                                    ): <MenuItem value={0}>New User</MenuItem> }
-                                        </Select>
-                                        <FormHelperText>Select the team members of this project.</FormHelperText>
-                                    </FormControl>
+                                <FormControl xs={12} fullWidth>
+                                    <InputLabel id="memberLabel">Members</InputLabel>
+                                    <Select
+                                        multiple
+                                        defaultValue={10}
+                                        value={member}
+                                        onChange={handleMemberChange}
+                                        label="memberLabel"
+                                        textOverflow="ellipsis"
+                                        overflow="hidden"
+                                        id="memberLabel"
+                                        renderValue={(member) => (
+                                            <div>
+                                            {member.map((data) => (
+                                                <Chip 
+                                                key={data[1]} 
+                                                avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
+                                                label={data[0].firstName + " " + data[0].lastName} 
+                                                sx={{marginRight:1,}}/>
+                                            ))}
+                                            </div>
+                                        )}
+                                    >
+                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                                    <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                    </Select>
+                                    <FormHelperText>Select the team members of this project.</FormHelperText>
+                                </FormControl>
+
+                                <br></br>
+                                <br></br>
+                                <Divider>Viewers</Divider>
+                                <br></br>
+
+                                <FormControl xs={12} fullWidth>
+                                    <InputLabel id="viewerLabel">Viewers</InputLabel>
+                                    <Select
+                                        multiple
+                                        defaultValue={10}
+                                        value={viewer}
+                                        onChange={handleViewerChange}
+                                        label="viewerLabel"
+                                        textOverflow="ellipsis"
+                                        overflow="hidden"
+                                        id="viewerLabel"
+                                        renderValue={(viewer) => (
+                                            <div>
+                                            {viewer.map((data) => (
+                                                <Chip 
+                                                key={data[1]} 
+                                                avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
+                                                label={data[0].firstName + " " + data[0].lastName} 
+                                                sx={{marginRight:1,}}/>
+                                            ))}
+                                            </div>
+                                        )}
+                                    >
+                                        { userList && userList.length != 0 ? userList.map((data) => 
+                                                    <MenuItem value={data} id={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                                ): <MenuItem value={0}>New User</MenuItem> }
+                                    </Select>
+                                    <FormHelperText>Select the members who can view this project.</FormHelperText>
+                                </FormControl>
                                 </Box>
                             </Box>
                             <Button

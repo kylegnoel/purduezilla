@@ -15,15 +15,17 @@ import AddIcon from '@mui/icons-material/Add';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const theme = createTheme();
 
 export default function ProjectDashboard() {
+    const { id } = useParams();
     const [projListarr, setProjListArr] = useState([]);
     // const taskListarr = []
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const user = apiFunctions.useFirebaseAuth();
 
     useEffect(() => {
         console.log("reload")
@@ -32,12 +34,10 @@ export default function ProjectDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
-            // console.log("eventid: " + event.currentTarget.id)
-            window.location.href='/project/'+event.currentTarget.id;
-            //window.location.reload()
+            navigate('/project/'+event.currentTarget.id);
         }
         else {
-            window.location.href='/newproject/';
+            navigate('/newproject/');
         }
     }
 
@@ -48,7 +48,7 @@ export default function ProjectDashboard() {
         // // console.log("response: " + response)
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                const projectTemp = []
+                const projectTemp = []; //apiFunctions.getUsersProjects(id);
     
                 snapshot.forEach(function(child) {
                     const project = child.val()
