@@ -205,7 +205,7 @@ const getTaggedComments = function getTaggedComments(userKey) {
 
 // Create new project
 // To get all tasks associated with project, query 'tasks' by project id
-const createNewProject = function createNewProject(name, description, memberIds, ownerIds) {
+const createNewProject = function createNewProject(name, description, groupId, memberIds, ownerIds) {
 
   const projectListRef = ref(db, 'projects');
   const newProjectRef = push(projectListRef);
@@ -215,6 +215,10 @@ const createNewProject = function createNewProject(name, description, memberIds,
     creationDate: new Date(),
     status: "Active"
   });
+
+  if (groupId !== "") {
+    addNewProjectToGroup(groupId, newProjectRef.key, name)
+  }
 
   // Add owner user Id's
   for (const i in ownerIds) {
@@ -414,6 +418,26 @@ const getProjectsTasks = async function getProjectsTasks(projectId) {
   }
 }
 
+// Returns array of task keys
+const getGroupsTasks = async function getGroupsTasks(groupId) {
+  const dbRef = ref(db);
+  var taskListArr = []
+
+  const projectList = (await getGroupsProjects(groupId))
+  console.log("projectList: " + JSON.stringify(projectList))
+
+  for (const project of projectList) {
+    console.log("projectListarr: " + JSON.stringify(project[1].projectId))
+    const taskList = (await getProjectsTasks(project[1].projectId))
+    for (const task of taskList) {
+      console.log("taskListarr: " + JSON.stringify(task))
+      taskListArr.push(task)
+    }
+  }
+  console.log("returning: " + JSON.stringify(taskListArr))
+  return taskListArr;
+}
+
 // Returns array of project keys
 const getUsersProjects = function getUsersProjects(userId) {
   const usersProjects = []
@@ -477,16 +501,38 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
 }
 
 // Returns array of project keys
-const getGroupsProjects = function getGroupsProjects(groupId) {
+const getGroupsProjects = async function getGroupsProjects(groupId) {
   const groupsProjects = []
+  const dbRef = ref(db);
 
-  onValue(ref(apiFunctions.db, 'groups/' + groupId + "/projects"), (snapshot) => {
+  await get(child(dbRef, 'groups/' + groupId + `/projects`)).then((snapshot) => {
     snapshot.forEach(function (childSnapshot) {
-      groupsProjects.push([childSnapshot.key, childSnapshot.val().projectId]);
+      groupsProjects.push([childSnapshot.key, childSnapshot.val()]);
     })
   });
 
   return groupsProjects;
+}
+
+// Returns array of member keys and values
+const getGroupsMembers = async function getGroupsMembers(lookVal, groupId) {
+  const groupMembers = []
+  const dbRef = ref(db);
+
+  const groupMemberIds = []
+  // accepted values: owners, members, viewers
+  await get(child(dbRef, 'groups/' + groupId + `/` + lookVal)).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      groupMemberIds.push(childSnapshot.val().userId);
+    })
+  });
+
+  for (const ids of groupMemberIds) {
+    const tempUser = await getObjectById("users", ids)
+    groupMembers.push(tempUser[0]);
+  }
+
+  return groupMembers;
 }
 
 // returns the value of the project in an array
@@ -529,6 +575,25 @@ const getTaskById = async function getTaskById(taskId) {
   }
 
   return taskInfo;
+}
+
+const getObjectById = async function getObjectById(lookVal, id) {
+  const retInfo = []
+  const dbRef = ref(db);
+  // accepted values: users, tasks, projects, groups
+  if (id === "") {
+    await get(child(dbRef, lookVal+`/`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        retInfo.push([childSnapshot.key, childSnapshot.val()]);
+      })
+    });
+  } else {
+    await get(child(dbRef, lookVal+`/` + id)).then((snapshot) => {
+      retInfo.push([snapshot.key, snapshot.val()]);
+    });
+  }
+
+  return retInfo;
 }
 
 const getUserById = async function getUserById(userId) {
@@ -890,6 +955,8 @@ const apiFunctions = {
   changeGroupOwner,
   addNewProjectToGroup,
   createNewProject,
+  getObjectById,
+  getGroupsMembers,
   changeProjectOwner,
   addTaskToProject,
   addProjectMember,
@@ -902,6 +969,7 @@ const apiFunctions = {
   getProjectHistory,
   getGroupsProjects,
   getProjectsTasks,
+  getGroupsTasks,
   getUsersProjects,
   getUsersAssignedTasks,
   getUsersFollowedTasks,

@@ -73,9 +73,10 @@ const Projects = () => {
             const finishedArr = await apiFunctions.getProjectsTasks(id);
             setTaskListArr(finishedArr);
 
-            const currProject = await apiFunctions.getProjectById(id)[1];
-            setProject(currProject[0].name);
-            setDesc(currProject[0].description);
+            const currProject = (await apiFunctions.getProjectById(id))[0];
+            console.log(currProject)
+            setProject(currProject[1].name);
+            setDesc(currProject[1].description);
 
             setComments(apiFunctions.getProjectComments(id));
         }

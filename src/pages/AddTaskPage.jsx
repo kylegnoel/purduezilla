@@ -97,7 +97,7 @@ export default function AddTaskPage() {
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
-            followerId.push(follower[1])
+            followerId.push(follower[0])
         })
         // console.log("followers: " + followerId)
 
