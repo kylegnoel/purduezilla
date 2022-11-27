@@ -27,7 +27,9 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
+import { Draggable, Droppable, DragDropContext} from 'react-beautiful-dnd';
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import ProjectDashboard from '../components/ProjectDashboard';
 import {Route, Link, Routes, useParams} from 'react-router-dom'; 
 
@@ -35,11 +37,28 @@ import {Route, Link, Routes, useParams} from 'react-router-dom';
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
-const card = {
-  name: "Example name",
-  description:
-    "Example description"
-};
+const ColumnHeader = styled.div`
+  text-transform: uppercase;
+  margin-bottom: 20px;
+`;
+
+const DroppableStyles = styled.div`
+  padding: 10px;
+  border-radius: 6px;
+  background: #d4d4d4;
+`;
+
+const DragItem = styled.div`
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  background: white;
+  margin: 0 0 8px 0;
+  display: grid;
+  grid-gap: 20px;
+  flex-direction: column;
+`;
+
 export default function SimpleCard() {
     const {id} = useParams();
 
@@ -129,6 +148,15 @@ export default function SimpleCard() {
         }
     }
 
+    const onDragEnd = (result) => {
+        console.log(result);
+        if (!result.destination) {
+            console.log('hello');
+            return;
+        }
+        
+    }
+
     if (id === undefined) {
         return (
             <div>
@@ -145,79 +173,148 @@ export default function SimpleCard() {
                     <Container component="main">
                         <br></br>
                         <h2>{project}</h2>
-                        
+                        <DragDropContext onDragEnd={onDragEnd}>
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2} direction="row" alignItems="stretch" >
                                 <Grid item sm={3}>
                                     <Typography><h3>To Do</h3></Typography>
                                     <Divider></Divider>
-                                    <FixedSizeList fullWidth sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 10, flexDirection:"column", mt:2 }} height={400}>
-                                            { toDo && toDo.length != 0 ? toDo.map((data) => {
+                                            { toDo && toDo.length != 0 ? toDo.map((item, index) => {
+                                                const randInt = Math.floor(Math.random() * 1000);
                                                 return (
-                                                <div key={data.key}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "" }
-                                    </FixedSizeList>                          
+                                                    <div key={item.key}>
+                                                        <Droppable droppableId="list">
+                                                        {(provided) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.droppableProps}
+                                                            >
+                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-toDo'} key={item[1]} index={(randInt * (index + 1))}>
+                                                            {(provided) => (
+                                                                <DragItem
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
+                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
+                                                                    </ListItem>
+                                                                </DragItem>
+                                                            )}
+                                                            </Draggable>
+                                                            {provided.placeholder}
+                                                            </div>
+                                                        )}
+                                                        </Droppable>
+                                                    <Divider />
+                                                </div> 
+                                            )}): "" }                      
                                 </Grid>
                                 <Grid item sm={3}>
                                     <Typography><h3>In Progress</h3></Typography>
                                     <Divider></Divider>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { inProgress && inProgress.length != 0 ? inProgress.map((data) => {
+                                            { inProgress && inProgress.length != 0 ? inProgress.map((item, index) => {
+                                                const randInt = Math.floor(Math.random() * 1000);
                                                 return (
-                                                <div key={data.key}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "" }
-                                    </FixedSizeList>   
+                                                    <div key={item.key}>
+                                                        <Droppable droppableId="list">
+                                                        {(provided) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.droppableProps}
+                                                            >
+                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-inProgress'} key={item[1]} index={(randInt * (index + 1))}>
+                                                            {(provided) => (
+                                                                <DragItem
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
+                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
+                                                                    </ListItem>
+                                                                </DragItem>
+                                                            )}
+                                                            </Draggable>
+                                                            {provided.placeholder}
+                                                            </div>
+                                                        )}
+                                                        </Droppable>
+                                                    <Divider />
+                                                </div>   
+                                            )}): "" } 
                                 </Grid>
                                 <Grid item sm={3}>
                                     <Typography><h3>In Testing</h3></Typography>
                                     <Divider></Divider>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { inTesting && inTesting.length != 0 ? inTesting.map((data) => {
+                                            { inTesting && inTesting.length != 0 ? inTesting.map((item, index) => {
+                                                const randInt = Math.floor(Math.random() * 1000);
                                                 return (
-                                                <div key={data.key}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "" }
-                                    </FixedSizeList>   
+                                                    <div key={item.key}>
+                                                        <Droppable droppableId="list">
+                                                        {(provided) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.droppableProps}
+                                                            >
+                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-testing'} key={item[1]} index={(randInt * (index + 1))}>
+                                                            {(provided) => (
+                                                                <DragItem
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
+                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
+                                                                    </ListItem>
+                                                                </DragItem>
+                                                            )}
+                                                            </Draggable>
+                                                            {provided.placeholder}
+                                                            </div>
+                                                        )}
+                                                        </Droppable>
+                                                    <Divider />
+                                                </div>   
+                                            )}): "" } 
                                 </Grid>
                                 <Grid item sm={3}>
                                     <Typography><h3>Completed</h3></Typography>
                                     <Divider></Divider>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 2, flexDirection:"column", mt:2 }} height={400}>
-                                            { completed && completed.length != 0 ? completed.map((data) => {
+                                            { completed && completed.length != 0 ? completed.map((item, index) => {
+                                                const randInt = Math.floor(Math.random() * 1000);
                                                 return (
-                                                <div key={data.key}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemText primary={data[0].name} secondary={data[0].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "" }
-                                    </FixedSizeList>   
+                                                    <div key={item.key}>
+                                                        <Droppable droppableId="list">
+                                                        {(provided) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.droppableProps}
+                                                            >
+                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-completed'} key={item[1]} index={(randInt * (index + 1))}>
+                                                            {(provided) => (
+                                                                <DragItem
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                >
+                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
+                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
+                                                                    </ListItem>
+                                                                </DragItem>
+                                                            )}
+                                                            </Draggable>
+                                                            {provided.placeholder}
+                                                            </div>
+                                                        )}
+                                                        </Droppable>
+                                                    <Divider />
+                                                </div>     
+                                            )}): "" }  
                                 </Grid>                  
                             </Grid>
                         </Box>
+                        </DragDropContext>
                     </Container>
                 </ThemeProvider>
                 {/* <LoadTasks></LoadTasks> */}
