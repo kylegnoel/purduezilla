@@ -28,6 +28,7 @@ export default function GroupsDashboard() {
 
     const theme = createTheme();
     const [groupList, setGroupList] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("reload")

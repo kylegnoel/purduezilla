@@ -43,7 +43,7 @@ const Groups = () => {
     const [curUser, setUser] = useState('');
 
     const [groupList, setGroupList] = useState([]);
-
+    const [taskListArr, setTaskListArr] = React.useState([]);
     const [owners, setOwners] = useState([]);
     const [members, setMembers] = useState([]);
     const [viewers, setViewers] = useState([]);

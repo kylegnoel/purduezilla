@@ -109,9 +109,6 @@ export default function NewProject() {
 
                 setUserList(userTemp)
             })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
             console.log("userList: " + userList)
         }
         catch {
