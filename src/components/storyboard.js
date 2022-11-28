@@ -27,11 +27,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
-import { Draggable, Droppable, DragDropContext} from 'react-beautiful-dnd';
+import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd';
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ProjectDashboard from '../components/ProjectDashboard';
-import {Route, Link, Routes, useParams} from 'react-router-dom'; 
+import { Route, Link, Routes, useParams } from 'react-router-dom';
 
 
 import apiFunctions from '../firebase/api';
@@ -46,6 +46,7 @@ const DroppableStyles = styled.div`
   padding: 10px;
   border-radius: 6px;
   background: #d4d4d4;
+  min-height: 600px;
 `;
 
 const DragItem = styled.div`
@@ -59,8 +60,13 @@ const DragItem = styled.div`
   flex-direction: column;
 `;
 
+const tallGrid = {
+    height: '100%'
+}
+
+
 export default function SimpleCard() {
-    const {id} = useParams();
+    const { id } = useParams();
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
@@ -73,6 +79,7 @@ export default function SimpleCard() {
     const [inProgress, setInProgress] = useState([]);
     const [inTesting, setInTesting] = useState([]);
     const [completed, setCompleted] = useState([]);
+
 
     const handleClickOpen = () => {
 
@@ -87,7 +94,7 @@ export default function SimpleCard() {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        if ( id === undefined ) {
+        if (id === undefined) {
 
         }
         else {
@@ -97,8 +104,8 @@ export default function SimpleCard() {
                     const inprogressTemp = []
                     const intestingTemp = []
                     const completedTemp = []
-        
-                    snapshot.forEach(function(child) {
+
+                    snapshot.forEach(function (child) {
                         const task = child.val()
                         if (task.status === "To Do") {
                             todoTemp.push([task, child.key])
@@ -113,19 +120,19 @@ export default function SimpleCard() {
                             completedTemp.push([task, child.key])
                         }
                     })
-    
+
                     setToDo(todoTemp)
                     setInProgress(inprogressTemp)
                     setInTesting(intestingTemp)
                     setCompleted(completedTemp)
                 })
-    
+
                 // set project name
                 onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
                     setProject(snapshot.val().name)
                     setDesc(snapshot.val().description)
                 });
-    
+
                 if (taskListarr.length !== 0) {
                     setLoading(false)
                 }
@@ -141,20 +148,96 @@ export default function SimpleCard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            navigate('/task/'+event.currentTarget.id);
+            navigate('/task/' + event.currentTarget.id);
         }
         else {
-            navigate('/newtask/'+id);
+            navigate('/newtask/' + id);
         }
     }
+
+
 
     const onDragEnd = (result) => {
         console.log(result);
         if (!result.destination) {
             console.log('hello');
             return;
+        } else {
+            console.log('goodbye');
+            console.log(result.draggableId % 100);
+
+            switch (result.source.droppableId) {
+                case "toDo":
+                    switch (result.destination.droppableId) {
+                        case "inProgress":
+                            inProgress.push(toDo[result.draggableId])
+                            break;
+
+                        case "inTesting":
+                            inTesting.push(toDo[result.draggableId])
+                            break;
+                        case "completed":
+                            completed.push(toDo[result.draggableId])
+                            break;
+                    }
+                    console.log("WOAH");
+                    toDo = toDo.splice((result.draggableId % 100), 1);
+                    setToDo(toDo.splice((result.draggableId % 100), 1));
+                    break;
+
+                case "inProgress":
+                    switch (result.destination.droppableId) {
+                        case "completed":
+                            completed.push(inProgress[result.draggableId])
+                            break;
+
+                        case "toDo":
+                            toDo.push(inProgress[result.draggableId])
+                            break;
+                        case "inTesting":
+                            completed.push(inProgress[result.draggableId])
+                            break;
+                    }
+                    setInProgress(inProgress.splice((result.draggableId % 100), 1));
+                    break;
+
+                case "inTesting":
+                    switch (result.destination.droppableId) {
+                        case "inProgress":
+                            inProgress.push(inTesting[result.draggableId])
+                            break;
+
+                        case "toDo":
+                            toDo.push(inTesting[result.draggableId])
+                            break;
+                        case "completed":
+                            completed.push(inTesting[result.draggableId])
+                            break;
+                    }
+                    setInTesting(inTesting.splice((result.draggableId % 100), 1));
+                    break;
+
+                case "completed":
+                    switch (result.destination.droppableId) {
+                        case "inProgress":
+                            inProgress.push(completed[result.draggableId])
+                            break;
+
+                        case "toDo":
+                            toDo.push(completed[result.draggableId])
+                            break;
+                        case "inTesting":
+                            inTesting.push(completed[result.draggableId])
+                            break;
+                    }
+                    setCompleted(completed.splice((result.draggableId % 100), 1));
+                    break;
+            }
+
+
+
         }
-        
+
     }
 
     if (id === undefined) {
@@ -168,158 +251,183 @@ export default function SimpleCard() {
     }
     else {
         return (
-            <div> 
+            <div>
                 <ThemeProvider theme={theme}>
                     <Container component="main">
                         <br></br>
                         <h2>{project}</h2>
                         <DragDropContext onDragEnd={onDragEnd}>
-                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                            <Grid container spacing={2} direction="row" alignItems="stretch" >
-                                <Grid item sm={3}>
-                                    <Typography><h3>To Do</h3></Typography>
+                            <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                                <Grid container spacing={2} direction="row" alignItems="stretch" >
+                                    <Grid item sm={3}>
+                                        <Typography><h3>To Do</h3></Typography>
+                                        <Divider></Divider>
+                                    </Grid>
+
+                                    <Grid item sm={3}>
+                                        <Typography><h3>In Progress</h3></Typography>
+                                        <Divider></Divider>
+                                    </Grid>
+
+                                    <Grid item sm={3}>
+                                        <Typography><h3>In Testing</h3></Typography>
+                                        <Divider></Divider>
+                                    </Grid>
+
                                     <Divider></Divider>
-                                            { toDo && toDo.length != 0 ? toDo.map((item, index) => {
-                                                const randInt = Math.floor(Math.random() * 1000);
-                                                return (
-                                                    <div key={item.key}>
-                                                        <Droppable droppableId="list">
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.droppableProps}
-                                                            >
-                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-toDo'} key={item[1]} index={(randInt * (index + 1))}>
-                                                            {(provided) => (
-                                                                <DragItem
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                >
-                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
-                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
-                                                                    </ListItem>
-                                                                </DragItem>
-                                                            )}
-                                                            </Draggable>
-                                                            {provided.placeholder}
-                                                            </div>
-                                                        )}
-                                                        </Droppable>
-                                                    <Divider />
-                                                </div> 
-                                            )}): "" }                      
+                                    <Grid item sm={3}>
+                                        <Typography><h3>Completed</h3></Typography>
+                                        <Divider></Divider>
+                                    </Grid>
                                 </Grid>
-                                <Grid item sm={3}>
-                                    <Typography><h3>In Progress</h3></Typography>
-                                    <Divider></Divider>
-                                            { inProgress && inProgress.length != 0 ? inProgress.map((item, index) => {
-                                                const randInt = Math.floor(Math.random() * 1000);
-                                                return (
-                                                    <div key={item.key}>
-                                                        <Droppable droppableId="list">
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.droppableProps}
-                                                            >
-                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-inProgress'} key={item[1]} index={(randInt * (index + 1))}>
-                                                            {(provided) => (
-                                                                <DragItem
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                >
-                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
-                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
-                                                                    </ListItem>
-                                                                </DragItem>
-                                                            )}
-                                                            </Draggable>
-                                                            {provided.placeholder}
-                                                            </div>
-                                                        )}
-                                                        </Droppable>
-                                                    <Divider />
-                                                </div>   
-                                            )}): "" } 
+                            </Box>
+
+                            <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                                <Grid container spacing={2} direction="row" alignItems="stretch" >
+                                    <Grid item sm={3}>
+                                        <DroppableStyles>
+                                            <Droppable droppableId="toDo">
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                    >
+                                                        {toDo && toDo.map((item, index) => {
+                                                            return (
+                                                                <Draggable draggableId={(index).toString()} key={item[1]} index={(index)}>
+                                                                    {(provided, snapshot) => (
+                                                                        <DragItem
+                                                                            ref={provided.innerRef}
+                                                                            snapshot={snapshot}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ListItem id={(index)} onClick={handleTask}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            </ListItem>
+                                                                        </DragItem>
+
+                                                                    )}
+
+                                                                </Draggable>
+                                                            )
+                                                        })}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DroppableStyles>
+                                    </Grid>
+                                    <Grid item sm={3}>
+                                        <DroppableStyles>
+                                            <Droppable droppableId="inProgress">
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                    >
+                                                        {inProgress && inProgress.map((item, index) => {
+                                                            return (
+                                                                <Draggable draggableId={(100 + index).toString()} key={item[1]} index={(100 + index)}>
+                                                                    {(provided, snapshot) => (
+                                                                        <DragItem
+                                                                            ref={provided.innerRef}
+                                                                            snapshot={snapshot}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ListItem id={(100 + index)} onClick={handleTask}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            </ListItem>
+                                                                        </DragItem>
+
+                                                                    )}
+
+                                                                </Draggable>
+                                                            )
+                                                        })}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DroppableStyles>
+                                    </Grid>
+                                    <Grid item sm={3}>
+                                        <DroppableStyles>
+                                            <Droppable droppableId="inTesting">
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                    >
+                                                        {inTesting && inTesting.map((item, index) => {
+                                                            return (
+                                                                <Draggable draggableId={(200 + index).toString()} key={item[1]} index={(200 + index)}>
+                                                                    {(provided, snapshot) => (
+                                                                        <DragItem
+                                                                            ref={provided.innerRef}
+                                                                            snapshot={snapshot}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ListItem id={(200 + index)} onClick={handleTask}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            </ListItem>
+                                                                        </DragItem>
+
+                                                                    )}
+
+                                                                </Draggable>
+                                                            )
+                                                        })}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DroppableStyles>
+                                    </Grid>
+                                    <Grid item sm={3}>
+                                        <DroppableStyles>
+                                            <Droppable droppableId="completed">
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                    >
+                                                        {completed && completed.map((item, index) => {
+                                                            return (
+                                                                <Draggable draggableId={(300 + index).toString()} key={item[1]} index={(300 + index)}>
+                                                                    {(provided, snapshot) => (
+                                                                        <DragItem
+                                                                            ref={provided.innerRef}
+                                                                            snapshot={snapshot}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ListItem id={(300 + index)} onClick={handleTask}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            </ListItem>
+                                                                        </DragItem>
+
+                                                                    )}
+
+                                                                </Draggable>
+                                                            )
+                                                        })}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DroppableStyles>
+                                    </Grid>
                                 </Grid>
-                                <Grid item sm={3}>
-                                    <Typography><h3>In Testing</h3></Typography>
-                                    <Divider></Divider>
-                                            { inTesting && inTesting.length != 0 ? inTesting.map((item, index) => {
-                                                const randInt = Math.floor(Math.random() * 1000);
-                                                return (
-                                                    <div key={item.key}>
-                                                        <Droppable droppableId="list">
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.droppableProps}
-                                                            >
-                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-testing'} key={item[1]} index={(randInt * (index + 1))}>
-                                                            {(provided) => (
-                                                                <DragItem
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                >
-                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
-                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
-                                                                    </ListItem>
-                                                                </DragItem>
-                                                            )}
-                                                            </Draggable>
-                                                            {provided.placeholder}
-                                                            </div>
-                                                        )}
-                                                        </Droppable>
-                                                    <Divider />
-                                                </div>   
-                                            )}): "" } 
-                                </Grid>
-                                <Grid item sm={3}>
-                                    <Typography><h3>Completed</h3></Typography>
-                                    <Divider></Divider>
-                                            { completed && completed.length != 0 ? completed.map((item, index) => {
-                                                const randInt = Math.floor(Math.random() * 1000);
-                                                return (
-                                                    <div key={item.key}>
-                                                        <Droppable droppableId="list">
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.droppableProps}
-                                                            >
-                                                            <Draggable draggableId={(randInt * (index + 1)).toString() + '-completed'} key={item[1]} index={(randInt * (index + 1))}>
-                                                            {(provided) => (
-                                                                <DragItem
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                >
-                                                                    <ListItem id={randInt * (index + 1)} onClick={handleTask}>
-                                                                        <ListItemText primary={item[0].name} secondary={item[0].description}/>
-                                                                    </ListItem>
-                                                                </DragItem>
-                                                            )}
-                                                            </Draggable>
-                                                            {provided.placeholder}
-                                                            </div>
-                                                        )}
-                                                        </Droppable>
-                                                    <Divider />
-                                                </div>     
-                                            )}): "" }  
-                                </Grid>                  
-                            </Grid>
-                        </Box>
+                            </Box>
                         </DragDropContext>
                     </Container>
                 </ThemeProvider>
                 {/* <LoadTasks></LoadTasks> */}
-                </div>
+            </div >
         );
-        
+
     }
 }
