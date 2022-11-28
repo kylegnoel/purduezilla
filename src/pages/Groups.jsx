@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useParams} from 'react-router-dom'; 
+import { ref, onValue } from "firebase/database";
+import { useNavigate } from "react-router-dom";
 
 import NavBar from '../components/NavBar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -8,7 +10,6 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import ListSubheader from '@mui/material/ListSubheader';
 import FixedSizeList from '@mui/material/List';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -25,13 +26,9 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-
 import apiFunctions from '../firebase/api';
-import { ref, onValue } from "firebase/database";
-import { useNavigate } from "react-router-dom";
 
 import GroupsDashboard from '../components/GroupsDashboard';
-import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 
 const Groups = () => {
     const {id} = useParams();
@@ -40,7 +37,6 @@ const Groups = () => {
     const [group, setGroup] = useState('');
     const [description, setDesc] = useState('');
     const [projectListArr, setProjectList] = useState([]);
-    const [taskListArr, setTaskListArr] = useState([]);
 
     const navigate = useNavigate();
     const user = apiFunctions.useFirebaseAuth();
@@ -72,7 +68,6 @@ const Groups = () => {
         const projectListTemp = (await apiFunctions.getGroupsProjects(id))
         setProjectList(projectListTemp)
         console.log("projectListTemp: " + projectListArr)
-
 
         // get owners
         const groupOwners = (await apiFunctions.getGroupsMembers("owners", id))

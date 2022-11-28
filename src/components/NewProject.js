@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, } from '@mui/material';
+import { Container } from '@mui/material';
+
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
@@ -16,8 +18,8 @@ import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Avatar from "@mui/material/Avatar";
 
+//db imports 
 import { ref, onValue } from "firebase/database";
-
 import apiFunctions from '../firebase/api';
 
 const theme = createTheme();

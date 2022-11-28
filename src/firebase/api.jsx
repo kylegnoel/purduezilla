@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, push, onValue, update, child, remove, get } from "firebase/database";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
 
@@ -139,7 +138,7 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   }, { onlyOnce: true });
   for (var key in child1) {
     console.log(key);
-    if (userRefObjects[child1[key].email] == 1) {
+    if (userRefObjects[child1[key].email] === 1) {
       console.log("enters the tagging phase");
       userRef = ref(db, `users/${key}/tagged`);
       newRef = push(userRef);
@@ -395,7 +394,6 @@ const getProjectHistory = (projectId) => {
 
 // Returns array of task keys
 const getProjectsTasks = async function getProjectsTasks(projectId) {
-
   const dbRef = ref(db);
   try {
     const snapshot = await get(child(dbRef, `tasks`))
@@ -446,7 +444,6 @@ const getUsersProjects = function getUsersProjects(userId) {
     snapshot.forEach(function (projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function (memberSnapshot) {
-          console.log("id: " + userId + " " + memberSnapshot.val().userId)
           if (memberSnapshot.val().userId === userId) {
             // Keep track of key and values
             usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
@@ -487,7 +484,7 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
         var found = false
         snapshot2.forEach(function (userSnapshot) {
-          if (userSnapshot.val().userId == userId && found === false)  {
+          if (userSnapshot.val().userId === userId && found === false)  {
             // Keep track of key and values
             usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
             found = true
@@ -640,7 +637,7 @@ const isTaskOwner = function isTaskOwner(userId, taskId) {
     }    
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;
@@ -656,7 +653,7 @@ const isProjectOwner = function isProjectOwner(userId, projectId) {
     }
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;
@@ -672,7 +669,7 @@ const isGroupOwner = function isGroupOwner(userId, groupId) {
     }
   });
 
-  if (isOwner.length == 0) {
+  if (isOwner.length === 0) {
     return false;
   }
   return true;

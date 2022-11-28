@@ -4,15 +4,12 @@ import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import TaskIcon from '@mui/icons-material/Task';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import { useState, useEffect } from 'react';
-import GroupIcon from '@mui/icons-material/Group';
-import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
 import GroupsIcon from '@mui/icons-material/Groups';
 
@@ -30,13 +27,7 @@ export default function GroupsDashboard() {
     const { id } = useParams();
 
     const theme = createTheme();
-    const [group, setGroup] = useState('');
-    const [projectListArr, setProjectList] = useState([]);
-    const [taskListArr, setTaskListArr] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const [groupList, setGroupList] = useState([]);
-    const navigate = useNavigate();
-    const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         console.log("reload")
@@ -81,8 +72,6 @@ export default function GroupsDashboard() {
             // if there is no internet
         }
 
-        setLoading(false)
-
         return true;
     };
 
@@ -97,7 +86,7 @@ export default function GroupsDashboard() {
                             <Grid item xs={50} sm={12}>
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                        { groupList && groupList.length != 0 ? groupList.map((data) => {
+                                        { groupList && groupList.length !== 0 ? groupList.map((data) => {
                                             return (
                                             <div key={data[1]}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>

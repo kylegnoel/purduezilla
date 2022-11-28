@@ -1,4 +1,6 @@
 import * as React from 'react';
+
+// material ui
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -11,8 +13,6 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { Container, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import WorkIcon from '@mui/icons-material/Work';
-import ListSubheader from '@mui/material/ListSubheader';
 import AddIcon from '@mui/icons-material/Add';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 
@@ -20,7 +20,6 @@ import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
 import { useNavigate } from "react-router-dom";
-import AddTask from './AddTask';
 
 const theme = createTheme();
 
@@ -98,7 +97,6 @@ export default function TaskDashboard() {
         catch {
             // if there is no internet
         }
-
         return true;
     };
 

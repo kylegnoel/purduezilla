@@ -1,37 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Link, Routes, useParams } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
 import NavBar from '../components/NavBar';
+import { useNavigate } from "react-router-dom";
+
+// material ui imports
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Container } from '@mui/material';
+
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-
+import Divider from '@mui/material/Divider';
+import { Button } from '@mui/material';
+import { AddModerator } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ClearIcon from '@mui/icons-material/Clear';
-
-import MenuItem from '@mui/material/MenuItem';
-import { useNavigate } from "react-router-dom";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Divider } from '@mui/material';
-
-import '../App.css';
-
-import apiFunctions from '../firebase/api';
-import { ref, onValue } from "firebase/database";
 import TaskDashboard from '../components/TaskDashboard';
 import EditTask from '../components/EditTask';
 import ViewTask from '../components/ViewTask';
-import { Button } from '@mui/material';
-import { AddModerator } from '@mui/icons-material';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
+
+import '../App.css';
+
+import apiFunctions from '../firebase/api';
+import { ref, onValue } from "firebase/database";
 
 const Task = () => {
     const { id } = useParams();
@@ -39,7 +39,6 @@ const Task = () => {
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
     const [followedTaskListarr, setFollowedTaskList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const [showFollow, setFollow] = useState(false);
 
     const [name, setName] = useState('');
@@ -212,7 +211,7 @@ const Task = () => {
                         aria-describedby="alert-dialog-description"
                     >
                         <DialogTitle id="alert-dialog-title">
-                            {"Are you sure you want to delete \'" + name + "\'?"}
+                            {"Are you sure you want to delete '" + name + "'?"}
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">

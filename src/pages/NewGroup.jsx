@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Link, CssBaseline, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
@@ -12,21 +13,16 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
-import Input from '@mui/material/Input';
 import NavBar from '../components/NavBar';
 import { useNavigate } from "react-router-dom";
-import ClearIcon from '@mui/icons-material/Clear';
 import Avatar from '@mui/material/Avatar';
 
 import { ref, onValue } from "firebase/database";
-
 import apiFunctions from '../firebase/api';
-import { Navigate } from "react-router-dom";
 
 const theme = createTheme();
 
 export default function NewProject() {
-    const [selectedFollower, setSelectedFollower] = React.useState([]);
     const [name, setName] = useState('');
     const [description, setDesc] = useState('');
     const [owner, setOwner] = React.useState([]);
@@ -38,7 +34,6 @@ export default function NewProject() {
     const [viewerId, setViewerId] = React.useState([]);
 
     const [userList, setUserList] = useState([]);
-    const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const handleNameChange = event => {
@@ -100,7 +95,6 @@ export default function NewProject() {
     }, []);
 
     const fetchData = async(event) => {
-
         // user
         try {
             

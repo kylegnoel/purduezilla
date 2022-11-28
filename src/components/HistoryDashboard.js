@@ -1,4 +1,7 @@
-import * as React from 'react';
+import { React, useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -9,18 +12,10 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { Container, Typography } from '@mui/material';
-import { useState, useEffect } from 'react';
-import WorkIcon from '@mui/icons-material/Work';
-import ListSubheader from '@mui/material/ListSubheader';
-import AddIcon from '@mui/icons-material/Add';
+import { Container } from '@mui/material';
 
+// db imports
 import apiFunctions from '../firebase/api';
-import { ref, onValue } from "firebase/database";
-import { Link } from 'react-router-dom';
-
-import { useNavigate } from "react-router-dom";
-import AddTask from './AddTask';
 
 const theme = createTheme();
 
@@ -29,8 +24,7 @@ export default function HistoryDashboard() {
     const [task, setTask] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const [open, setOpen] = React.useState(false);
-    const [history, setHistoryEvents] = React.useState([]);
+    const [history, setHistoryEvents] = useState([]);
 
     useEffect(() => {
         console.log("reload")
@@ -44,15 +38,13 @@ export default function HistoryDashboard() {
     }
 
 
-    const fetchData = (event) => {
+    const fetchData = () => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
         setHistoryEvents([])
         const historyTemp = apiFunctions.getHistoryEvents;
         setHistoryEvents(historyTemp)
-
-        setLoading(false)
 
         return true;
     };
@@ -67,7 +59,7 @@ export default function HistoryDashboard() {
                                 border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
                                 flexDirection: "column",
                             }} height={400}>
-                                {history && history.length != 0 ? history.map((data) => {
+                                {history && history.length !== 0 ? history.map((data) => {
                                     return (
                                         <div key={data.projectId}>
                                             <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
