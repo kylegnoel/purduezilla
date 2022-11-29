@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
+
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -19,8 +21,14 @@ import { ref, onValue } from "firebase/database";
 const theme = createTheme();
 
 export default function ProjectDashboard() {
+    const { id } = useParams();
     const [projListarr, setProjListArr] = useState([]);
     // const taskListarr = []
+
+    const [isLoading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const user = apiFunctions.useFirebaseAuth();
+
 
     useEffect(() => {
         console.log("reload")
@@ -29,12 +37,10 @@ export default function ProjectDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
-            // console.log("eventid: " + event.currentTarget.id)
-            window.location.href='/project/'+event.currentTarget.id;
-            //window.location.reload()
+            navigate('/project/'+event.currentTarget.id);
         }
         else {
-            window.location.href='/newproject/';
+            navigate('/newproject/');
         }
     }
 
@@ -43,23 +49,9 @@ export default function ProjectDashboard() {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // // console.log("response: " + response)
-        try {
-            onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                const projectTemp = []
-    
-                snapshot.forEach(function(child) {
-                    projectTemp.push([child.val(), child.key])
-                    // console.log("key: " + child.key);
-                })
-
-                setProjListArr(projectTemp)
-                // console.log("snapshot: " + setProjListArr.length + " " +  projectTemp.length)
-            })
-
-        }
-        catch {
-            // if there is no internet
-        }
+        const projectTemp = apiFunctions.getUsersProjects(user.key);
+        console.log("value: " + JSON.stringify(projectTemp))
+        setProjListArr(projectTemp)
         
         // console.log("taskListarr: " + projListarr.length)
         return true;
@@ -76,12 +68,12 @@ export default function ProjectDashboard() {
                                     { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
                                             return (  
                                             <div key={data[1]}>
-                                            <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItem>
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[0].name} secondary="Content was changed"/>
+                                                    <ListItemText primary={data[1].name} secondary="Content was changed"/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />
