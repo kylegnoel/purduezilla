@@ -183,7 +183,7 @@ export default function SimpleCard() {
             switch (result.source.droppableId) {
                 case "inProgress":
                     task = inProgress[index][0];
-                    apiFunctions.updateTaskDetails(inProgress[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    apiFunctions.updateTaskDetails(inProgress[index][1], task.name, task.description, task.status, task.name, task.description, newStatus);
                     break;
                 case "toDo":
                     task = toDo[index][0];
