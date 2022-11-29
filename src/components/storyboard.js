@@ -158,84 +158,46 @@ export default function SimpleCard() {
 
 
     const onDragEnd = (result) => {
-        console.log(result);
+        //console.log(result);
         if (!result.destination) {
-            console.log('hello');
             return;
         } else {
-            console.log('goodbye');
-            console.log(result.draggableId % 100);
+            const index = result.draggableId % 100;
+            var newStatus = "";
 
-            switch (result.source.droppableId) {
-                case "toDo":
-                    switch (result.destination.droppableId) {
-                        case "inProgress":
-                            inProgress.push(toDo[result.draggableId])
-                            break;
-
-                        case "inTesting":
-                            inTesting.push(toDo[result.draggableId])
-                            break;
-                        case "completed":
-                            completed.push(toDo[result.draggableId])
-                            break;
-                    }
-                    console.log("WOAH");
-                    toDo = toDo.splice((result.draggableId % 100), 1);
-                    setToDo(toDo.splice((result.draggableId % 100), 1));
-                    break;
-
-                case "inProgress":
-                    switch (result.destination.droppableId) {
-                        case "completed":
-                            completed.push(inProgress[result.draggableId])
-                            break;
-
-                        case "toDo":
-                            toDo.push(inProgress[result.draggableId])
-                            break;
-                        case "inTesting":
-                            completed.push(inProgress[result.draggableId])
-                            break;
-                    }
-                    setInProgress(inProgress.splice((result.draggableId % 100), 1));
-                    break;
-
-                case "inTesting":
-                    switch (result.destination.droppableId) {
-                        case "inProgress":
-                            inProgress.push(inTesting[result.draggableId])
-                            break;
-
-                        case "toDo":
-                            toDo.push(inTesting[result.draggableId])
-                            break;
-                        case "completed":
-                            completed.push(inTesting[result.draggableId])
-                            break;
-                    }
-                    setInTesting(inTesting.splice((result.draggableId % 100), 1));
-                    break;
-
-                case "completed":
-                    switch (result.destination.droppableId) {
-                        case "inProgress":
-                            inProgress.push(completed[result.draggableId])
-                            break;
-
-                        case "toDo":
-                            toDo.push(completed[result.draggableId])
-                            break;
-                        case "inTesting":
-                            inTesting.push(completed[result.draggableId])
-                            break;
-                    }
-                    setCompleted(completed.splice((result.draggableId % 100), 1));
-                    break;
+            //Finds out which column the task is moving to
+            if (result.destination.droppableId == "toDo") {
+                newStatus = "To Do";
+            } else if (result.destination.droppableId == "inProgress") {
+                newStatus = "In Progress"
+            } else if (result.destination.droppableId == "inTesting") {
+                newStatus = "In Testing"
+            } else if (result.destination.droppableId == "completed") {
+                newStatus = "Completed";
             }
 
+            //console.log(index);
 
+            var task;
 
+            switch (result.source.droppableId) {
+                case "inProgress":
+                    task = inProgress[index][0];
+                    apiFunctions.updateTaskDetails(inProgress[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    break;
+                case "toDo":
+                    task = toDo[index][0];
+                    apiFunctions.updateTaskDetails(toDo[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    break;
+                case "completed":
+                    task = completed[index][0];
+                    apiFunctions.updateTaskDetails(completed[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    break;
+                case "inTesting":
+                    task = inTesting[index][0];
+                    apiFunctions.updateTaskDetails(inTesting[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    break;
+            }
         }
 
     }
