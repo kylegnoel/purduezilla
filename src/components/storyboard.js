@@ -43,7 +43,7 @@ const ColumnHeader = styled.div`
 `;
 
 const DroppableStyles = styled.div`
-  padding: 10px;
+  padding: 30px;
   border-radius: 6px;
   background: #d4d4d4;
   min-height: 600px;
@@ -67,6 +67,8 @@ const tallGrid = {
 
 export default function SimpleCard() {
     const { id } = useParams();
+
+    const user = apiFunctions.useFirebaseAuth();
 
     const theme = createTheme();
     const [taskListarr, setTaskListArr] = useState([]);
@@ -166,13 +168,13 @@ export default function SimpleCard() {
             var newStatus = "";
 
             //Finds out which column the task is moving to
-            if (result.destination.droppableId == "toDo") {
+            if (result.destination.droppableId === "toDo") {
                 newStatus = "To Do";
-            } else if (result.destination.droppableId == "inProgress") {
+            } else if (result.destination.droppableId === "inProgress") {
                 newStatus = "In Progress"
-            } else if (result.destination.droppableId == "inTesting") {
+            } else if (result.destination.droppableId === "inTesting") {
                 newStatus = "In Testing"
-            } else if (result.destination.droppableId == "completed") {
+            } else if (result.destination.droppableId === "completed") {
                 newStatus = "Completed";
             }
 
@@ -183,20 +185,22 @@ export default function SimpleCard() {
             switch (result.source.droppableId) {
                 case "inProgress":
                     task = inProgress[index][0];
-                    apiFunctions.updateTaskDetails(inProgress[index][1], task.name, task.description, task.status, task.name, task.description, newStatus);
+                    apiFunctions.updateTaskDetails(inProgress[index][1], task.name, task.description, task.estimatedTime, newStatus, user.key);
                     break;
                 case "toDo":
                     task = toDo[index][0];
-                    apiFunctions.updateTaskDetails(toDo[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    apiFunctions.updateTaskDetails(toDo[index][1], task.name, task.description, task.estimatedTime, newStatus, user.key);
                     break;
                 case "completed":
                     task = completed[index][0];
-                    apiFunctions.updateTaskDetails(completed[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    apiFunctions.updateTaskDetails(completed[index][1], task.name, task.description, task.estimatedTime, newStatus, user.key);
                     break;
                 case "inTesting":
                     task = inTesting[index][0];
-                    apiFunctions.updateTaskDetails(inTesting[index][1], task.projectId[index][0], task.name, task.description, task.estimatedTime, newStatus);
+                    apiFunctions.updateTaskDetails(inTesting[index][1], task.name, task.description, task.estimatedTime, newStatus, user.key);
                     break;
+                default:
+                    console.log("Status not found");
             }
         }
 
