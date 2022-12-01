@@ -272,6 +272,7 @@ test("Correctly deletes a project owner", () => {
 });
 */
 
+/*
 test("Correctly deletes a project member", () => {
   const projectId = apiFunctions.createNewProject("New Project Name", "Project description", "In Progress", ["22", "99"], ["123", "456"]);
   apiFunctions.deleteProjectMembers(projectId, ["99"]);
@@ -293,6 +294,7 @@ test("Correctly deletes a project member", () => {
     expect(retrievedProject).toMatch(inputProject);
   });
 });
+*/
 
 // //owner, assigned, follower
 // test("Correctly updates a task", () => {
