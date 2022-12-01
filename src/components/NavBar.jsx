@@ -15,6 +15,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
+
+import NotificationsBox from "./notifications";
 const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -22,9 +24,11 @@ const ResponsiveAppBar = () => {
   const user = apiFunctions.useFirebaseAuth();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [notifications, setNotifications] = React.useState([]);
+  const [anchorNotif, setAnchorNotif] = React.useState(null);
 
   const navigate = useNavigate();
-  
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -48,9 +52,16 @@ const ResponsiveAppBar = () => {
       apiFunctions.signOutAccount();
       navigate('/');
     }
-    
+
   }
 
+  const swapNotif = (event) => {
+    setAnchorNotif(event.currentTarget);
+  }
+
+  const handleCloseNotif = () => {
+    setAnchorNotif(null);
+  }
   return (
     <AppBar position="static" style={{ background: '#CFB991' }}>
 
@@ -138,21 +149,50 @@ const ResponsiveAppBar = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} className="second-step">
             <MenuItem component={Link} to="/mygroups"><h1>
-                <Typography textAlign="center">My Groups</Typography></h1>
+              <Typography textAlign="center">My Groups</Typography></h1>
             </MenuItem>
             <MenuItem component={Link} to="/myprojects"><h1>
-                <Typography textAlign="center">My Projects</Typography></h1>
+              <Typography textAlign="center">My Projects</Typography></h1>
             </MenuItem>
             <MenuItem component={Link} to="/mytasks"><h1>
-                <Typography textAlign="center">My Tasks</Typography></h1>
+              <Typography textAlign="center">My Tasks</Typography></h1>
             </MenuItem>
+            <div style={{ marginTop: 20 }}>
+              <IconButton onClick={swapNotif}>
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorNotif}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorNotif)}
+                onClose={handleCloseNotif}
+              >
+                <IconButton> <MenuIcon /></IconButton>
+                <MenuItem>notif</MenuItem>
+                <MenuItem>notif</MenuItem>
+                <MenuItem>notif</MenuItem>
+                <MenuItem>notif</MenuItem>
+                <MenuItem>notif</MenuItem>
+              </Menu>
+            </div>
           </Box>
+
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton className="third-step" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar></Avatar>
-              {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
+                {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
               </IconButton>
             </Tooltip>
             <Menu

@@ -23,6 +23,7 @@ import { ref, onValue } from "firebase/database";
 // components import
 import NavBar from '../components/NavBar';
 import ProjectDashboard from '../components/ProjectDashboard';
+import CommentBox from '../components/comments';
 
 const Projects = () => {
     const { id } = useParams();
@@ -44,16 +45,26 @@ const Projects = () => {
     const createComment = (event) => {
         event.preventDefault();
         console.log(comments);
-        apiFunctions.createNewProjectComment(newCommentBody, user.key, id);
+        apiFunctions.createNewProjectComment(newCommentBody, user.key, id, user.info.firstName);
         // console.log(comments);
         console.log(user.key);
-        setComments([...comments, { body: newCommentBody, author: user.key }]);
+        //setComments([...comments, { body: newCommentBody, author: user.key }]);
         // console.log(comments);
         // console.log(user.key);
         // window.location.reload();
         setNewCommentBody("");
-
+        window.location.reload(false);
     }
+
+    const updateComment = (authorKey, authorName, commentKey, newBody) => {
+        apiFunctions.updateProjectComment(commentKey, newBody, authorKey, authorName, id);
+        window.location.reload(false);
+    }
+    const deleteComment = (commentKey) => {
+        apiFunctions.deleteProjectComment(commentKey, id);
+        window.location.reload(false);
+    }
+
 
     const fetchData = () => {
         setTaskListArr([]);
@@ -67,8 +78,8 @@ const Projects = () => {
             try {
                 onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
                     const taskTemp = []
-        
-                    snapshot.forEach(function(child) {
+
+                    snapshot.forEach(function (child) {
                         const task = child.val()
                         if (task.projectId[0] === id) {
                             taskTemp.push([task, child.key])
@@ -122,7 +133,7 @@ const Projects = () => {
                         <br></br>
                         <h2>{project}</h2>
                         <Button component={Link} to={window.location.pathname + "/storyboard"} variant="contained">View Project Storyboard</Button>
-                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
+                        <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={50} sm={12}>
                                     <Divider></Divider>
@@ -168,10 +179,21 @@ const Projects = () => {
                                 </Grid>
                                 <Grid>
                                     {comments.map((comment) => (
+
                                         < div >
-                                            <p> author key: {comment.author}</p>
-                                            <p>body: {comment.body}</p>
+                                            <CommentBox
+                                                infoObject={{
+                                                    ownComment: user.key === comment[0].author,
+                                                    authorKey: comment[0].author,
+                                                    authorName: comment[0].firstName,
+                                                    body: comment[0].body,
+                                                    commentKey: comment[1],
+                                                }}
+                                                handleCommentDelete={deleteComment}
+                                                handleCommentUpdate={updateComment}
+                                            ></CommentBox>
                                         </div>
+
                                     ))}
                                     <TextField
                                         required

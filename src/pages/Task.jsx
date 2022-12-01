@@ -35,6 +35,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 // components import
 import NavBar from '../components/NavBar';
+import CommentBox from '../components/comments';
 
 import '../App.css';
 
@@ -70,7 +71,7 @@ const Task = () => {
     const [isEditing, setEditing] = useState(false);
     const [selected, setSelected] = useState([]);
     const [assign, setAssigned] = useState(false);
-    
+
     const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
 
@@ -115,10 +116,10 @@ const Task = () => {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            window.location.href='/task/'+event.currentTarget.id
+            window.location.href = '/task/' + event.currentTarget.id
         }
         else {
-            window.location.href='/newtask/'
+            window.location.href = '/newtask/'
         }
     }
 
@@ -151,7 +152,7 @@ const Task = () => {
             alert("Task Failed to Save");
         }
     }
-    
+
     const handleShowFollow = (event) => {
         setFollow(!showFollow)
     }
@@ -179,13 +180,13 @@ const Task = () => {
             description, // description
             hour, //estimated time
             selectedTemp, // status
-            )
+        )
 
         setLabel(selectedTemp)
-        
+
         if (updateTaskDetails) {
             //window.location.href='/task/'+id
-            
+
         } else {
             alert("Task Failed to Save");
         }
@@ -194,7 +195,7 @@ const Task = () => {
 
     const handleSubmit = async (event) => {
         //event.preventDefault()
-        
+
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
             newProject, // projectId 
@@ -232,12 +233,22 @@ const Task = () => {
             }
         });
 
-        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
+        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged, user.info.firstName);
         // window.location.reload();
 
         setNewCommentBody("");
-        setComments([...comments, newAdded]);
+        // setComments([...comments, newAdded]);
+        window.location.reload(false);
     };
+
+    const updateComment = (authorKey, authorName, commentKey, newBody) => {
+        apiFunctions.updateTaskComment(commentKey, newBody, authorKey, authorName, id);
+        window.location.reload(false);
+    }
+    const deleteComment = (commentKey) => {
+        apiFunctions.deleteTaskComment(commentKey, id);
+        window.location.reload(false);
+    }
 
     const fetchData = () => {
         // Update the document title using the browser API
@@ -254,18 +265,18 @@ const Task = () => {
                     setDesc(val.description)
                     setHour(val.estimatedTime)
                     setLabel(val.status)
-                    setOwner(val.owners[1].firstName + " " +  val.owners[1].lastName)
-                    setAssign(val.assignedUsers[1].firstName + " " +  val.assignedUsers[1].lastName)
+                    setOwner(val.owners[1].firstName + " " + val.owners[1].lastName)
+                    setAssign(val.assignedUsers[1].firstName + " " + val.assignedUsers[1].lastName)
                     setProject(val.projectId[1].name)
                 })
-    
+
                 //fetch comments as well
                 const settingComments = apiFunctions.getTaskComments(id);
                 setComments(settingComments);
             }
             catch {
                 // if there is no internet
-            }    
+            }
 
         }
         else {
@@ -277,12 +288,12 @@ const Task = () => {
             const taskFollowedTemp = apiFunctions.getUsersFollowedTasks(user.key);
             setFollowedTaskList(taskFollowedTemp)
         }
-        
+
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                const projectTemp = []    
-                snapshot.forEach(function(child) {
+                const projectTemp = []
+                snapshot.forEach(function (child) {
                     const project = child.val()
                     projectTemp.push([project, child.key])
                 })
@@ -297,8 +308,8 @@ const Task = () => {
         // user
         try {
             onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                const userTemp = []    
-                snapshot.forEach(function(child) {
+                const userTemp = []
+                snapshot.forEach(function (child) {
                     const user = child.val()
                     userTemp.push([user, child.key])
                 })
@@ -318,104 +329,110 @@ const Task = () => {
             <div>
                 <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="lg">
-                    <br></br>
-                    {showFollow
-                                ? <h2>Assigned Tasks</h2>
-                                : <h2>Followed Tasks</h2>
-                            }
-                    <Divider></Divider>
-                    <br></br>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            width: '40%',
-                            mb: '-100px',
-                            ml: '30%'
-                        }}>
+                    <Container component="main" maxWidth="lg">
+                        <br></br>
+                        {showFollow
+                            ? <h2>Assigned Tasks</h2>
+                            : <h2>Followed Tasks</h2>
+                        }
+                        <Divider></Divider>
+                        <br></br>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                width: '40%',
+                                mb: '-100px',
+                                ml: '30%'
+                            }}>
                             {showFollow
-                                ?   <div>
-                                        <Button
+                                ? <div>
+                                    <Button
                                         onClick={handleShowFollow}
                                         variant="outlined"
                                         startIcon={<BookmarkIcon />}
                                         sx={{ mb: 8 }}
-                                        >
+                                    >
                                         <b>Show Tasks I Follow</b>
-                                        </Button>
-                                    </div>
-                                : 
-                                    <div>
-                                        <Button
+                                    </Button>
+                                </div>
+                                :
+                                <div>
+                                    <Button
                                         onClick={handleShowFollow}
                                         variant="outlined"
                                         startIcon={<BookmarkIcon />}
                                         sx={{ mb: 8 }}>
-                                            <b>Show Tasks I Am Assigned</b>
-                                        </Button>
-                                     </div>
+                                        <b>Show Tasks I Am Assigned</b>
+                                    </Button>
+                                </div>
                             }
                             <br></br>
                         </Box>
-                    <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={50} sm={12} lg={'50%'}>
-                            { showFollow
-                                ? <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-                                flexDirection:"column",}} height={400}>
-                                        { taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
-                                            return (
-                                            <div key={data.projectId}>
-                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <TaskIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[1].name} secondary={data[1].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                        )}): "There are no tasks!" }
-                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <AddIcon color="grey" />
-                                                </ListItemAvatar>
-                                                <ListItemText primary={"Create New Task"} />
-                                            </ListItem>
-                                        </Button>
-                                </FixedSizeList>
-                                : <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-                                flexDirection:"column",}} height={400}>
-                                        { followedTaskListarr && followedTaskListarr.length !== 0 ? followedTaskListarr.map((data) => {
-                                            return (
-                                            <div key={data.projectId}>
-                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <TaskIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[1].name} secondary={data[1].description}/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                        )}): "There are no tasks!" }
-                                        <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <AddIcon color="grey"/>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={"Create New Task"}/>
-                                            </ListItem>
-                                        </Button>
-                                </FixedSizeList> }
+                        <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={50} sm={12} lg={'50%'}>
+                                    {showFollow
+                                        ? <FixedSizeList sx={{
+                                            border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                            flexDirection: "column",
+                                        }} height={400}>
+                                            {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
+                                                return (
+                                                    <div key={data.projectId}>
+                                                        <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                                            <ListItem>
+                                                                <ListItemAvatar>
+                                                                    <TaskIcon color="grey" />
+                                                                </ListItemAvatar>
+                                                                <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                                            </ListItem>
+                                                        </Button>
+                                                        <Divider />
+                                                    </div>
+                                                )
+                                            }) : "There are no tasks!"}
+                                            <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
+                                                <ListItem>
+                                                    <ListItemAvatar>
+                                                        <AddIcon color="grey" />
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={"Create New Task"} />
+                                                </ListItem>
+                                            </Button>
+                                        </FixedSizeList>
+                                        : <FixedSizeList sx={{
+                                            border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                            flexDirection: "column",
+                                        }} height={400}>
+                                            {followedTaskListarr && followedTaskListarr.length !== 0 ? followedTaskListarr.map((data) => {
+                                                return (
+                                                    <div key={data.projectId}>
+                                                        <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                                            <ListItem>
+                                                                <ListItemAvatar>
+                                                                    <TaskIcon color="grey" />
+                                                                </ListItemAvatar>
+                                                                <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                                            </ListItem>
+                                                        </Button>
+                                                        <Divider />
+                                                    </div>
+                                                )
+                                            }) : "There are no tasks!"}
+                                            <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
+                                                <ListItem>
+                                                    <ListItemAvatar>
+                                                        <AddIcon color="grey" />
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={"Create New Task"} />
+                                                </ListItem>
+                                            </Button>
+                                        </FixedSizeList>}
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
+                        </Box>
                     </Container>
                 </ThemeProvider>
             </div>
@@ -530,23 +547,23 @@ const Task = () => {
                                                 </Grid>
                                             </Grid>
                                             <Grid item xs={12}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="projectLabel">Project</InputLabel>
-                                                <Select
-                                                    labelId="projectLabel"
-                                                    id="projectLabel"
-                                                    label="Project"
-                                                    fullWidth
-                                                    defaultValue={id}
-                                                    onChange={handleProjectChange}
-                                                >
-                                                    { projectList && projectList.length !== 0 ? projectList.map((data) => 
-                                                        <MenuItem value={data[1]}>{data[0].name}</MenuItem>
-                                                    ): <MenuItem value={0}>New Project</MenuItem> }
-                                                </Select>
-                                                <FormHelperText>Previous values: {project}</FormHelperText>
-                                            </FormControl>
-                                        </Grid>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="projectLabel">Project</InputLabel>
+                                                    <Select
+                                                        labelId="projectLabel"
+                                                        id="projectLabel"
+                                                        label="Project"
+                                                        fullWidth
+                                                        defaultValue={id}
+                                                        onChange={handleProjectChange}
+                                                    >
+                                                        {projectList && projectList.length !== 0 ? projectList.map((data) =>
+                                                            <MenuItem value={data[1]}>{data[0].name}</MenuItem>
+                                                        ) : <MenuItem value={0}>New Project</MenuItem>}
+                                                    </Select>
+                                                    <FormHelperText>Previous values: {project}</FormHelperText>
+                                                </FormControl>
+                                            </Grid>
                                             <Grid item xs={12}>
                                                 <TextField
                                                     required
@@ -689,27 +706,27 @@ const Task = () => {
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main">
-                            <Box component="form" Validate sx={{ mt: 3 }}> 
+                            <Box component="form" Validate sx={{ mt: 3 }}>
                                 <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'right',
-                                            width: '26%',
-                                            mb: '-100px',
-                                            mr: '20rem',
-                                            ml: '73%',
-                                        }}>
-                                            <Button
-                                                onClick={handleMarkDone}
-                                                variant="outlined"
-                                                startIcon={<CheckIcon />}
-                                                sx={{ mt: 3, mb: 2 }}
-                                                >
-                                            <b>{completed ? 'Mark as In Progress' : 'Mark as Complete'}</b> 
-                                            </Button>
-                                            <br></br>
-                                        </Box>       
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'right',
+                                        width: '26%',
+                                        mb: '-100px',
+                                        mr: '20rem',
+                                        ml: '73%',
+                                    }}>
+                                    <Button
+                                        onClick={handleMarkDone}
+                                        variant="outlined"
+                                        startIcon={<CheckIcon />}
+                                        sx={{ mt: 3, mb: 2 }}
+                                    >
+                                        <b>{completed ? 'Mark as In Progress' : 'Mark as Complete'}</b>
+                                    </Button>
+                                    <br></br>
+                                </Box>
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -810,15 +827,15 @@ const Task = () => {
                                         <Divider>ASSIGN</Divider>
                                         <Grid container spacing={2}>
                                             <Grid item xs={8}>
-                                            <Button onClick={handleClick} fullWidth>
-                                                <TextField
-                                                    autoComplete="given-name"
-                                                    name="assign"
-                                                    fullWidth
-                                                    id="assign"
-                                                    value={assignee}
-                                                    disabled
-                                                />
+                                                <Button onClick={handleClick} fullWidth>
+                                                    <TextField
+                                                        autoComplete="given-name"
+                                                        name="assign"
+                                                        fullWidth
+                                                        id="assign"
+                                                        value={assignee}
+                                                        disabled
+                                                    />
                                                 </Button>
                                             </Grid>
                                             <Grid item xs={4}>
@@ -828,8 +845,8 @@ const Task = () => {
                                                     fullWidth
                                                     startIcon={<CheckIcon />}
                                                     sx={{ mt: 1, mb: 2, height: '55px' }}
-                                                    >
-                                                <b>{assign ? 'Assigned to Me' : 'Assign to Me'}</b> 
+                                                >
+                                                    <b>{assign ? 'Assigned to Me' : 'Assign to Me'}</b>
                                                 </Button>
                                             </Grid>
                                         </Grid>
@@ -848,10 +865,17 @@ const Task = () => {
                                     }}
                                 >
                                     {comments.map((comment) => (
-                                        < div >
-                                            <p> author key: {comment.author}</p>
-                                            <p>body: {comment.body}</p>
-                                        </div>
+                                        <CommentBox
+                                            infoObject={{
+                                                ownComment: user.key === comment[0].author,
+                                                authorKey: comment[0].author,
+                                                authorName: comment[0].firstName,
+                                                body: comment[0].body,
+                                                commentKey: comment[1],
+                                            }}
+                                            handleCommentDelete={deleteComment}
+                                            handleCommentUpdate={updateComment}
+                                        ></CommentBox>
                                     ))}
 
 

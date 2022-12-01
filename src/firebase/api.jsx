@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue, update, child, remove, get } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, update, child, remove, get, serverTimestamp } from "firebase/database";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
 
@@ -99,13 +99,67 @@ const addNewProjectToGroup = function addNewProjectToGroup(groupKey, projectId, 
   });
 }
 
-const createNewProjectComment = function createNewProjectComment(body, authorKey, projectKey) {
+//notifications
+/*
+  sourcePath: save path to target ex. (`/projects/${projectKey}/comments/${commentKey}`)
+  body: notification message
+  type: heading that tells user what this notification is about.
+  timeMade: datetime at notification creation "day-month-year hour:time"
+*/
+const createNotification = function createNotification(targetKey, body, type, sourcePath) {
+  const notifRef = ref(db, `users/${targetKey}/notifications`);
+  const newNotificationRef = push(notifRef);
+  const curDate = new Date();
+  set(newNotificationRef, {
+    sourcePath: sourcePath,
+    body: body,
+    type: type,
+    timeMade: `${curDate.getDate()}-${curDate.getMonth() + 1}-${curDate.getFullYear()} ${curDate.getHours()}:${curDate.getMinutes()}`,
+  });
+}
+
+
+const getNotifications = function getNotifications(userKey) {
+  const notifRef = ref(db, `users/${userKey}/notifications`);
+  let returnedNotifs = [];
+  onValue(notifRef, (snapshot) => {
+    let child = snapshot.val();
+
+    for (var key in child) {
+      // console.log("adding");
+      returnedNotifs.push([child[key], key]);
+    }
+  }, { onlyOnce: true });
+  // console.log(returnedComments);
+  return returnedNotifs;
+}
+
+const createNewProjectComment = function createNewProjectComment(body, authorKey, projectKey, authorFirstName) {
   const projectRef = ref(db, `projects/${projectKey}/comments`);
   const newCommentRef = push(projectRef);
   set(newCommentRef, {
     body: body,
     author: authorKey,
+    firstName: authorFirstName,
   });
+  return [{ body: body, author: authorKey, firstName: authorFirstName }, newCommentRef.key];
+}
+
+const deleteProjectComment = function deleteProjectComment(commentKey, projectKey) {
+  const projectCommentRef = ref(db, `projects/${projectKey}/comments/${commentKey}`);
+  remove(projectCommentRef);
+  console.log(`removing ${commentKey} from ${projectKey}`)
+}
+
+const updateProjectComment = function updateProjectComment(commentKey, newBody, authorKey, authorFirstName, projectKey) {
+  const commentData = {
+    author: authorKey,
+    body: newBody,
+    firstName: authorFirstName,
+  }
+  const updates = {}
+  updates[`/projects/${projectKey}/comments/${commentKey}`] = commentData
+  update(ref(db), updates);
 }
 
 const getProjectComments = function getProjectComments(projectKey) {
@@ -113,20 +167,24 @@ const getProjectComments = function getProjectComments(projectKey) {
   let returnedComments = [];
   onValue(projectRef, (snapshot) => {
     let child = snapshot.val();
+
     for (var key in child) {
-      returnedComments.push(child[key]);
+      console.log("adding");
+      returnedComments.push([child[key], key]);
     }
   }, { onlyOnce: true });
+  // console.log(returnedComments);
   return returnedComments;
 }
 
 //create new comments
-const createNewComment = function createNewComment(body, authorKey, taskKey, taggedKeys) {
+const createNewComment = function createNewComment(body, authorKey, taskKey, taggedKeys, authorFirstName) {
   let taskRef = ref(db, `tasks/${taskKey}/comments`);
   let newCommentRef = push(taskRef);
   set(newCommentRef, {
     body: body,
     author: authorKey,
+    firstName: authorFirstName,
   });
 
   let newRef;
@@ -153,10 +211,14 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
         commentKey: newCommentRef.key,
         author: authorKey,
         body: body
-      })
+      });
+      createNotification(key,
+        `You have been tagged in a task by ${child1[key].firstName}!`,
+        "task",
+        taskKey,
+      )
     }
   }
-
 
   // taggedKeys.forEach(function (key) {
   //   if (userRefObjects[key]) {
@@ -171,7 +233,23 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   //   }
   // });
 
-  return { body: body, author: authorKey };
+  return [{ body: body, author: authorKey, authorName: authorFirstName }, newCommentRef.key];
+}
+
+const deleteTaskComment = function deleteTaskComment(commentKey, taskKey) {
+  const commentRef = ref(db, `tasks/${taskKey}/comments/${commentKey}`);
+  remove(commentRef);
+}
+
+const updateTaskComment = function updateTaskComment(commentKey, newBody, authorKey, authorFirstName, taskKey) {
+  const commentData = {
+    author: authorKey,
+    body: newBody,
+    firstName: authorFirstName,
+  }
+  const updates = {}
+  updates[`/tasks/${taskKey}/comments/${commentKey}`] = commentData
+  update(ref(db), updates);
 }
 
 //get the comments for a task
@@ -183,8 +261,9 @@ const getTaskComments = function getTaskComments(taskKey) {
   // console.log("iterate");
   onValue(taskRef, (snapshot) => {
     let child = snapshot.val();
+
     for (var key in child) {
-      returnedTasks.push(child[key]);
+      returnedTasks.push([child[key], key]);
     }
   }, { onlyOnce: true });
   // console.log("finish getting nothing");
@@ -208,20 +287,22 @@ const getTaggedComments = function getTaggedComments(userKey) {
   return returnedComments;
 }
 
+
+
 const getHistoryEvents = function getHistoryEvents() {
-    const history = []
-    onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
-      snapshot.forEach(function (childSnapshot) {
+  const history = []
+  onValue(ref(apiFunctions.db, 'tasks'), (snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
 
-        onValue(ref(apiFunctions.db, 'tasks/' + childSnapshot.key + '/history'), (historyTempIt) => {
-          historyTempIt.forEach(function (childHistory) {
-            history.push([childSnapshot.key, childSnapshot.val().name, childHistory.val()])
-          })
-        });
-      })
-    });
+      onValue(ref(apiFunctions.db, 'tasks/' + childSnapshot.key + '/history'), (historyTempIt) => {
+        historyTempIt.forEach(function (childHistory) {
+          history.push([childSnapshot.key, childSnapshot.val().name, childHistory.val()])
+        })
+      });
+    })
+  });
 
-    return history
+  return history
 }
 
 // Create new project
@@ -291,34 +372,34 @@ const createNewTask = async function createNewTask(projectId, name, description,
     status: status,
     followers: followerIds
   });
-  
+
   return newTaskRef.key;
 }
 
 const addTaskOwners = (taskId, ownerIds) => {
-    const ownersListRef = ref(db, 'tasks/' + ownerIds + '/owners');
-    const userRef = push(ownersListRef);
-        push(userRef, {
-            userId: ownerIds
-        });
+  const ownersListRef = ref(db, 'tasks/' + ownerIds + '/owners');
+  const userRef = push(ownersListRef);
+  push(userRef, {
+    userId: ownerIds
+  });
 }
 
 const addTaskAssignedUsers = async (taskId, assignedUserIds) => {
   const assignedUserListRef = ref(db, 'tasks/' + taskId + '/assignedUsers');
   const userRef = push(assignedUserListRef);
   push(userRef, {
-      userId: await getUserById(assignedUserIds)[0]
+    userId: await getUserById(assignedUserIds)[0]
   });
   return taskId
 }
 
 // changed to only one follower - derek
 const addTaskFollowers = (taskId, followerIds) => {
-    const followersListRef = ref(db, 'tasks/' + taskId + '/followers');
-    const userRef = push(followersListRef);
-        set(userRef, {
-            userId: followerIds
-        });
+  const followersListRef = ref(db, 'tasks/' + taskId + '/followers');
+  const userRef = push(followersListRef);
+  set(userRef, {
+    userId: followerIds
+  });
 }
 
 const addTaskHistoryEvent = (taskId, description) => {
@@ -415,7 +496,7 @@ const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
         //     found = true
         //   }
         // });
-        if (snapshot2.val()[0] === userId && found === false)  {
+        if (snapshot2.val()[0] === userId && found === false) {
           // Keep track of key and values
           usersAssignedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
           found = true
@@ -436,7 +517,7 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
         var found = false
         snapshot2.forEach(function (userSnapshot) {
-          if (userSnapshot.val().userId === userId && found === false)  {
+          if (userSnapshot.val().userId === userId && found === false) {
             // Keep track of key and values
             usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
             found = true
@@ -678,34 +759,34 @@ const deleteProjectMembers = (id, exMemberIds) => {
  */
 
 const updateTaskDetails = async (id, projectId, name, description, estimatedTime, status) => {
-    const taskListRef = ref(db, 'tasks/'  + id);
+  const taskListRef = ref(db, 'tasks/' + id);
 
-    const taskTemp = getTaskById(id)[0][1];
+  const taskTemp = getTaskById(id)[0][1];
 
-    const oldName = taskTemp.name;
-    if (oldName != name) {
+  const oldName = taskTemp.name;
+  if (oldName != name) {
     const historyDescription = "Name updated.\nDate: " + new Date() + "\nPrevious name: " + oldName;
-        addTaskHistoryEvent(id, historyDescription);
-    }
-    const oldDescription = taskTemp.description;
-    if (oldDescription != description) {
+    addTaskHistoryEvent(id, historyDescription);
+  }
+  const oldDescription = taskTemp.description;
+  if (oldDescription != description) {
     const historyDescription = "Description updated.\nDate: " + new Date() + "\nPrevious description: " + oldDescription;
-        addTaskHistoryEvent(id, historyDescription);
-    }
-    const oldStatus = taskTemp.status;
-    if (oldStatus != status) {
+    addTaskHistoryEvent(id, historyDescription);
+  }
+  const oldStatus = taskTemp.status;
+  if (oldStatus != status) {
     const historyDescription = "Status updated.\nDate: " + new Date() + "\nPrevious status: " + oldStatus;
-        addTaskHistoryEvent(id, historyDescription);
-    }
+    addTaskHistoryEvent(id, historyDescription);
+  }
 
-    update(taskListRef, {
-        id: id,
-        projectId: projectId,
-        name: name,
-        description: description,
-        estimatedTime: estimatedTime,
-        status: status,
-    })
+  update(taskListRef, {
+    id: id,
+    projectId: projectId,
+    name: name,
+    description: description,
+    estimatedTime: estimatedTime,
+    status: status,
+  })
 
   return taskListRef.key
 }
@@ -926,6 +1007,8 @@ const apiFunctions = {
   db,
   app,
   FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,
+  deleteProjectComment, updateProjectComment, deleteTaskComment,
+  updateTaskComment, getNotifications,
   getTaskComments, getTaggedComments, createNewComment,
   createNewProjectComment, getProjectComments,
   auth
