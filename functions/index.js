@@ -2,6 +2,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
+const e = require('cors');
 const cors = require('cors')({origin: true});
 admin.initializeApp();
 
@@ -38,3 +39,32 @@ exports.sendMail = functions.https.onRequest((req, res) => {
     });    
 });
 
+exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
+        .onCreate((snapshot, context) => {
+            const taskData = snapshot.val();
+            const taskName = taskData.name;
+            console.log(taskName)
+            const owners = taskData.owners;
+            owners.forEach(owner => {
+                console.log("This is how owner looks like " + owner);
+                const ownerInfo = owner[1];
+                console.log("owner info " + ownerInfo);
+                const ownerEmail = ownerInfo.email;
+                console.log(ownerEmail)
+                transporter.sendMail(generateTaskOwnerNotificationEmail(ownerEmail, taskName), (error, inf) => {
+                    if (!error) {
+                        console.log('sent')
+                    }
+                    console.log('you done messed up' + error.toString())
+                })
+            });
+})
+
+const generateTaskOwnerNotificationEmail = (dest, taskName) => {
+    return {
+        from: 'PurdueZilla Team <purduezilla@gmail.com>',
+        to: dest,
+        subject: "You now own task: " + taskName,
+        html: 'please get it done a$ap'
+    }
+}
