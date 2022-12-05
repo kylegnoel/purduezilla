@@ -17,7 +17,8 @@ import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
 import Storyboard from '../pages/Storyboard';
 import DashboardTour from '../pages/DashboardWithTour';
-import TestSendMail from '../pages/TestSendMail';
+import ResetPassword from '../pages/PasswordReset';
+import ResetPasswordEmailSentConfirmation from '../pages/PasswordResetEmailSent';
 
 const Routing = props => {
 
@@ -41,7 +42,8 @@ const Routing = props => {
                 <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask/:id" element={<AddTaskPage />} />
                 <Route exact path="/homeTour" element={<DashboardTour/>} />
-                <Route exact path="/test" element={<TestSendMail/>}/>
+                <Route exact path="/passwordReset" element={<ResetPassword/>}/>
+                <Route exact path="/passwordResetEmailSent" element={<ResetPasswordEmailSentConfirmation/>}/>
             </Routes>
         </Router>
     );

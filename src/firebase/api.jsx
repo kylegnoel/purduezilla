@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, push, onValue, update, child, remove, get } from "firebase/database";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth";
 import React from 'react';
 
 /*****
@@ -805,6 +805,16 @@ const signOutAccount = () => {
   });
 }
 
+const sendUserPasswordResetEmail = (email) => {
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      console.log("sent")
+    })  
+    .catch((error) => {
+      console.log(error.message)
+    })
+}
+
 //context stuff
 
 const storageUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -915,6 +925,7 @@ const apiFunctions = {
   tryCreateAccount,
   trySignInAccount,
   signOutAccount,
+  sendUserPasswordResetEmail,
   updateUser,
   updateProjectDetails,
   deleteProjectOwners,

@@ -19,7 +19,6 @@ let transporter = nodemailer.createTransport({
 exports.sendMail = functions.https.onRequest((req, res) => {
     cors(req, res, () => {
       
-        // getting dest email by query string
         const dest = req.body.dest;
 
         const mailOptions = {
@@ -38,3 +37,4 @@ exports.sendMail = functions.https.onRequest((req, res) => {
         });
     });    
 });
+
