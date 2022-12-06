@@ -43,10 +43,11 @@ const ColumnHeader = styled.div`
 `;
 
 const DroppableStyles = styled.div`
-  padding: 30px;
+  padding: 15px;
   border-radius: 6px;
-  background: #d4d4d4;
   min-height: 600px;
+  background: #f0f0f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 `;
 
 const DragItem = styled.div`
@@ -59,10 +60,6 @@ const DragItem = styled.div`
   grid-gap: 20px;
   flex-direction: column;
 `;
-
-const tallGrid = {
-    height: '100%'
-}
 
 
 export default function SimpleCard() {
@@ -149,12 +146,8 @@ export default function SimpleCard() {
     };
 
     const handleTask = (event) => {
-        if (event.currentTarget.id !== "addtask") {
-            navigate('/task/' + event.currentTarget.id);
-        }
-        else {
-            navigate('/newtask/' + id);
-        }
+        console.log(event);
+        navigate('/task/' + event);
     }
 
 
@@ -229,18 +222,14 @@ export default function SimpleCard() {
                                         <Typography><h3>To Do</h3></Typography>
                                         <Divider></Divider>
                                     </Grid>
-
                                     <Grid item sm={3}>
                                         <Typography><h3>In Progress</h3></Typography>
                                         <Divider></Divider>
                                     </Grid>
-
                                     <Grid item sm={3}>
                                         <Typography><h3>In Testing</h3></Typography>
                                         <Divider></Divider>
                                     </Grid>
-
-                                    <Divider></Divider>
                                     <Grid item sm={3}>
                                         <Typography><h3>Completed</h3></Typography>
                                         <Divider></Divider>
@@ -268,8 +257,8 @@ export default function SimpleCard() {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                         >
-                                                                            <ListItem id={(index)} onClick={handleTask}>
-                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            <ListItem id={(index)} onClick={() => handleTask(item[1])}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].owners[0][1].firstName + " " + item[0].owners[0][1].lastName} />
                                                                             </ListItem>
                                                                         </DragItem>
 
@@ -302,8 +291,8 @@ export default function SimpleCard() {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                         >
-                                                                            <ListItem id={(100 + index)} onClick={handleTask}>
-                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            <ListItem id={(100 + index)} onClick={() => handleTask(item[1])}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].owners[0][1].firstName + " " + item[0].owners[0][1].lastName} />
                                                                             </ListItem>
                                                                         </DragItem>
 
@@ -336,8 +325,8 @@ export default function SimpleCard() {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                         >
-                                                                            <ListItem id={(200 + index)} onClick={handleTask}>
-                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            <ListItem id={(200 + index)} onClick={() => handleTask(item[1])}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].owners[0][1].firstName + " " + item[0].owners[0][1].lastName} />
                                                                             </ListItem>
                                                                         </DragItem>
 
@@ -370,8 +359,8 @@ export default function SimpleCard() {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                         >
-                                                                            <ListItem id={(300 + index)} onClick={handleTask}>
-                                                                                <ListItemText primary={item[0].name} secondary={item[0].description} />
+                                                                            <ListItem id={(300 + index)} onClick={() => handleTask(item[1])}>
+                                                                                <ListItemText primary={item[0].name} secondary={item[0].owners[0][1].firstName + " " + item[0].owners[0][1].lastName} />
                                                                             </ListItem>
                                                                         </DragItem>
 
