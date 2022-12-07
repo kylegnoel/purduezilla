@@ -66,7 +66,7 @@ const Groups = () => {
     }, []);
 
     const fetchData = async (event) => {
-        const currGroup =  (await apiFunctions.getObjectById("groups", id))[0]
+        const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
         setGroup(currGroup[1].name)
         setDesc(currGroup[1].description)
 
@@ -78,10 +78,13 @@ const Groups = () => {
         // get owners
         const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
         setOwners(groupOwners)
+        console.log("owners: " + groupOwners)
 
         // get members
         const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
         setMembers(groupMembers)
+        console.log("members: " + groupMembers)
+
 
         // get viewers
         const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
@@ -122,10 +125,12 @@ const Groups = () => {
                 <ThemeProvider theme={theme}>
                     <Container component="main" maxWidth="lg">
                         <br></br>
-                        <h2>{group}</h2>
-                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
+                        <h2><i>Group: </i>{group}</h2>
+                        <Divider></Divider>
+                        <Box sx={{ mt: 2 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2}>
                                 <Grid item xs={50} sm={6}>
+                                    <h3>Group Projects</h3>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',minHeight:400, maxHeight:400, overflowY:'auto',flexGrow: 1, mt: '0px',
             flexDirection:"column",}} height={600}>
                                             { projectListArr && projectListArr.length != 0 ? projectListArr.map((data) => {
@@ -152,6 +157,7 @@ const Groups = () => {
                                         </Button>
                                 </Grid>
                                 <Grid item xs={50} sm={6} sx={{ mt: 0 }}>
+                                    <h3>Description</h3>
                                     <TextField
                                         required
                                         fullWidth
@@ -295,8 +301,9 @@ const Groups = () => {
                                             </AccordionDetails>
                                         </Accordion>
                                 </Grid>
-
                                 <Grid item xs={50} sm={12}>
+                                    <Divider></Divider>
+                                    <h3>Group Tasks</h3>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
             flexDirection:"column",}} height={400}>
                                             { taskListArr && taskListArr.length != 0 ? taskListArr.map((data) => {

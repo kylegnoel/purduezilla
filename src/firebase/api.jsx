@@ -469,17 +469,13 @@ const getGroupsTasks = async function getGroupsTasks(groupId) {
   var taskListArr = []
 
   const projectList = (await getGroupsProjects(groupId))
-  console.log("projectList: " + JSON.stringify(projectList))
 
   for (const project of projectList) {
-    console.log("projectListarr: " + JSON.stringify(project[1].projectId))
     const taskList = (await getProjectsTasks(project[1].projectId))
     for (const task of taskList) {
-      console.log("taskListarr: " + JSON.stringify(task))
       taskListArr.push(task)
     }
   }
-  console.log("returning: " + JSON.stringify(taskListArr))
   return taskListArr;
 }
 
