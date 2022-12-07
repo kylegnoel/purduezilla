@@ -1,8 +1,8 @@
-
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const e = require('cors');
+const { CatchingPokemonSharp } = require('@mui/icons-material');
 const cors = require('cors')({origin: true});
 admin.initializeApp();
 
@@ -60,11 +60,49 @@ exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
             });
 })
 
+exports.sendMailToAddedTaskAssignUser = functions.database.ref('tasks/{taskId}')
+        .onCreate((snapshot, context) => {
+            const taskData = snapshot.val();
+            const taskName = taskData.name;
+            const auid = taskData.assignedUsers;
+            return admin.database().ref('users/' + auid).once('value', (snapshot) => {
+                const userInfo = snapshot.val();
+                transporter.sendMail(generaeteTaskAssignedUserNotificationEmail(userInfo.email, taskName), (error, info) => {
+                    if (error) {
+                        console.log('you done messed up again ' + error.toString());
+                        return;
+                    }
+                    console.log('sent')
+                })
+            })
+
+})
+
+
+
 const generateTaskOwnerNotificationEmail = (dest, taskName) => {
     return {
         from: 'PurdueZilla Team <purduezilla@gmail.com>',
         to: dest,
         subject: "You now own task: " + taskName,
         html: 'please get it done a$ap'
+    }
+}
+
+const generaeteTaskAssignedUserNotificationEmail = (dest, taskName) => {
+    return {
+        from: 'PurdueZilla Team <purduezilla@gmail.com>',
+        to: dest,
+        subject: 'You are now assigned to do ' + taskName,
+        html: 'Get working'
+    }
+}
+
+const generateAddedGroupMemberNotificationEmail = (dest, projectName) => {
+    return {
+        from: 'PurdueZilla Team <purduezilla@gmail.com>',
+        to: dest,
+        subject: 'You are now member of ' + projectName,
+        html: 'be nice to each other'
     }
 }
