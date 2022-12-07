@@ -92,24 +92,15 @@ const Projects = () => {
             setTaskListArr(finishedArr);
 
             const currProject = (await apiFunctions.getProjectById(id))[0];
-            console.log(currProject)
             setProject(currProject[1].name);
             setDesc(currProject[1].description);
 
-            const groupOwners = (await apiFunctions.getProjectOwners("ownerId", id))
+            const groupOwners = (await apiFunctions.getProjectMembers("owner", id))
             setOwners(groupOwners)
-            console.log("owners: " + groupOwners)
 
             // get members
-            const groupMembers = (await apiFunctions.getProjectMembers("memberId", id))
+            const groupMembers = (await apiFunctions.getProjectMembers("members", id))
             setMembers(groupMembers)
-            console.log("members: " + groupMembers)
-
-
-            // get viewers
-            const groupViewers = (await apiFunctions.getProjectMembers("viewerId", id))
-            setViewers(groupViewers)
-            console.log("viewers: " + groupViewers)
 
             setComments(apiFunctions.getProjectComments(id));
         }
@@ -157,7 +148,7 @@ const Projects = () => {
                                                 return (
                                                 <div key={data[0]}>
                                                 <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
+                                                    <ListItem key={data[0]} >
                                                         <ListItemAvatar>
                                                             <WorkIcon color="grey"/>
                                                         </ListItemAvatar>
@@ -190,7 +181,6 @@ const Projects = () => {
                                     />
                                     <Accordion 
                                         sx={{ mt: '10px' }} 
-                                        fullWidth 
                                         expanded={expanded === 'panel1'} 
                                         onChange={handleChange('panel1')}>
                                         <AccordionSummary
@@ -209,28 +199,26 @@ const Projects = () => {
                                         <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
                                             { owners && owners.length !== 0 && owners !== {} ? owners.map((data) => {
                                                 return(
-                                                    <ListItem alignItems="flex-start">
-                                                    <ListItemAvatar>
-                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
-                                                    </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
-                                                        <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
-                                                        secondary={
-                                                            <React.Fragment>
-                                                            <Typography
-                                                                sx={{ display: 'inline' }}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Owner
-                                                            </Typography>
-                                                            </React.Fragment>
-                                                        }
-                                                        />
-                                                    </Link>
-                                                </ListItem>
+                                                    <ListItem alignItems="flex-start" key={data[0]}>
+                                                        <ListItemAvatar>
+                                                            <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
+                                                        </ListItemAvatar>
+                                                            <ListItemText
+                                                            primary={<Link onClick={showUser} id={data[0]}>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                            secondary={
+                                                                <React.Fragment>
+                                                                <Typography
+                                                                    sx={{ display: 'inline' }}
+                                                                    component="span"
+                                                                    variant="body2"
+                                                                    color="text.primary"
+                                                                >
+                                                                    Owner
+                                                                </Typography>
+                                                                </React.Fragment>
+                                                            }
+                                                            />
+                                                    </ListItem>
                                                 );
                                             }): "There are no owners in this project!" }
                                         </List>
@@ -251,13 +239,12 @@ const Projects = () => {
                                                 <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
                                                 { members && members.length !== 0 && members !== {} ? members.map((data) => {
                                                 return(
-                                                    <ListItem alignItems="flex-start">
+                                                    <ListItem alignItems="flex-start" key={data[0]}>
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]}>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography
@@ -271,60 +258,17 @@ const Projects = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
-                                                    </Link>
                                                 </ListItem>
                                                 );
                                             }): "There are no members in this project!" }
                                             </List>
                                             </AccordionDetails>
                                         </Accordion>
-                                        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
-                                            <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel3bh-content"
-                                            id="panel3bh-header"
-                                            >
-                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                                                Viewers
-                                            </Typography>
-                                            <Typography sx={{ color: 'text.secondary' }}>
-                                                Users who can only view this project.
-                                            </Typography>
-                                            </AccordionSummary>
-                                            <AccordionDetails>
-                                            { viewers && viewers.length !== 0 && viewers !== {} ? viewers.map((data) => {
-                                                return(
-                                                    <ListItem alignItems="flex-start">
-                                                    <ListItemAvatar>
-                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
-                                                    </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
-                                                        <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
-                                                        secondary={
-                                                            <React.Fragment>
-                                                            <Typography
-                                                                sx={{ display: 'inline' }}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Viewer
-                                                            </Typography>
-                                                            </React.Fragment>
-                                                        }
-                                                        />
-                                                    </Link>
-                                                    </ListItem>
-                                                );
-                                            }): "There are no viewers in this project!" }
-                                            </AccordionDetails>
-                                        </Accordion>
                                 </Grid>
                             </Grid>
                             </Box>
                             <Divider></Divider>
-                            <Grid fullWidth xs={50} sm={12}>
+                            <Grid>
                                 <Grid>
                                     {comments.map((comment) => (
                                         < div >
