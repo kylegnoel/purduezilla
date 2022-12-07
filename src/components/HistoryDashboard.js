@@ -52,7 +52,7 @@ export default function HistoryDashboard() {
 
         setHistoryEvents(historyTemp)
 
-        console.log("resulting value: " + JSON.stringify(historyTemp[2]))
+        console.log("resulting value: " + JSON.stringify(historyTemp))
 
         return true;
     };
@@ -75,7 +75,7 @@ export default function HistoryDashboard() {
                                                     <ListItemAvatar>
                                                         <TaskIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[1]} secondary={data[1] + " was changed on " + data[1]} />
+                                                    <ListItemText primary={data[1]} secondary={data[2]} />
                                                 </ListItem>
                                             </Button>
                                             <Divider />

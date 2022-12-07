@@ -340,7 +340,7 @@ const addTaskFollowers = (taskId, followerId) => {
         });
 }
 
-const addTaskHistoryEvent = (taskId, change, oldVal, newVal, userId) => {
+const addTaskHistoryEvent = (taskId, change, oldVal, newVal, userId, historyDesc) => {
   const userListRef = ref(db, 'tasks/' + taskId + '/history');
   const newUserRef = push(userListRef);
   const date = String(new Date());
@@ -349,7 +349,8 @@ const addTaskHistoryEvent = (taskId, change, oldVal, newVal, userId) => {
     oldValue: oldVal,
     newValue: newVal,
     date: date,
-    authorId: userId
+    authorId: userId,
+    description: historyDesc,
   });
 }
 
@@ -400,7 +401,7 @@ const getHistoryEvents = async function getHistoryEvents(userID) {
     console.log("task: " + tempTask[0])
     await get(child(dbRef, `tasks/` + tempTask[0] + '/history')).then((snapshot) => {
       snapshot.forEach(function (childSnapshot) {
-        history.push("task/" + tempTask[0], tempTask[1], childSnapshot.val())
+        history.push(["task/" + tempTask[0], tempTask[1], childSnapshot.val().description])
         // console.log("result: " + JSON.stringify(childSnapshot))
       })
     });
@@ -420,7 +421,7 @@ const getHistoryEvents = async function getHistoryEvents(userID) {
     console.log("task: " + projectTemp)
     await get(child(dbRef, `projects/` + projectTemp[0] + '/history')).then((snapshot) => {
       snapshot.forEach(function (childSnapshot) {
-        history.push("project/" +projectTemp[0], projectTemp[1], childSnapshot.val())
+        history.push(["project/" +projectTemp[0], projectTemp[1], childSnapshot.val().description])
         // console.log("result: " + JSON.stringify(childSnapshot))
       })
     });
@@ -805,22 +806,27 @@ const deleteProjectMembers = (id, exMemberIds) => {
  * @returns 
  */
 
-const updateTaskDetails = (id, name, description, estimatedTime, status, userId) => {
+const updateTaskDetails =  (id, name, description, estimatedTime, status, userId, userName) => {
 
     const taskListRef = ref(db, 'tasks/'  + id);
+    const date = String(new Date());
 
     get(taskListRef).then((snapshot) => {
       if (name != snapshot.val().name) {
-        addTaskHistoryEvent(id, "name", snapshot.val().name, name, userId);
+        const historyDesc = userName + " modified the name at " + date + "."
+        addTaskHistoryEvent(id, "name", snapshot.val().name, name, userId, historyDesc);
       }
       if (description != snapshot.val().description) {
-        addTaskHistoryEvent(id, "description", snapshot.val().description, description, userId);
+        const historyDesc = userName + " modified the description at " + date + "."
+        addTaskHistoryEvent(id, "description", snapshot.val().description, description, userId, historyDesc);
       }
       if (estimatedTime != snapshot.val().estimatedTime) {
-        addTaskHistoryEvent(id, "estimated time", snapshot.val().estimatedTime, estimatedTime, userId);
+        const historyDesc = userName + " modified the estimated time at " + date + "."
+        addTaskHistoryEvent(id, "estimated time", snapshot.val().estimatedTime, estimatedTime, userId, historyDesc);
       }
       if (status != snapshot.val().status) {
-        addTaskHistoryEvent(id, "status", snapshot.val().status, status, userId);
+        const historyDesc = userName + " modified the current status at " + date + "."
+        addTaskHistoryEvent(id, "status", snapshot.val().status, status, userId, historyDesc);
       }
     });
 
