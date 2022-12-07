@@ -228,17 +228,9 @@ const createNewProject = function createNewProject(name, description, memberIds,
     name: name,
     description: description,
     creationDate: new Date(),
+    ownerId: ownerId,
     status: "Active"
   });
-
-  if (groupId !== "") {
-    addNewProjectToGroup(groupId, newProjectRef.key, name)
-  }
-
-  // Add owner user Id's
-  for (const i in ownerIds) {
-    addProjectOwner(newProjectRef.key, ownerIds[i])
-  }
 
   // Add member user Id's
   for (const i in memberIds) {
