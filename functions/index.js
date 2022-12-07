@@ -2,7 +2,6 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const e = require('cors');
-const { CatchingPokemonSharp } = require('@mui/icons-material');
 const cors = require('cors')({origin: true});
 admin.initializeApp();
 
@@ -44,20 +43,17 @@ exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
             const taskData = snapshot.val();
             const taskName = taskData.name;
             console.log(taskName)
-            const owners = taskData.owners;
-            owners.forEach(owner => {
-                console.log("This is how owner looks like " + owner);
-                const ownerInfo = owner[1];
-                console.log("owner info " + ownerInfo);
-                const ownerEmail = ownerInfo.email;
-                console.log(ownerEmail)
-                transporter.sendMail(generateTaskOwnerNotificationEmail(ownerEmail, taskName), (error, inf) => {
-                    if (!error) {
-                        console.log('sent')
+            const ownerId = taskData.ownerId;
+            return admin.database().ref('users/' + ownerId).once('value', (ss) => {
+                const userInfo = ss.val();
+                transporter.sendMail(generateTaskOwnerNotificationEmail(userInfo.email, taskName), (error, info) => {
+                    if (error) {
+                        console.log('messed up' + error.toString());
+                    } else {
+                        console.log('sent');
                     }
-                    console.log('you done messed up' + error.toString())
                 })
-            });
+            })
 })
 
 exports.sendMailToAddedTaskAssignUser = functions.database.ref('tasks/{taskId}')
@@ -70,15 +66,12 @@ exports.sendMailToAddedTaskAssignUser = functions.database.ref('tasks/{taskId}')
                 transporter.sendMail(generaeteTaskAssignedUserNotificationEmail(userInfo.email, taskName), (error, info) => {
                     if (error) {
                         console.log('you done messed up again ' + error.toString());
-                        return;
-                    }
-                    console.log('sent')
+                    } else 
+                        console.log('sent')
                 })
             })
 
 })
-
-
 
 const generateTaskOwnerNotificationEmail = (dest, taskName) => {
     return {
