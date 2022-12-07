@@ -78,8 +78,17 @@ export default function NewProject() {
             memberId.push(member[0])
         })
 
+        // convert owner names into userid 
+        const ownersTemp = []
+        userList.forEach(function(userTemp) {
+            if (owner === userTemp[0].firstName + " " + userTemp[0].lastName) {
+                ownersTemp.push (userTemp[1])
+            }
+        })
+
+        console.log("members: " + memberId)
         let createNewProject = await apiFunctions.createNewProject(
-            name, description, group, memberId, owner[0])
+            name, description, group, memberId, ownersTemp)
 
         navigate('/myprojects')
         if (createNewProject) {

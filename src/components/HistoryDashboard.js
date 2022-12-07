@@ -20,6 +20,9 @@ import apiFunctions from '../firebase/api';
 const theme = createTheme();
 
 export default function HistoryDashboard() {
+    const [taskListarr, setTaskListArr] = useState([]);
+    const [task, setTask] = useState([]);
+    const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [history, setHistoryEvents] = useState([]);
     const user = apiFunctions.useFirebaseAuth();
@@ -42,6 +45,8 @@ export default function HistoryDashboard() {
         // console.log("response: " + response)
         setHistoryEvents([])
         const historyTemp = (await apiFunctions.getHistoryEvents(user.key));
+        const userList = [];
+        const finalHistory = [];
 
         console.log("returned: " + historyTemp)
 

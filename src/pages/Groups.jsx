@@ -78,7 +78,7 @@ const Groups = () => {
         // get owners
         const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
         setOwners(groupOwners)
-        console.log("owners: " + JSON.stringify(groupOwners))
+        console.log("owners: " + groupOwners)
 
         // get members
         const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
