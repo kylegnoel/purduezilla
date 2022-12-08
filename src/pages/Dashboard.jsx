@@ -1,8 +1,15 @@
-import { React, useState, useEffect } from 'react';
+import React from 'react';
+import NavBar from '../components/NavBar';
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 
-// material ui imports
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import History from '../components/HistoryDashboard';
 import { Typography } from '@mui/material';
+import apiFunctions from '../firebase/api';
+import { ref, onValue } from "firebase/database";
+
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FixedSizeList from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -16,31 +23,21 @@ import { Container } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TaskIcon from '@mui/icons-material/Task';
 
-// component imports
-import NavBar from '../components/NavBar';
-import History from '../components/HistoryDashboard';
-
-// db imports
-import apiFunctions from '../firebase/api';
-
-// stylesheet
-import { useTour } from '@reactour/tour';
-
 import '../App.css'
-
 const theme = createTheme();
 
 const Dashboard = () => {
+    const { id } = useParams();
     const user = apiFunctions.useFirebaseAuth();
-    console.log(user);
 
     const [projListarr, setProjListArr] = useState([]);
+    const [isLoading, setLoading] = useState(true);
     const [taskListarr, setTaskListArr] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("reload")
         fetchData()
-        setData()
     }, []);
 
     const handleTask = (event) => {
@@ -55,16 +52,24 @@ const Dashboard = () => {
 
     const fetchData = async (event) => {
         // Update the document title using the browser API
+        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
+        // console.log("response: " + response)
         const settingProjects = apiFunctions.getUsersProjects(user.key);
         await setProjListArr(settingProjects);
 
         const settingTasks = apiFunctions.getUsersAssignedTasks(user.key);
         await setTaskListArr(settingTasks);
 
+        setLoading(false)
+        
         return true;
     };
 
     const [comments, setComments] = useState([]);
+    useEffect(() => {
+        setData();
+
+    }, []);
 
     const setData = () => {
         try {
@@ -79,10 +84,9 @@ const Dashboard = () => {
 
         }
     }
-    const { setIsOpen } = useTour();
+
     return (
         <div>
-            <button onClick={() => setIsOpen(true)} id="start-tour" hidden>Open Tour</button>
             <NavBar></NavBar>
             <div class="flex-container">
 <div style={{marginBottom: '-16px'}}class="flex-child">
@@ -143,12 +147,12 @@ const Dashboard = () => {
             <Container component="main" maxWidth="lg">
                 <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={50} sm={12} >
+                        <Grid item xs={50} sm={12} lg={'50%'}>
                             <FixedSizeList sx={{
                                 border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
                                 flexDirection: "column",
                             }} height={400}>
-                                {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
+                                {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                     return (
                                         <div key={data.projectId}>
                                             <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
@@ -202,10 +206,10 @@ const Dashboard = () => {
                     <Container component="main" maxWidth="lg">
                         <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2} alignItems="center">
-                                <Grid item xs={50} sm={12}>
+                                <Grid item xs={50} sm={12} lg={'50%'}>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
             flexDirection:"column",}} height={400}>
-                                        { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
+                                        { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                                 return (  
                                                 <div key={data[1]}>
                                                 <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
