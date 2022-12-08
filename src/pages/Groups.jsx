@@ -66,39 +66,69 @@ const Groups = () => {
     }, []);
 
     const fetchData = async (event) => {
-        const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
-        setGroup(currGroup[1].name)
-        setDesc(currGroup[1].description)
+        if (id !== undefined) {
+            console.log(user.key)
+            const usersGroups = (await apiFunctions.getUsersGroups(user.key))
+            var found = false
 
-        // set groups projects
-        const projectListTemp = (await apiFunctions.getGroupsProjects(id))
-        setProjectList(projectListTemp)
-        console.log("projectListTemp: " + projectListArr)
+            for (const i of usersGroups) {
+                if (i[0] === id) {
+                    console.log("found")
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                console.log("not found")
+                console.log(JSON.stringify(usersGroups))
+                //navigate("/mygroups")
+            }
 
-        // get owners
-        const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
-        setOwners(groupOwners)
-        console.log("owners: " + groupOwners)
+            const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
+            setGroup(currGroup[1].name)
+            setDesc(currGroup[1].description)
 
-        // get members
-        const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
-        setMembers(groupMembers)
-        console.log("members: " + groupMembers)
+            // set groups projects
+            const projectListTemp = (await apiFunctions.getGroupsProjects(id))
+            setProjectList(projectListTemp)
+            console.log("projectListTemp: " + projectListArr)
+
+            // get owners
+            const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
+            setOwners(groupOwners)
+            console.log("owners: " + groupOwners)
+
+            // get members
+            const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
+            setMembers(groupMembers)
+            console.log("members: " + groupMembers)
 
 
-        // get viewers
-        const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
-        setViewers(groupViewers)
-        console.log("viewers: " + groupViewers)
+            // get viewers
+            const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
+            setViewers(groupViewers)
+            console.log("viewers: " + groupViewers)
 
-        const taskListTemp = (await apiFunctions.getGroupsTasks(id))
-        console.log("taskList: " + JSON.stringify(taskListArr))
-        setTaskListArr(taskListTemp)
-
+            const taskListTemp = (await apiFunctions.getGroupsTasks(id))
+            console.log("taskList: " + JSON.stringify(taskListArr))
+            setTaskListArr(taskListTemp)
+        }
         return true;
     };
 
     const handleTask = (event) => {
+        if (event.currentTarget.id === "addproject") {
+            navigate('/newproject/' + id);
+        }
+        else if (event.currentTarget.id === "addtask") {
+            navigate('/newtask/');
+        }
+        else {
+            navigate('/task/'+event.currentTarget.id);
+        }
+    }
+
+    const handleProject = (event) => {
         if (event.currentTarget.id === "addproject") {
             navigate('/newproject/' + id);
         }
@@ -136,7 +166,7 @@ const Groups = () => {
                                             { projectListArr && projectListArr.length != 0 ? projectListArr.map((data) => {
                                                 return (
                                                 <div key={data[0]}>
-                                                <Button onClick={handleTask} id={data[1].projectId} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleProject} id={data[1].projectId} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
                                                             <WorkIcon color="grey"/>
@@ -149,7 +179,7 @@ const Groups = () => {
                                             )}): "There are no projects in this group!" }
                                     </FixedSizeList>
                                     <Button 
-                                        onClick={handleTask} 
+                                        onClick={handleProject} 
                                         id={"addproject"} 
                                         variant="outlined"
                                         sx={{ mt: '10px', width: '100%'}}>

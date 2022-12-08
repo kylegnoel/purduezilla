@@ -72,28 +72,21 @@ export default function NewProject() {
         // console.log(memberId)
 
         // convert member names into userid 
-        const memberId = ([]);
+        var memberId = ([]);
 
         selected.forEach(function(member) {
+            console.log("adding new member: " + member[0])
             memberId.push(member[0])
         })
 
-        // convert owner names into userid 
-        const ownersTemp = []
-        userList.forEach(function(userTemp) {
-            if (owner === userTemp[0].firstName + " " + userTemp[0].lastName) {
-                ownersTemp.push (userTemp[1])
-            }
-        })
-        console.log("owners: " + ownersTemp)
-
         console.log("members: " + memberId)
-        let createNewProject = await apiFunctions.createNewProject(
-            name, description, group, memberId, ownersTemp)
+        console.log("group: " + group)
 
-        //navigate('/myprojects')
+        let createNewProject = await apiFunctions.createNewProject(
+            name, description, group, memberId, owner[0])
+
         if (createNewProject) {
-            
+            navigate('/myprojects')
         } else {
         // perform error UI like highlighting textfield to red
             alert("Project Creation Failed.\nPlease try again.")
@@ -109,7 +102,7 @@ export default function NewProject() {
 
     const fetchData = async (event) => {
         // users
-        const userTemp = (await apiFunctions.getUserById(""))
+        const userTemp = (await apiFunctions.getObjectById("users",""))
         console.log("userTemp: " + JSON.stringify(userTemp))
         setUserList(userTemp)
 
@@ -201,7 +194,7 @@ export default function NewProject() {
                                                 <MenuItem value={data} id={data}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                             </Select>
-                            <FormHelperText>Select the team member who oversees this task.</FormHelperText>
+                            <FormHelperText>Select the team member who oversees this project.</FormHelperText>
                         </FormControl>
 
                             <br></br>
@@ -209,7 +202,7 @@ export default function NewProject() {
                         <br></br>
 
                             <FormControl xs={12} fullWidth>
-                                <InputLabel id="memberLabel">Follower</InputLabel>
+                                <InputLabel id="memberLabel">Members</InputLabel>
                                 <Select
                                     multiple
                                     defaultValue={10}

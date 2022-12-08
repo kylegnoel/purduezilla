@@ -219,7 +219,10 @@ const getTaggedComments = function getTaggedComments(userKey) {
 
 // Create new project
 // To get all tasks associated with project, query 'tasks' by project id
-const createNewProject = function createNewProject(name, description, memberIds, ownerId) {
+const createNewProject = function createNewProject(name, description, group, memberIds, ownerId) {
+
+  console.log("recieved members:" + memberIds)
+  console.log("recieved owner: " + ownerId)
 
   const projectListRef = ref(db, 'projects');
   const newProjectRef = push(projectListRef);
@@ -227,13 +230,15 @@ const createNewProject = function createNewProject(name, description, memberIds,
     name: name,
     description: description,
     creationDate: new Date(),
+    group: group,
     ownerId: ownerId,
     status: "Active"
   });
 
   // Add member user Id's
-  for (const i in memberIds) {
-    addProjectMember(newProjectRef.key, memberIds[i]);
+  for (const i of memberIds) {
+    console.log("adding member: " + i )
+    addProjectMember(newProjectRef.key, i);
   }
 
   return newProjectRef.key;
@@ -249,7 +254,7 @@ const addProjectMember = (id, memberId) => {
   const ownersListRef = ref(db, 'projects/' + id + '/members');
   const userRef = push(ownersListRef);
   set(userRef, {
-    memberId: memberId
+    userId: memberId
   });
 }
 
@@ -300,7 +305,7 @@ const createNewTask = function createNewTask(project, name, description, estimat
   });
 
   // Add follower user Id's
-  for (const i in followerIds) {
+  for (const i of followerIds) {
     addTaskFollower(newTaskRef.key, i);
   }
 
@@ -483,23 +488,88 @@ const getGroupsTasks = async function getGroupsTasks(groupId) {
 // Returns array of project keys
 const getUsersProjects = async function getUsersProjects(userId) {
   const usersProjects = []
+  const dbRef = ref(db);
 
-  onValue(ref(apiFunctions.db, 'projects'), (snapshot) => {
-    snapshot.forEach(function (projectSnapshot) {
-      onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
-        snapshot2.forEach(function (memberSnapshot) {
-          if (memberSnapshot.val().memberId === userId) {
-            // Keep track of key and values
-            usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
-          }
-        });
+  if (userId === undefined) {
+    return [];
+  }
+
+  const projects = (await getObjectById("projects", ""))
+
+  for (const i of projects) {
+    const projects = (await getObjectById("projects", i[0]))
+    await get(child(dbRef, "projects/" +i[0] + '/members')).then((snapshot) => {
+      snapshot.forEach(function (memberSnapshot) {
+        if (memberSnapshot.val().userId === userId) {
+          // Keep track of key and values
+          usersProjects.push([i[0], i[1]]);
+        }
       });
-    })
-  });
+    });
+  }
+  for (const i of projects) {
+    await get(child(dbRef, "projects/" + i[0] + '/ownerId')).then((snapshot) => {
+      if (snapshot.val() == userId && !usersProjects.includes([i[0], i[1]])) {
+        usersProjects.push([i[0], i[1]]);
+      }
+    });
+  }
 
-  console.log("returning: " + JSON.stringify(usersProjects))
   return usersProjects;
 }
+
+// Returns array of group keys
+const getUsersGroups = async function getUsersProjects(userId) {
+  const usersGroups = []
+  const dbRef = ref(db);
+
+  if (userId === undefined) {
+    return [];
+  }
+
+  console.log("called")
+
+  const projects = (await getObjectById("groups", ""))
+
+  for (const i of projects) {
+    await get(child(dbRef, "groups/" +i[0] + '/memberId')).then((snapshot) => {
+      snapshot.forEach(function (memberSnapshot) {
+        console.log("value: " + memberSnapshot)
+        if (memberSnapshot.val() === userId) {
+          // Keep track of key and values
+          usersGroups.push([i[0], i[1]]);
+          console.log("value: " + snapshot.val() + " " + userId)
+        }
+      });
+    });
+  }
+  for (const i of projects) {
+    await get(child(dbRef, "groups/" + i[0] + '/viewerId')).then((snapshot) => {
+      snapshot.forEach(function (memberSnapshot) {
+        console.log(memberSnapshot.val() + " " + userId )
+        if (memberSnapshot.val() == userId && !usersGroups.includes([i[0], i[1]])) {
+          usersGroups.push([i[0], i[1]]);
+          console.log(" this guy is an viewer")
+        }
+      });
+    });
+  }
+  for (const i of projects) {
+    await get(child(dbRef, "groups/" + i[0] + '/ownerId')).then((snapshot) => {
+      snapshot.forEach(function (memberSnapshot) {
+        if (memberSnapshot.val() == userId && !usersGroups.includes([i[0], i[1]])) {
+          usersGroups.push([i[0], i[1]]);
+          console.log(" this guy is an owner")
+        }
+      });
+    });
+  }
+
+  console.log("returning: " + JSON.stringify(usersGroups))
+  return usersGroups;
+}
+
+
 
 // Returns array of task keys
 const getUsersAssignedTasks = function getUsersAssignedTasks(userId) {
@@ -811,6 +881,7 @@ const updateProjectDetails = (id, name, description, status, userId) => {
  */
 
 const updateTaskDetails =  (id, name, description, estimatedTime, status, userId, userName) => {
+    console.log("values: " + userName + " " + userId)
 
     const taskListRef = ref(db, 'tasks/'  + id);
     const date = String(new Date());
@@ -1096,6 +1167,7 @@ const apiFunctions = {
   getUsersProjects,
   getUsersAssignedTasks,
   getUsersFollowedTasks,
+  getUsersGroups,
   getUserById,
   getUserByEmail,
   getTaskById,

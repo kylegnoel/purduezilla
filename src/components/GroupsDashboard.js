@@ -24,6 +24,7 @@ import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 const theme = createTheme();
 
 export default function GroupsDashboard() {
+    const user = apiFunctions.useFirebaseAuth();
     const { id } = useParams();
 
     const theme = createTheme();
@@ -53,25 +54,28 @@ export default function GroupsDashboard() {
     }
 
 
-    const fetchData = (event) => {
-        try {
-            //const groupsTemp = apiFunctions.getUserGroups(id)
-            //console.log("groupsTemp: " + groupsTemp)
-            onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
-                const groupTemp = []
+    const fetchData = async (event) => {
+        const groupTempList = (await apiFunctions.getUsersGroups(user.key))
+        setGroupList(groupTempList)
+
+        // try {
+        //     //const groupsTemp = apiFunctions.getUserGroups(id)
+        //     //console.log("groupsTemp: " + groupsTemp)
+        //     onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
+        //         const groupTemp = []
     
-                snapshot.forEach(function(child) {
-                    // console.log("group name: " + child.val().name)
-                    groupTemp.push([child.val(), child.key])
-                })
+        //         snapshot.forEach(function(child) {
+        //             // console.log("group name: " + child.val().name)
+        //             groupTemp.push([child.val(), child.key])
+        //         })
 
-                setGroupList(groupTemp)
-            })
+        //         setGroupList(groupTemp)
+        //     })
 
-        }
-        catch {
-            // if there is no internet
-        }
+        // }
+        // catch {
+        //     // if there is no internet
+        // }
 
         return true;
     };
@@ -90,12 +94,12 @@ export default function GroupsDashboard() {
                                         { groupList && groupList.length !== 0 ? groupList.map((data) => {
                                             return (
                                             <div key={data[1]}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
                                                             <GroupsIcon color="grey"/>
                                                         </ListItemAvatar>
-                                                        <ListItemText primary={data[0].name}/>
+                                                        <ListItemText primary={data[1].name}/>
                                                     </ListItem>
                                                 </Button>
                                                 <Divider />

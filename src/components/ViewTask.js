@@ -132,7 +132,7 @@ export default function ViewTask() {
 
     const assignToMe = async (event) => {
         if (!assignedToMe) {
-            const curUser = (await apiFunctions.getUserById(user.key))[0]
+            const curUser = (await apiFunctions.getObjectById("users",user.key))[0]
             console.log("assigningTask: " + id + " " + user.key)
             let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
                 id,

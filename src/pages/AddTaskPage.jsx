@@ -89,9 +89,9 @@ export default function AddTaskPage() {
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
-            followerId.push(follower[0][0])
+            followerId.push(follower[0])
         })
-        // console.log("followers: " + followerId)
+        console.log("followers: " + followerId)
 
         const projVar = await apiFunctions.getObjectById("projects", project)[1]
         console.log("projVar: " + projVar + " " + project)

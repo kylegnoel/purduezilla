@@ -21,14 +21,13 @@ import { ref, onValue } from "firebase/database";
 const theme = createTheme();
 
 export default function ProjectDashboard() {
+    var user = apiFunctions.useFirebaseAuth();
     const { id } = useParams();
     const [projListarr1, setProjListArr] = useState([]);
     // const taskListarr = []
 
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const user = apiFunctions.useFirebaseAuth();
-
 
     useEffect(() => {
         console.log("reload")
@@ -44,9 +43,9 @@ export default function ProjectDashboard() {
         }
     }
 
-    const fetchData = async () => {
+    const fetchData = async (event) => {
         setProjListArr([])
-        const projectTemp = (await apiFunctions.getUsersProjects(user.key));
+        const projectTemp = (await apiFunctions.getUsersProjects(user.key))
         setProjListArr(projectTemp)
         
         // console.log("taskListarr: " + projListarr.length)
