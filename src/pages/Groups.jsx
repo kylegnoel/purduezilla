@@ -193,9 +193,8 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography
@@ -209,7 +208,6 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
-                                                    </Link>
                                                 </ListItem>
                                                 );
                                             }): "There are no owners in this group!" }
@@ -235,9 +233,8 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography
@@ -251,7 +248,6 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
-                                                    </Link>
                                                 </ListItem>
                                                 );
                                             }): "There are no members in this group!" }
@@ -278,9 +274,8 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography
@@ -294,7 +289,6 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
-                                                    </Link>
                                                     </ListItem>
                                                 );
                                             }): "There are no viewers in this group!" }

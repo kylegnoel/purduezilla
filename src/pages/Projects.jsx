@@ -209,7 +209,7 @@ const Projects = () => {
                                                     </ListItemAvatar>
                                                     <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography
@@ -251,7 +251,7 @@ const Projects = () => {
                                                     </ListItemAvatar>
                                                     <Link onClick={showUser} id={data[0]} fullWidth>
                                                         <ListItemText
-                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
                                                         secondary={
                                                             <React.Fragment>
                                                             <Typography

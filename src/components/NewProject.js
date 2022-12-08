@@ -96,7 +96,7 @@ export default function NewProject() {
             
         } else {
         // perform error UI like highlighting textfield to red
-            alert("invalid login\n TODO: perform error UI")
+            alert("Project Creation Failed.\nPlease try again.")
         }
         // console.log("FINISHED");
         alert("Project Added");

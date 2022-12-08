@@ -85,7 +85,7 @@ export default function NewProject() {
             navigate('/group/'+ ret);
         } else {
         // perform error UI like highlighting textfield to red
-            alert("invalid login\n TODO: perform error UI")
+            alert("Group Creation Failed.")
         }
     };
 
