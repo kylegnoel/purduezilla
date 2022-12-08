@@ -25,6 +25,7 @@ export default function HistoryDashboard() {
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [history, setHistoryEvents] = useState([]);
+    const user = apiFunctions.useFirebaseAuth();
 
     useEffect(() => {
         console.log("reload")
@@ -33,18 +34,25 @@ export default function HistoryDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            navigate('/task/' + event.currentTarget.id);
+            navigate('/' + event.currentTarget.id);
         }
     }
 
 
-    const fetchData = () => {
+    const fetchData = async () => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
         setHistoryEvents([])
-        const historyTemp = apiFunctions.getHistoryEvents;
+        const historyTemp = (await apiFunctions.getHistoryEvents(user.key));
+        const userList = [];
+        const finalHistory = [];
+
+        console.log("returned: " + historyTemp)
+
         setHistoryEvents(historyTemp)
+
+        console.log("resulting value: " + JSON.stringify(historyTemp))
 
         return true;
     };
@@ -61,13 +69,13 @@ export default function HistoryDashboard() {
                             }} height={400}>
                                 {history && history.length !== 0 ? history.map((data) => {
                                     return (
-                                        <div key={data.projectId}>
+                                        <div key={data[0]}>
                                             <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
                                                 <ListItem>
                                                     <ListItemAvatar>
                                                         <TaskIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[1]} secondary={data[2].description} />
+                                                    <ListItemText primary={data[1]} secondary={data[2]} />
                                                 </ListItem>
                                             </Button>
                                             <Divider />
