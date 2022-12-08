@@ -16,7 +16,9 @@ const SearchComponent = () => {
     }, []);
 
     const fetchData = () => {
-
+        setUsers(apiFunctions.getAllAccounts);
+        setProjects(apiFunctions.getAllProjects);
+        setTasks(apiFunctions.getAllTasks);
     }
 
     const swapTarget = (newTarget) => {
@@ -32,6 +34,10 @@ const SearchComponent = () => {
         <div>
             <SearchBar value={searchParam} onChange={(e) => setSearchParam(e.target.value)} />
             <Button onClick={onSearch}>Search</Button>
+            <br></br>
+            <Button onClick={() => { swapTarget("Task") }}>Tasks</Button>
+            <Button onClick={() => { swapTarget("Project") }}>Projects</Button>
+            <Button onClick={() => { swapTarget("User") }}>Users</Button>
 
         </div>
     )

@@ -54,8 +54,6 @@ const NotificationsBox = (notifications) => {
                         e.preventDefault();
 
                         navigate(`/${notification[0].type}/${notification[0].sourcePath}`);
-
-
                     }}>
                         {notification[0].body}</Button>
                     <p>{notification[0].timeMade}</p>

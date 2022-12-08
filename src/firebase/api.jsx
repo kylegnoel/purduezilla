@@ -474,6 +474,48 @@ const addProjectHistoryEvent = (projectId, change, oldVal, newVal, userId) => {
  *
 *****/
 
+const getAllTasks = () => {
+  const tasks = [];
+  onValue(ref(db, "tasks/"), (snapshot) => {
+    let child = snapshot.val();
+
+    for (var key in child) {
+      // console.log("adding");
+      tasks.push([child[key], key]);
+    }
+  }, { onlyOnce: true });
+  // console.log(returnedCom
+  return tasks;
+}
+
+const getAllProjects = () => {
+  const projects = [];
+  onValue(ref(db, "projects/"), (snapshot) => {
+    let child = snapshot.val();
+
+    for (var key in child) {
+      // console.log("adding");
+      projects.push([child[key], key]);
+    }
+  }, { onlyOnce: true });
+  // console.log(returnedCom
+  return projects;
+}
+
+const getAllAccounts = () => {
+  const accounts = [];
+  onValue(ref(db, "users/"), (snapshot) => {
+    let child = snapshot.val();
+
+    for (var key in child) {
+      // console.log("adding");
+      accounts.push([child[key], key]);
+    }
+  }, { onlyOnce: true });
+  // console.log(returnedCom
+  return accounts;
+}
+
 const getTaskHistory = (taskId) => {
   const history = [];
   onValue(ref(db, 'tasks/' + taskId + '/history'), (snapshot) => {
@@ -1143,6 +1185,7 @@ const apiFunctions = {
   updateTaskDetails,
   deleteItemById,
   deleteUserById,
+  getAllAccounts, getAllProjects, getAllTasks,
   db,
   app,
   FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,
