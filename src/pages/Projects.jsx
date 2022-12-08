@@ -87,6 +87,9 @@ const Projects = () => {
 
         }
         else {
+            const permTemp = (await apiFunctions.isProjectMember(user.key, id));
+            console.log("permission is: " + JSON.stringify(permTemp))
+            
             // set project tasks
             const finishedArr = await apiFunctions.getProjectsTasks(id);
             setTaskListArr(finishedArr);

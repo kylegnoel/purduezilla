@@ -20,12 +20,25 @@ import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
+import ClearIcon from '@mui/icons-material/Clear';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Menu from '@mui/material/Menu';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import IconButton from '@mui/material/IconButton';
 
 import apiFunctions from '../firebase/api';
 
@@ -49,7 +62,16 @@ const Groups = () => {
     const [members, setMembers] = useState([]);
     const [viewers, setViewers] = useState([]);
 
+    const [permissions, setPermissions] = useState(0);
+    const [canEdit, setCanEdit] = useState(0);
+    const [isOwner, setOwner] = useState(0);
+
     const [expanded, setExpanded] = React.useState(false);
+
+    const settings = ["Edit Description", 'Delete Group', 'Transfer Ownership'];
+    const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [open, setOpen] = React.useState(false);
 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
@@ -60,6 +82,34 @@ const Groups = () => {
         navigate('/profile/' + event.currentTarget.id);
     }
 
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleButtonClick = async (setting) => {
+        setAnchorElUser(null);
+        if (setting === 'Delete Group') {
+            setOpen(true)
+        } else if (setting === 'Edit Description') {
+            
+        } else if (setting === 'Transfer Ownership') {
+            
+        } 
+    }
+
+    const handleDelete = (event) => {
+        setOpen(false);
+        alert("Group Deleted.")
+
+        // to do implement delete
+        apiFunctions.deleteItemById("group",id);
+        navigate("/")
+    }
+
     useEffect(() => {
         console.log("reload")
         fetchData()
@@ -67,22 +117,18 @@ const Groups = () => {
 
     const fetchData = async (event) => {
         if (id !== undefined) {
-            console.log(user.key)
-            const usersGroups = (await apiFunctions.getUsersGroups(user.key))
-            var found = false
-
-            for (const i of usersGroups) {
-                if (i[0] === id) {
-                    console.log("found")
-                    found = true;
-                    break;
-                }
+            const permTemp = (await apiFunctions.isGroupMember(user.key, id));
+            setPermissions(permTemp)
+            if (permTemp === 1 || permTemp === 2) {
+                setCanEdit(1)
             }
-            if (!found) {
-                console.log("not found")
-                console.log(JSON.stringify(usersGroups))
-                //navigate("/mygroups")
+            if (permTemp === 1) {
+                setOwner(1)
             }
+            if (permTemp === 0) {
+                navigate("/mygroups")
+            }
+            console.log("permission: " + permTemp)
 
             const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
             setGroup(currGroup[1].name)
@@ -91,26 +137,26 @@ const Groups = () => {
             // set groups projects
             const projectListTemp = (await apiFunctions.getGroupsProjects(id))
             setProjectList(projectListTemp)
-            console.log("projectListTemp: " + projectListArr)
+            // console.log("projectListTemp: " + projectListArr)
 
             // get owners
             const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
             setOwners(groupOwners)
-            console.log("owners: " + groupOwners)
+            // console.log("owners: " + groupOwners)
 
             // get members
             const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
             setMembers(groupMembers)
-            console.log("members: " + groupMembers)
+            // console.log("members: " + groupMembers)
 
 
             // get viewers
             const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
             setViewers(groupViewers)
-            console.log("viewers: " + groupViewers)
+            // console.log("viewers: " + groupViewers)
 
             const taskListTemp = (await apiFunctions.getGroupsTasks(id))
-            console.log("taskList: " + JSON.stringify(taskListArr))
+            // console.log("taskList: " + JSON.stringify(taskListArr))
             setTaskListArr(taskListTemp)
         }
         return true;
@@ -140,6 +186,22 @@ const Groups = () => {
         }
     }
 
+    const handleOpenNavMenu = (event) => {
+        setAnchorElNav(event.currentTarget);
+    };
+
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseNavMenu = () => {
+        setAnchorElNav(null);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+
     if (id === undefined) {
         return (
             <div>
@@ -157,6 +219,46 @@ const Groups = () => {
                         <br></br>
                         <h2><i>Group: </i>{group}</h2>
                         <Divider></Divider>
+                        <br></br>
+                        {isOwner ? <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Tooltip title="Open settings">
+                                <Button
+                                    width='20%'
+                                    variant="outlined"
+                                    onClick={handleOpenUserMenu}
+                                    startIcon={<ExpandMoreIcon />} >
+                                    <b>Options</b> 
+                                </Button>
+                                </Tooltip>
+                                <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'center',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'center',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                                >
+                                {settings.map((setting) => (
+                                    <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
+                                    <Typography textAlign="center">{setting}</Typography>
+                                    </MenuItem>
+                                ))}
+                                </Menu>
+                            </Box> : ''}
                         <Box sx={{ mt: 2 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2}>
                                 <Grid item xs={50} sm={6}>
@@ -178,13 +280,13 @@ const Groups = () => {
                                             </div>   
                                             )}): "There are no projects in this group!" }
                                     </FixedSizeList>
-                                    <Button 
+                                    {canEdit ? <Button 
                                         onClick={handleProject} 
                                         id={"addproject"} 
                                         variant="outlined"
                                         sx={{ mt: '10px', width: '100%'}}>
                                         Create New Project
-                                        </Button>
+                                        </Button> : ''}
                                 </Grid>
                                 <Grid item xs={50} sm={6} sx={{ mt: 0 }}>
                                     <h3>Description</h3>
@@ -238,6 +340,11 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
+                                                        <ListItemAvatar>
+                                                        <IconButton aria-label="delete" disabled color="primary">
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                    </ListItemAvatar>
                                                 </ListItem>
                                                 );
                                             }): "There are no owners in this group!" }
@@ -278,6 +385,11 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
+                                                        <ListItemAvatar>
+                                                        <IconButton aria-label="delete" disabled color="primary">
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                        </ListItemAvatar>
                                                 </ListItem>
                                                 );
                                             }): "There are no members in this group!" }
@@ -304,21 +416,26 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                        <ListItemText
-                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
-                                                        secondary={
-                                                            <React.Fragment>
-                                                            <Typography
-                                                                sx={{ display: 'inline' }}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Viewer
-                                                            </Typography>
-                                                            </React.Fragment>
-                                                        }
-                                                        />
+                                                    <ListItemText
+                                                    primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                    secondary={
+                                                        <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'inline' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            Viewer
+                                                        </Typography>
+                                                        </React.Fragment>
+                                                    }
+                                                    />
+                                                    <ListItemAvatar>
+                                                    <IconButton aria-label="delete" disabled color="primary">
+                                                        <ClearIcon />
+                                                    </IconButton>
+                                                    </ListItemAvatar>
                                                     </ListItem>
                                                 );
                                             }): "There are no viewers in this group!" }
@@ -344,18 +461,40 @@ const Groups = () => {
                                                 <Divider />
                                             </div>   
                                             )}): "There are no tasks!" }
-                                            <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
+                                            {canEdit ? <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%'}}>
+                                            
                                             <ListItem>
                                                 <ListItemAvatar>
                                                     <AddIcon color="grey"/>
                                                 </ListItemAvatar>
                                                 <ListItemText primary={"Create New Task"}/>
                                             </ListItem>
-                                        </Button>
+                                        </Button> : ''}
                                     </FixedSizeList>
                                 </Grid>
                             </Grid>
                         </Box>
+                            <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Are you sure you want to delete this group?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    This action cannot be undone.
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose}>Close</Button>
+                                <Button onClick={handleDelete} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </Container>
                 </ThemeProvider>
             </div>

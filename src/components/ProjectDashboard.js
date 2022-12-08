@@ -21,7 +21,8 @@ import { ref, onValue } from "firebase/database";
 const theme = createTheme();
 
 export default function ProjectDashboard() {
-    var user = apiFunctions.useFirebaseAuth();
+    var user = useState([]);
+    user = apiFunctions.useFirebaseAuth();
     const { id } = useParams();
     const [projListarr1, setProjListArr] = useState([]);
     // const taskListarr = []
@@ -44,6 +45,8 @@ export default function ProjectDashboard() {
     }
 
     const fetchData = async (event) => {
+        console.log("user.key: " + user.key)
+        
         setProjListArr([])
         const projectTemp = (await apiFunctions.getUsersProjects(user.key))
         setProjListArr(projectTemp)
