@@ -93,6 +93,35 @@ exports.sendMailToNewGroupMember = functions.database.ref('groups/{groupId}/memb
 
 })
 
+// subject: USER1 commented on your TASK
+// content: COMMENT 
+exports.sendMailToTaggedUser = functions.database.ref('users/{userId}/tagged/{tagId}')
+        .onCreate(snapshot => {
+            const taggedData = snapshot.val();
+            const authorId = taggedData.author;
+            const comment = taggedData.body;
+            const taskId = taggedData.taskKey;
+
+            const receiverEmailRef = snapshot.ref.parent.parent.child('email');
+
+            receiverEmailRef.once('value', (email) => {
+                admin.database().ref('users/'+authorId).once('value', (authorData) => {
+                    const author = authorData.val().firstName;
+                    admin.database().ref('tasks/'+taskId).once('value', (taskData) => {
+                        const td = taskData.val();
+                        const taskName = td.name;
+                        transporter.sendMail(generateTaggedUserEmail(email.val(), author, comment, taskName), (error) => {
+                            if (error) {
+                                console.log(error.toString());
+                            } else {
+                                console.log('sent');
+                            }
+                        })
+                    })
+                })
+            })
+        })
+
 const generateTaskOwnerNotificationEmail = (dest, taskName) => {
     return {
         from: 'PurdueZilla Team <purduezilla@gmail.com>',
@@ -120,11 +149,20 @@ const generateNewGroupMemberEmail = (dest, groupName) => {
     }
 }
 
-const generateAddedGroupMemberNotificationEmail = (dest, projectName) => {
+const generateNewProjectMemberEmail = (dest, projectName) => {
     return {
         from: 'PurdueZilla Team <purduezilla@gmail.com>',
         to: dest,
         subject: 'You are now member of ' + projectName,
         html: 'be nice to each other'
+    }
+}
+
+const generateTaggedUserEmail = (dest, commenter, comment, taskName) => {
+    return {
+        from: 'PurdueZilla Team <purduezilla@gmail.com>',
+        to: dest,
+        subject: commenter + ' commented on ' + taskName,
+        html: comment
     }
 }
