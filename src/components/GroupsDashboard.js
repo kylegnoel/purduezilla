@@ -15,10 +15,20 @@ import GroupsIcon from '@mui/icons-material/Groups';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { Link } from 'react-router-dom';
+
+import { useNavigate, useParams } from 'react-router-dom';
+import AddTask from './AddTask';
+import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
+
+const theme = createTheme();
 
 export default function GroupsDashboard() {
+    const { id } = useParams();
+
     const theme = createTheme();
     const [groupList, setGroupList] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log("reload")
@@ -26,28 +36,27 @@ export default function GroupsDashboard() {
     }, []);
 
     const handleTask = (event) => {
+        console.log(event.currentTarget.id)
         if (event.currentTarget.id === "addgroup") {
             window.location.href='/newgroup/';
             // navigate('/newgroup/');
         }
         if (event.currentTarget.id === "addproject") {
-            window.location.href='/newproject/';
-            // navigate('/newproject/');
+            navigate('/newproject/');
+            //window.location.href='/newproject/';
         }
         else {
             // console.log("eventid: " + event.currentTarget.id)
-            window.location.href='/group/'+event.currentTarget.id;
-            // navigate('/group/'+event.currentTarget.id);
+            //window.location.href='/group/'+event.currentTarget.id;
+            navigate('/group/'+event.currentTarget.id);
         }
     }
 
 
     const fetchData = (event) => {
-        // console.log("hello")
-        // Update the document title using the browser API
-        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // // console.log("response: " + response)
         try {
+            //const groupsTemp = apiFunctions.getUserGroups(id)
+            //console.log("groupsTemp: " + groupsTemp)
             onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
                 const groupTemp = []
     

@@ -28,6 +28,7 @@ const Routing = props => {
                 <Route exact path="/register" element={<Register />} />
                 <Route exact path="/myprojects" element={<PrivateRoute redirectRoute="/" ><Projects /></PrivateRoute>} />
                 <Route exact path="/newproject" element={<NewProject />} />
+                <Route exact path="/newproject/:id" element={<NewProject />} />
                 <Route exact path="/profile/:id" element={<Profile />} />
                 <Route exact path="/newgroup" element={<PrivateRoute redirectRoute="/" ><NewGroup /></PrivateRoute>} />
                 <Route exact path="/group/:id" element={<Groups />} />

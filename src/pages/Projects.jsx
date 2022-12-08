@@ -65,8 +65,7 @@ const Projects = () => {
         window.location.reload(false);
     }
 
-
-    const fetchData = () => {
+    const fetchData = async (event) => {
         setTaskListArr([]);
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -75,31 +74,16 @@ const Projects = () => {
 
         }
         else {
-            try {
-                onValue(ref(apiFunctions.db, 'tasks/'), (snapshot) => {
-                    const taskTemp = []
+            // set project tasks
+            const finishedArr = await apiFunctions.getProjectsTasks(id);
+            setTaskListArr(finishedArr);
 
-                    snapshot.forEach(function (child) {
-                        const task = child.val()
-                        if (task.projectId[0] === id) {
-                            taskTemp.push([task, child.key])
-                        }
-                    });
+            const currProject = (await apiFunctions.getProjectById(id))[0];
+            console.log(currProject)
+            setProject(currProject[1].name);
+            setDesc(currProject[1].description);
 
-                    setTaskListArr(taskTemp);
-                });
-
-                // set project name
-                onValue(ref(apiFunctions.db, "projects/" + id), (snapshot) => {
-                    setProject(snapshot.val().name);
-                    setDesc(snapshot.val().description);
-                });
-                // console.log("is this happening");
-                setComments(apiFunctions.getProjectComments(id));
-            }
-            catch {
-                // if there is no internet
-            }
+            setComments(apiFunctions.getProjectComments(id));
         }
 
         return true;
@@ -155,12 +139,12 @@ const Projects = () => {
                                         {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
                                             return (
                                                 <div key={data.key}>
-                                                    <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
+                                                    <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
                                                         <ListItem>
                                                             <ListItemAvatar>
                                                                 <WorkIcon color="grey" />
                                                             </ListItemAvatar>
-                                                            <ListItemText primary={data[0].name} secondary={data[0].description} />
+                                                            <ListItemText primary={data[1].name} secondary={data[1].description} />
                                                         </ListItem>
                                                     </Button>
                                                     <Divider />
