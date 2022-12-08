@@ -20,6 +20,7 @@ import Storyboard from '../pages/Storyboard';
 import AddTask from '../components/AddTask';
 import ResetPassword from '../pages/PasswordReset';
 import ResetPasswordEmailSentConfirmation from '../pages/PasswordResetEmailSent';
+import DashboardTour from '../pages/DashboardWithTour';
 
 const Routing = props => {
 
