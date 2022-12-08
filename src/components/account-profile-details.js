@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+
 import {
   Box,
   Button,
@@ -21,11 +23,13 @@ import { ref, onValue } from "firebase/database";
 export const AccountProfileDetails = (props) => {
   const user = apiFunctions.useFirebaseAuth();
   const [groupList, setGroupList] = useState([]);
-  const [values, setValues] = useState({
-    name: user.info.firstName,
-    email: user.info.email,
-    description: user.info.profileDescription
-  }); 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [description, setDesc] = useState('');
+
+  const [viewOnly, setViewOnly] = useState(0);
+
+  const { id } = useParams();
 
   useEffect(() => {
     console.log("reload")
@@ -45,19 +49,29 @@ const handleTask = (event) => {
   }
 }
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value
-    });
+  const handleNameChange = (event) => {
+    setName(event.currentTarget.value)
+  };
+
+  const handleEmailChange = (event) => {
+    setEmail(event.currentTarget.value)
+  };
+
+  const handleDescChange = (event) => {
+    setDesc(event.currentTarget.value)
   };
 
   const update = (event) => {
     //console.log(user.key + user.info.email + user.info.firstName + user.info.profileDescription + user.info.notificationSetting)
-    apiFunctions.updateUser(user.key, user.info.email, values.name, "", values.description, user.info.notificationSetting)
+    apiFunctions.updateUser(user.key, user.info.email, name, "", description, user.info.notificationSetting)
   };
 
-  const fetchData = () => {
+  const fetchData = async() => {
+    const userTemp = (await apiFunctions.getObjectById("users", id))[0];
+    setName(userTemp[1].firstName)
+    setEmail(userTemp[1].email)
+    setDesc(userTemp[1].description)
+
     try {
         onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
             const groupTemp = []
@@ -73,6 +87,10 @@ const handleTask = (event) => {
     }
     catch {
         // if there is no internet
+    }
+
+    if (user.key !== id) {
+      setViewOnly(1);
     }
 
     return true;
@@ -105,9 +123,10 @@ const handleTask = (event) => {
                 helperText="Please specify your name"
                 label="Name"
                 name="name"
-                onChange={handleChange}
+                onChange={handleNameChange}
                 required
-                value={values.name}
+                disabled={viewOnly}
+                value={name}
                 variant="outlined"
               />
             </Grid>
@@ -120,10 +139,10 @@ const handleTask = (event) => {
                 fullWidth
                 label="Email Address"
                 name="email"
-                onChange={handleChange}
+                onChange={handleEmailChange}
                 required
                 disabled={true}
-                value={values.email}
+                value={email}
                 variant="outlined"
               />
             </Grid>
@@ -136,9 +155,10 @@ const handleTask = (event) => {
                 fullWidth
                 label="Description"
                 name="description"
-                onChange={handleChange}
+                onChange={handleDescChange}
                 required
-                value={values.description}
+                disabled={viewOnly}
+                value={description}
                 variant="outlined"
               />
             </Grid>
@@ -190,13 +210,15 @@ const handleTask = (event) => {
             p: 2
           }}
         >
-          <Button
+           {!viewOnly && <Button
             color="primary"
             variant="contained"
             onClick={update}
           >
             Save details
           </Button>
+          }
+          
         </Box>
       </Card>
       
