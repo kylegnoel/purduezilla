@@ -38,12 +38,11 @@ const auth = getAuth();
 // Create new user in our db
 // Does not authenticate user: must also call createAccount() for authentication
 // kyle: it is called only when createAccount returns true, this assures that the email is not duplicated
-const createNewUser = function createNewUser(email, username, firstName, lastName, profileDescription = "", notificationSetting = "") {
+const createNewUser = function createNewUser(email, firstName, lastName, profileDescription = "", notificationSetting = "") {
   const userListRef = ref(db, 'users');
   const newUserRef = push(userListRef);
   set(newUserRef, {
     email: email,
-    username: username,
     firstName: firstName,
     lastName: lastName,
     profileDescription: profileDescription,
@@ -758,10 +757,9 @@ const isGroupOwner = function isGroupOwner(userId, groupId) {
  * @param {*} notificationSetting 
  * @returns the id of the updated user
  */
-const updateUser = (id, username, firstName, lastName, profileDescription, notificationSetting = "") => {
+const updateUser = (id, firstName, lastName, profileDescription, notificationSetting = "") => {
   const userListRef = ref(db, 'users/' + id);
   update(userListRef, {
-    username: username,
     firstName: firstName,
     lastName: lastName,
     profileDescription: profileDescription,
