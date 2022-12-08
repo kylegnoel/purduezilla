@@ -1,3 +1,6 @@
+import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+
 import {
   Avatar,
   Box,
@@ -12,12 +15,23 @@ import {
 import apiFunctions from '../firebase/api';
 
 export const AccountProfile = (props) => {
-  const account = apiFunctions.useFirebaseAuth();
+  const { id } = useParams();
 
-  const user = {
-    avatar: '',
-    name: account.info.firstName,
-  };
+  const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState('');
+  
+  useEffect(() => {
+    // console.log("reload");
+    fetchData();
+  }, []);
+
+  const fetchData = async (event) => {
+    console.log("loading: " + id)
+    const userTemp = (await apiFunctions.getObjectById("users", id))[0];
+    console.log(JSON.stringify(userTemp))
+    console.log("hello")
+    setName(userTemp[1].firstName)
+  }
   
   return (
   <Card {...props}>
@@ -30,7 +44,7 @@ export const AccountProfile = (props) => {
         }}
       >
         <Avatar
-          src={user.avatar}
+          src={avatar}
           sx={{
             height: 64,
             mb: 2,
@@ -42,7 +56,7 @@ export const AccountProfile = (props) => {
           gutterBottom
           variant="h5"
         >
-          {user.name}
+          {name}
         </Typography>
       </Box>
     </CardContent>
