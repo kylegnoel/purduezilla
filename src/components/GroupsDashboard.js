@@ -38,7 +38,7 @@ export default function GroupsDashboard() {
     const handleTask = (event) => {
         console.log(event.currentTarget.id)
         if (event.currentTarget.id === "addgroup") {
-            window.location.href = '/newgroup/';
+            window.location.href='/newgroup/';
             // navigate('/newgroup/');
         }
         if (event.currentTarget.id === "addproject") {
@@ -48,7 +48,7 @@ export default function GroupsDashboard() {
         else {
             // console.log("eventid: " + event.currentTarget.id)
             //window.location.href='/group/'+event.currentTarget.id;
-            navigate('/group/' + event.currentTarget.id);
+            navigate('/group/'+event.currentTarget.id);
         }
     }
 
@@ -59,8 +59,8 @@ export default function GroupsDashboard() {
             //console.log("groupsTemp: " + groupsTemp)
             onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
                 const groupTemp = []
-
-                snapshot.forEach(function (child) {
+    
+                snapshot.forEach(function(child) {
                     // console.log("group name: " + child.val().name)
                     groupTemp.push([child.val(), child.key])
                 })
@@ -82,34 +82,31 @@ export default function GroupsDashboard() {
                 <Container component="main">
                     <br></br>
                     <h2>My Groups</h2>
-                    <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                    <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={50} sm={12}>
-                                <FixedSizeList sx={{
-                                    border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
-                                    flexDirection: "column",
-                                }} height={400}>
-                                    {groupList && groupList.length !== 0 ? groupList.map((data) => {
-                                        return (
+                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
+        flexDirection:"column",}} height={400}>
+                                        { groupList && groupList.length !== 0 ? groupList.map((data) => {
+                                            return (
                                             <div key={data[1]}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%' }}>
+                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
-                                                            <GroupsIcon color="grey" />
+                                                            <GroupsIcon color="grey"/>
                                                         </ListItemAvatar>
-                                                        <ListItemText primary={data[0].name} />
+                                                        <ListItemText primary={data[0].name}/>
                                                     </ListItem>
                                                 </Button>
                                                 <Divider />
-                                            </div>
-                                        )
-                                    }) : "You aren't in any groups!"}
-                                    <Button onClick={handleTask} id={"addgroup"} sx={{ height: '80%', width: '100%' }}>
+                                            </div>   
+                                        )}): "You aren't in any groups!" }
+                                        <Button onClick={handleTask} id={"addgroup"} sx={{ height: '80%', width: '100%'}}>
                                         <ListItem>
                                             <ListItemAvatar>
-                                                <AddIcon color="grey" />
+                                                <AddIcon color="grey"/>
                                             </ListItemAvatar>
-                                            <ListItemText primary={"Create New Group"} />
+                                            <ListItemText primary={"Create New Group"}/>
                                         </ListItem>
                                     </Button>
                                 </FixedSizeList>
