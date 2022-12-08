@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import {useParams} from 'react-router-dom'; 
-
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -16,34 +14,22 @@ import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
-const Login = () => {
-    const {id} = useParams();
+const ResetPassword = () => {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        let signInAttept = await apiFunctions.trySignInAccount(email, password)
-
-        if (signInAttept.status) {
-        navigateToDashboard()
-        } else {
-        // perform error UI like highlighting textfield to red
-        alert(signInAttept.msg + "\ninvalid login\n TODO: perform error UI")
-        }
+        apiFunctions.sendUserPasswordResetEmail(email);
+        navigateToConfirmation();
     };
 
     const handleEmailChange = event => {
         setEmail(event.target.value)
     }
 
-    const handlePasswordChange = event => {
-        setPassword(event.target.value)
-    }
-
-    const navigateToDashboard = () => {
-        navigate('/home');
+    const navigateToConfirmation = () => {
+        navigate('/passwordResetEmailSent');
     }
 
     return (
@@ -72,42 +58,14 @@ const Login = () => {
                 onChange={handleEmailChange}
                 autoFocus
                 />
-                <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                value={password}
-                onChange={handlePasswordChange}
-                autoComplete="current-password"
-                />
-                <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-                />
                 <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 >
-                Sign In
+                Submit
                 </Button>
-                <Grid container>
-                <Grid item xs>
-                    <Link href="/passwordReset" variant="body2">
-                    Forgot password?
-                    </Link>
-                </Grid>
-                <Grid item>
-                    <Link href="/register" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                    </Link>
-                </Grid>
-                </Grid>
             </Box>
             </Box>
         </Container>
@@ -117,4 +75,4 @@ const Login = () => {
 
 
 
-export default Login;
+export default ResetPassword;
