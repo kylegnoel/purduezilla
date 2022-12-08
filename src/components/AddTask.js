@@ -97,15 +97,25 @@ export default function AddTask() {
         event.preventDefault()
         // console.log("submitted")
 
+        // convert follower names into userid 
+        const membersTemp = []
+        selected.forEach(function (selectedTemp) {
+            userList.forEach(function(userTemp) {
+                if (selectedTemp === userTemp[0].firstName + " " + userTemp[0].lastName) {
+                    membersTemp.push (userTemp[1])
+                }
+            })
+        })
+
         let createNewTask = await apiFunctions.createNewTask(
             apiFunctions.getProjectById(project)[0], // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime
             label, // status
-            apiFunctions.getUserById(owner)[0], // permiteedUserIds
             owner, // ownerIds
             assignee, // assignedUserIds
+            membersTemp,
         )
 
         if (createNewTask) {
@@ -174,6 +184,7 @@ export default function AddTask() {
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
+                <h2>Editing Task</h2>
                 <Button variant="outlined" onClick={handleClickOpen} sx={{
                     marginTop: 8,
                     marginBottom: 0,
