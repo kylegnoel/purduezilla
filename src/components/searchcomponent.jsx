@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button, Box } from '@mui/material';
-
-import TextField from '@mui/material';
+import TextField from '@mui/material/TextField';
 import apiFunctions from '../firebase/api';
 
 const SearchComponent = () => {
