@@ -4,7 +4,7 @@ import React from 'react';
 import NavBar from '../components/NavBar';
 import SearchComponent from '../components/searchcomponent';
 
-const Storyboard = () => {
+const SearchPage = () => {
 
     return (
         <div>
@@ -16,4 +16,4 @@ const Storyboard = () => {
 
 
 
-export default Storyboard;
+export default SearchPage;

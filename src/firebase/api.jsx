@@ -903,6 +903,7 @@ const updateProjectDetails = (id, name, description, status, userId) => {
 const updateTaskDetails = (id, name, description, estimatedTime, status, userId) => {
 
   const taskListRef = ref(db, 'tasks/' + id);
+  //TODO make notification upon completion to owner
 
   get(taskListRef).then((snapshot) => {
     if (name != snapshot.val().name) {

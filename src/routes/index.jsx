@@ -16,6 +16,7 @@ import AddTaskPage from '../pages/AddTaskPage';
 import NewGroup from '../pages/NewGroup';
 import Groups from '../pages/Groups';
 import Storyboard from '../pages/Storyboard';
+import SearchPage from '../pages/SearchPage';
 import DashboardTour from '../pages/DashboardWithTour';
 
 const Routing = props => {
@@ -41,6 +42,7 @@ const Routing = props => {
                 <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask/:id" element={<AddTaskPage />} />
                 <Route exact path="/homeTour" element={<DashboardTour />} />
+                <Route exact path="/searchPage" element={<SearchPage></SearchPage>} />
             </Routes>
         </Router>
     );
