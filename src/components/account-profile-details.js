@@ -20,9 +20,13 @@ import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
 
+
+
+
 export const AccountProfileDetails = (props) => {
   const user = apiFunctions.useFirebaseAuth();
   const [groupList, setGroupList] = useState([]);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDesc] = useState('');
@@ -30,6 +34,7 @@ export const AccountProfileDetails = (props) => {
   const [viewOnly, setViewOnly] = useState(0);
 
   const { id } = useParams();
+
 
   useEffect(() => {
     console.log("reload")
@@ -188,7 +193,7 @@ const handleTask = (event) => {
         />
         <FixedSizeList sx={{maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                        { groupList && groupList.length !== 0 ? groupList.map((data) => {
+                                        { groupList && groupList.length != 0 ? groupList.map((data) => {
                                             return (
                                             <div key={data[1]}>
                                                 <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>

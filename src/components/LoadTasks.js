@@ -56,6 +56,19 @@ export default function LoadTasks() {
         setOpen(false);
     };
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        // console.log({
+        //     email: data.get('taskName'),
+        //     password: data.get('label'),
+        //     project: data.get('projectLabel'),
+        //     description: data.get('taskDescription'),
+        //     owner: data.get('ownerSelect'),
+        //     assign: data.get('assignSelect'),
+        // });
+    };
+
     const [taskListarr, setTaskListArr] = useState([]);
     // const taskListarr = []
     const [isLoading, setLoading] = useState(true);
@@ -65,7 +78,7 @@ export default function LoadTasks() {
         fetchData()
     }, []);
 
-    const fetchData = () => {
+    const fetchData = (event) => {
         // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
@@ -148,7 +161,7 @@ export default function LoadTasks() {
 
                     <Dialog open={open} onClose={handleClose}>
                         <DialogContent>
-                            <Box component="form" sx={{ mt: 3 }}>
+                            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                                 <DialogTitle align='center'
                                     sx={{
                                         marginTop: 0,
