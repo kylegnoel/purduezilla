@@ -474,4 +474,3 @@ test("Correctly deletes a task", () => {
     expect(retrievedTask).toMatch(inputTask);
   });
 });
-
