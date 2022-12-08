@@ -20,10 +20,12 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
+import CommentBox from "../comments";
 import '../App.css';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { WindowSharp } from '@mui/icons-material';
 
 
 export default function ViewTask() {
@@ -55,7 +57,7 @@ export default function ViewTask() {
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
-    
+
     const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
@@ -109,10 +111,10 @@ export default function ViewTask() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            window.location.href='/task/'+event.currentTarget.id
+            window.location.href = '/task/' + event.currentTarget.id
         }
         else {
-            window.location.href='/newtask/'
+            window.location.href = '/newtask/'
         }
     }
 
@@ -143,7 +145,7 @@ export default function ViewTask() {
             setAssignedToMe(true)
             if (addTaskAssignedUsers) {
                 alert("Assigned to Me!");
-            } 
+            }
         } else {
             // assigned to me, remove designation
             let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
@@ -157,9 +159,19 @@ export default function ViewTask() {
                 alert("Task Assignee Removed!");
             }
         }
-        
+
     }
-    
+
+    const deleteComment = (commentKey) => {
+        apiFunctions.deleteTaskComment(commentKey, id);
+        window.location.reload();
+    }
+
+    const updateComment = (authorKey, authorName, commentKey, body) => {
+        apiFunctions.updateTaskComment(commentKey, body, authorKey, authorName, id);
+        window.location.reload();
+    }
+
     const handleShowFollow = (event) => {
         setFollow(!showFollow)
     }
@@ -190,13 +202,13 @@ export default function ViewTask() {
             else {
                 alert("Task Marked As In Progress!");
             }
-        }   
+        }
     }
 
 
     const handleSubmit = async (event) => {
         //event.preventDefault()
-        
+
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
             newProject, // projectId 
@@ -256,7 +268,7 @@ export default function ViewTask() {
                 setDesc(curTask[1].description)
                 setHour(curTask[1].estimatedTime)
                 setLabel(curTask[1].status)
-                
+
                 // set parent project name
                 const parentProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
                 console.log("parentProject: " + JSON.stringify(parentProject))
@@ -279,17 +291,17 @@ export default function ViewTask() {
                     const assignee = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                 }
-    
+
                 //fetch comments as well
                 const settingComments = apiFunctions.getTaskComments(id);
                 setComments(settingComments);
             }
             catch {
                 // if there is no internet
-            }    
+            }
 
         }
-        
+
         // projects
         const projectTemp = await apiFunctions.getProjectById("")
         setProjectList(projectTemp)
@@ -305,7 +317,7 @@ export default function ViewTask() {
         <div>
             <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="sm">
-                    <Box component="form" Validate sx={{ mt: 3 }}>      
+                    <Box component="form" Validate sx={{ mt: 3 }}>
                         <Box
                             sx={{
                                 display: 'flex',
@@ -405,15 +417,15 @@ export default function ViewTask() {
                                 <Divider>ASSIGN</Divider>
                                 <Grid container spacing={2}>
                                     <Grid item xs={8}>
-                                    <Button onClick={handleClick} fullWidth>
-                                        <TextField
-                                            autoComplete="given-name"
-                                            name="assign"
-                                            fullWidth
-                                            id="assign"
-                                            value={assignee}
-                                            disabled
-                                        />
+                                        <Button onClick={handleClick} fullWidth>
+                                            <TextField
+                                                autoComplete="given-name"
+                                                name="assign"
+                                                fullWidth
+                                                id="assign"
+                                                value={assignee}
+                                                disabled
+                                            />
                                         </Button>
                                     </Grid>
                                     <Grid item xs={4}>
@@ -421,10 +433,10 @@ export default function ViewTask() {
                                             onClick={assignToMe}
                                             variant="outlined"
                                             fullWidth
-                                            startIcon={assignedToMe ? <ClearIcon/> : <CheckIcon />}
+                                            startIcon={assignedToMe ? <ClearIcon /> : <CheckIcon />}
                                             sx={{ mt: 1, mb: 2, height: '55px' }}
-                                            >
-                                        <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b> 
+                                        >
+                                            <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b>
                                         </Button>
                                     </Grid>
                                 </Grid>
@@ -443,10 +455,17 @@ export default function ViewTask() {
                             }}
                         >
                             {comments.map((comment) => (
-                                < div >
-                                    <p> author key: {comment.author}</p>
-                                    <p>body: {comment.body}</p>
-                                </div>
+                                <CommentBox
+                                    infoObject={{
+                                        ownComment: user.key === comment[0].author,
+                                        authorKey: comment[0].author,
+                                        authorName: comment[0].firstName,
+                                        body: comment[0].body,
+                                        commentKey: comment[1],
+                                    }}
+                                    handleCommentDelete={deleteComment}
+                                    handleCommentUpdate={updateComment}
+                                ></CommentBox>
                             ))}
 
 
@@ -480,3 +499,20 @@ export default function ViewTask() {
     );
 
 }
+
+
+/*
+{comments.map((comment) => (
+                                        <CommentBox
+                                            infoObject={{
+                                                ownComment: user.key === comment[0].author,
+                                                authorKey: comment[0].author,
+                                                authorName: comment[0].firstName,
+                                                body: comment[0].body,
+                                                commentKey: comment[1],
+                                            }}
+                                            handleCommentDelete={deleteComment}
+                                            handleCommentUpdate={updateComment}
+                                        ></CommentBox>
+                                    ))}
+*/
