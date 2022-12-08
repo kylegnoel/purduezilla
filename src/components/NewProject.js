@@ -85,12 +85,13 @@ export default function NewProject() {
                 ownersTemp.push (userTemp[1])
             }
         })
+        console.log("owners: " + ownersTemp)
 
         console.log("members: " + memberId)
         let createNewProject = await apiFunctions.createNewProject(
             name, description, group, memberId, ownersTemp)
 
-        navigate('/myprojects')
+        //navigate('/myprojects')
         if (createNewProject) {
             
         } else {

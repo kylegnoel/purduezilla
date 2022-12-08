@@ -234,7 +234,7 @@ export default function EditTask() {
                 setLabel(curTask[1].status)
                 setSelectedFollower(curTask[1].followers)
 
-                const curProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
+                const curProject = (await apiFunctions.getObjectById("projects", curTask[1].projectId))[0]
                 console.log(JSON.stringify(curProject))
                 setProject(curProject[1].name)
 
@@ -259,12 +259,12 @@ export default function EditTask() {
         }
     
         // projects
-        const projectTemp = await apiFunctions.getProjectById("")
+        const projectTemp = await apiFunctions.getObjectById("projects", "")
         console.log("projectTemp: " + JSON.stringify(projectTemp))
         setProjectList(projectTemp)
 
         // users
-        const userTemp = await apiFunctions.getUserById("")
+        const userTemp = await apiFunctions.getObjectById("users", "")
         setUserList(userTemp)
 
         setLoading(false)

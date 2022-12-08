@@ -89,13 +89,13 @@ export default function AddTaskPage() {
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
-            followerId.push(follower[0])
+            followerId.push(follower[0][0])
         })
         // console.log("followers: " + followerId)
 
-        const projVar = await apiFunctions.getProjectById(project)[1]
+        const projVar = await apiFunctions.getObjectById("projects", project)[1]
         console.log("projVar: " + projVar + " " + project)
-        const ownerVar = await apiFunctions.getUserById(owner)
+        const ownerVar = await apiFunctions.getObjectById("users",owner)
         console.log("ownerVar: " + ownerVar + " " + owner)
 
         let createNewTask = await apiFunctions.createNewTask(
@@ -121,12 +121,12 @@ export default function AddTaskPage() {
 
     const fetchData = async() => {
         // projects
-        const projectTemp = (await apiFunctions.getProjectById(""))
+        const projectTemp = (await apiFunctions.getObjectById("projects",""))
         console.log("projectTemp: " + JSON.stringify(projectTemp))
         setProjectList(projectTemp)
 
         // users
-        const userTemp = (await apiFunctions.getUserById(""))
+        const userTemp = (await apiFunctions.getObjectById("users",""))
         console.log("userTemp: " + JSON.stringify(userTemp))
         setUserList(userTemp)
     }

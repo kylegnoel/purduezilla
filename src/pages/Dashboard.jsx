@@ -58,7 +58,7 @@ const Dashboard = () => {
         const settingProjects = apiFunctions.getUsersProjects(user.key);
         await setProjListArr(settingProjects);
 
-        const settingTasks = apiFunctions.getUsersAssignedTasks(user.key);
+        const settingTasks = await apiFunctions.getUsersAssignedTasks(user.key);
         await setTaskListArr(settingTasks);
 
         setLoading(false)

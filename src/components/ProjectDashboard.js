@@ -22,7 +22,7 @@ const theme = createTheme();
 
 export default function ProjectDashboard() {
     const { id } = useParams();
-    const [projListarr, setProjListArr] = useState([]);
+    const [projListarr1, setProjListArr] = useState([]);
     // const taskListarr = []
 
     const [isLoading, setLoading] = useState(true);
@@ -45,12 +45,8 @@ export default function ProjectDashboard() {
     }
 
     const fetchData = async () => {
-        // console.log("hello")
-        // Update the document title using the browser API
-        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // // console.log("response: " + response)
+        setProjListArr([])
         const projectTemp = (await apiFunctions.getUsersProjects(user.key));
-        console.log("value: " + JSON.stringify(projectTemp))
         setProjListArr(projectTemp)
         
         // console.log("taskListarr: " + projListarr.length)
@@ -65,7 +61,7 @@ export default function ProjectDashboard() {
                             <Grid item xs={50} sm={12} lg={'50%'}>
                                 <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
         flexDirection:"column",}} height={400}>
-                                    { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
+                                    { projListarr1 && projListarr1.length !== 0 ? projListarr1.map((data) => {
                                             return (  
                                             <div key={data[1]}>
                                             <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>

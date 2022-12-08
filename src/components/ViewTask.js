@@ -258,17 +258,17 @@ export default function ViewTask() {
                 setLabel(curTask[1].status)
                 
                 // set parent project name
-                const parentProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
+                const parentProject = (await apiFunctions.getObjectById("projects",curTask[1].projectId))[0]
                 console.log("parentProject: " + JSON.stringify(parentProject))
                 setProject(parentProject[1].name)
                 // set owner field
-                const ownerTemp = (await apiFunctions.getUserById(curTask[1].ownerId))[0]
+                const ownerTemp = (await apiFunctions.getObjectById("users",curTask[1].ownerId))[0]
                 setOwner(ownerTemp[1].firstName + " " + ownerTemp[1].lastName)
                 // set assignee field
 
                 if (curTask[1].assignedUserId === user.key) {
                     console.log("currently assigned to me")
-                    const assignee = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
+                    const assignee = (await apiFunctions.getObjectById("users",curTask[1].assignedUserId))[0]
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                     setAssignedToMe(true);
                 }
@@ -276,7 +276,7 @@ export default function ViewTask() {
                     setAssign("Task Not Assigned To Anyone")
                 }
                 else {
-                    const assignee = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
+                    const assignee = (await apiFunctions.getObjectById("users",curTask[1].assignedUserId))[0]
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                 }
     
@@ -291,11 +291,11 @@ export default function ViewTask() {
         }
         
         // projects
-        const projectTemp = await apiFunctions.getProjectById("")
+        const projectTemp = await apiFunctions.getObjectById("projects","")
         setProjectList(projectTemp)
 
         // users
-        const userTemp = await apiFunctions.getUserById("")
+        const userTemp = await apiFunctions.getObjectById("users","")
         setUserList(userTemp)
 
         return true;
