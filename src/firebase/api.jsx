@@ -289,7 +289,7 @@ const addTaskToProject = (projectId, taskId) => {
 
 // Create new task
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
-const createNewTask = function createNewTask(name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
+const createNewTask = function createNewTask(project, name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
 
   // Create basic task
   const taskListRef = ref(db, 'tasks');
@@ -302,6 +302,7 @@ const createNewTask = function createNewTask(name, description, estimatedTime, s
     assignedUserId: assignedUserId,
     ownerId: ownerId,
     status: status,
+    projectId: project,
   });
 
   // Add follower user Id's
