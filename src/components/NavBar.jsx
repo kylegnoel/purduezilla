@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Link, useNavigate, useParams } from "react-router-dom";
 import apiFunctions from '../firebase/api';
 
 import AppBar from '@mui/material/AppBar';
@@ -11,9 +11,11 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { ref, onValue } from "firebase/database";
 
 const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -42,9 +44,9 @@ const ResponsiveAppBar = () => {
 
   const handleButtonClick = (setting) => {
     setAnchorElUser(null);
-    if (setting === 'Profile') {
+    if (setting == 'Profile') {
       navigate('/profile/' + user.key);
-    } else if (setting === 'Logout') {
+    } else if (setting == 'Logout') {
       apiFunctions.signOutAccount();
       navigate('/');
     }
@@ -73,12 +75,11 @@ const ResponsiveAppBar = () => {
               color: 'inherit',
               textDecoration: 'none',
             }}
-            className='first-step'
           >
             PURDUEZILLA
           </Typography>
 
-          <a href='/home'><img alt-text="purdueZilla logo" src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }} /></a>
+          <a href='/home'><img src={process.env.PUBLIC_URL + "/no_text_logo.png"} style={{ height: 60, }} /></a>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -136,7 +137,7 @@ const ResponsiveAppBar = () => {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} className="second-step">
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <MenuItem component={Link} to="/mygroups"><h1>
                 <Typography textAlign="center">My Groups</Typography></h1>
             </MenuItem>
@@ -150,7 +151,7 @@ const ResponsiveAppBar = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton className="third-step" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar></Avatar>
               {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
               </IconButton>
