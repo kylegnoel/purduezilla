@@ -45,11 +45,11 @@ const Dashboard = () => {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            window.location.href='/project/'+event.currentTarget.id;
+            window.location.href = '/project/' + event.currentTarget.id;
             //window.location.reload()
         }
         else {
-            window.location.href='/newtask/';
+            window.location.href = '/newtask/';
         }
     }
 
@@ -71,7 +71,7 @@ const Dashboard = () => {
             if (user != null) {
                 // console.log("ran user not null");
                 // console.log(user);
-                let returnedComment = apiFunctions.getTaggedComments(user.user.key);
+                let returnedComment = apiFunctions.getTaggedComments(user.key);
                 setComments(returnedComment);
                 console.log(returnedComment);
             }
@@ -85,51 +85,51 @@ const Dashboard = () => {
             <button onClick={() => setIsOpen(true)} id="start-tour" hidden>Open Tour</button>
             <NavBar></NavBar>
             <div class="flex-container">
-<div style={{marginBottom: '-16px'}}class="flex-child">
-                <Typography
-                variant="h5"
-                maxWidth={'9em'}
-                marginBottom='-16px'
-                marginLeft='24px'
-                marginTop='24px'
-                noWrap
-                href=""
-                sx={{
-                mr: 2,
-                textAlign: 'center',
-                display: { xs: 'flex'},
-                flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                color: 'inherit',
-                textDecoration: 'none',
-                }}
-                >
-            Historical Feed
-          </Typography>
+                <div style={{ marginBottom: '-16px' }} class="flex-child">
+                    <Typography
+                        variant="h5"
+                        maxWidth={'9em'}
+                        marginBottom='-16px'
+                        marginLeft='24px'
+                        marginTop='24px'
+                        noWrap
+                        href=""
+                        sx={{
+                            mr: 2,
+                            textAlign: 'center',
+                            display: { xs: 'flex' },
+                            flexGrow: 1,
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            color: 'inherit',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Historical Feed
+                    </Typography>
                 </div>
-                <div style={{marginBottom: '-16px'}}class="flex-child">
-                <Typography
-                variant="h5"
-                maxWidth={'9em'}
-                marginBottom='-16px'
-                marginLeft='24px'
-                marginTop='24px'
-                noWrap
-                href=""
-                sx={{
-                mr: 2,
-                textAlign: 'center',
-                display: { xs: 'flex'},
-                flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                color: 'inherit',
-                textDecoration: 'none',
-                }}
-                >
-            Followed Tasks Feed
-          </Typography>
+                <div style={{ marginBottom: '-16px' }} class="flex-child">
+                    <Typography
+                        variant="h5"
+                        maxWidth={'9em'}
+                        marginBottom='-16px'
+                        marginLeft='24px'
+                        marginTop='24px'
+                        noWrap
+                        href=""
+                        sx={{
+                            mr: 2,
+                            textAlign: 'center',
+                            display: { xs: 'flex' },
+                            flexGrow: 1,
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            color: 'inherit',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Followed Tasks Feed
+                    </Typography>
                 </div>
             </div>
 
@@ -139,100 +139,103 @@ const Dashboard = () => {
                     <History></History>
                 </div>
                 <div class="flex-child">
-                <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="lg">
-                <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={50} sm={12} >
-                            <FixedSizeList sx={{
-                                border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
-                                flexDirection: "column",
-                            }} height={400}>
-                                {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
-                                    return (
-                                        <div key={data.projectId}>
-                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
-                                                <ListItem>
-                                                    <ListItemAvatar>
-                                                        <TaskIcon color="grey" />
-                                                    </ListItemAvatar>
-                                                    <ListItemText primary={data[1].name} secondary={data[1].description} />
-                                                </ListItem>
-                                            </Button>
-                                            <Divider />
-                                        </div>
-                                    )
-                                }) : "There are no tasks!"}
-                                <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <AddIcon color="grey" />
-                                        </ListItemAvatar>
-                                        <ListItemText primary={"Add Task"} />
-                                    </ListItem>
-                                </Button>
-                            </FixedSizeList>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Container>
-        </ThemeProvider>
-        <Typography
-        variant="h5"
-        maxWidth={'9em'}
-        marginBottom='-16px'
-        marginLeft='24px'
-        marginTop='24px'
-        noWrap
-        href=""
-        sx={{
-        mr: 2,
-        textAlign: 'center',
-        display: { xs: 'flex'},
-        flexGrow: 1,
-        fontFamily: 'monospace',
-        fontWeight: 700,
-        color: 'inherit',
-        textDecoration: 'none',
-        }}
-        >
-            Projects Feed
-          </Typography>
                     <ThemeProvider theme={theme}>
-                    <Container component="main" maxWidth="lg">
-                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                            <Grid container spacing={2} alignItems="center">
-                                <Grid item xs={50} sm={12}>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:400, overflowY:'auto',flexGrow: 1,
-            flexDirection:"column",}} height={400}>
-                                        { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
-                                                return (  
-                                                <div key={data[1]}>
-                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <WorkIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[1].name} secondary="Content was changed"/>
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "There are no Projects!" }
-                                        <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
+                        <Container component="main" maxWidth="lg">
+                            <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={50} sm={12} >
+                                        <FixedSizeList sx={{
+                                            border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                            flexDirection: "column",
+                                        }} height={400}>
+                                            {taskListarr && taskListarr.length !== 0 ? taskListarr.map((data) => {
+                                                return (
+                                                    <div key={data.projectId}>
+                                                        <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                                            <ListItem>
+                                                                <ListItemAvatar>
+                                                                    <TaskIcon color="grey" />
+                                                                </ListItemAvatar>
+                                                                <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                                            </ListItem>
+                                                        </Button>
+                                                        <Divider />
+                                                    </div>
+                                                )
+                                            }) : "There are no tasks!"}
+                                            <Button onClick={handleTask} id={"addtask"} sx={{ height: '80%', width: '100%' }}>
                                                 <ListItem>
                                                     <ListItemAvatar>
-                                                        <AddIcon color="grey"/>
+                                                        <AddIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={"Add Project"}/>
+                                                    <ListItemText primary={"Add Task"} />
                                                 </ListItem>
                                             </Button>
-                                    </FixedSizeList>
+                                        </FixedSizeList>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Box>
-                    </Container>
-                </ThemeProvider>
+                            </Box>
+                        </Container>
+                    </ThemeProvider>
+                    <Typography
+                        variant="h5"
+                        maxWidth={'9em'}
+                        marginBottom='-16px'
+                        marginLeft='24px'
+                        marginTop='24px'
+                        noWrap
+                        href=""
+                        sx={{
+                            mr: 2,
+                            textAlign: 'center',
+                            display: { xs: 'flex' },
+                            flexGrow: 1,
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            color: 'inherit',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Projects Feed
+                    </Typography>
+                    <ThemeProvider theme={theme}>
+                        <Container component="main" maxWidth="lg">
+                            <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={50} sm={12}>
+                                        <FixedSizeList sx={{
+                                            border: 1, borderColor: 'black', maxHeight: 400, overflowY: 'auto', flexGrow: 1,
+                                            flexDirection: "column",
+                                        }} height={400}>
+                                            {projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
+                                                return (
+                                                    <div key={data[1]}>
+                                                        <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                                            <ListItem>
+                                                                <ListItemAvatar>
+                                                                    <WorkIcon color="grey" />
+                                                                </ListItemAvatar>
+                                                                <ListItemText primary={data[1].name} secondary="Content was changed" />
+                                                            </ListItem>
+                                                        </Button>
+                                                        <Divider />
+                                                    </div>
+                                                )
+                                            }) : "There are no Projects!"}
+                                            <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%' }}>
+                                                <ListItem>
+                                                    <ListItemAvatar>
+                                                        <AddIcon color="grey" />
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={"Add Project"} />
+                                                </ListItem>
+                                            </Button>
+                                        </FixedSizeList>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Container>
+                    </ThemeProvider>
                 </div>
             </div>
             <div>

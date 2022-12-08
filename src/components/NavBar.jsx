@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiFunctions from '../firebase/api';
 
@@ -28,6 +28,18 @@ const ResponsiveAppBar = () => {
   const [anchorNotif, setAnchorNotif] = React.useState(null);
 
   const navigate = useNavigate();
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+  const fetchData = () => {
+    console.log(user);
+    console.log(user.key);
+    const notifs = apiFunctions.getNotifications(user.key);
+    // console.log("getting notifications");
+    setNotifications(notifs);
+  }
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -177,12 +189,9 @@ const ResponsiveAppBar = () => {
                 open={Boolean(anchorNotif)}
                 onClose={handleCloseNotif}
               >
-                <IconButton> <MenuIcon /></IconButton>
-                <MenuItem>notif</MenuItem>
-                <MenuItem>notif</MenuItem>
-                <MenuItem>notif</MenuItem>
-                <MenuItem>notif</MenuItem>
-                <MenuItem>notif</MenuItem>
+                <IconButton onClick={() => { setNotifications([]); apiFunctions.deleteNotifications(user.key) }}> Clear Notifications <MenuIcon /></IconButton>
+                <NotificationsBox notifications={notifications}></NotificationsBox>
+
               </Menu>
             </div>
           </Box>
@@ -219,8 +228,8 @@ const ResponsiveAppBar = () => {
             </Menu>
           </Box>
         </Toolbar>
-      </Container>
-    </AppBar>
+      </Container >
+    </AppBar >
   );
 };
 export default ResponsiveAppBar;

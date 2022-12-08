@@ -24,7 +24,7 @@ const Routing = props => {
         <Router>
             <Routes>
                 <Route exact path="/" element={<Login />} />
-                <Route exact path="/home" element={<PrivateRoute exact path ="/home" redirectRoute="/" ><Dashboard /></PrivateRoute>} />
+                <Route exact path="/home" element={<PrivateRoute exact path="/home" redirectRoute="/" ><Dashboard /></PrivateRoute>} />
                 <Route exact path="/register" element={<Register />} />
                 <Route exact path="/myprojects" element={<PrivateRoute redirectRoute="/" ><Projects /></PrivateRoute>} />
                 <Route exact path="/newproject" element={<NewProject />} />
@@ -40,7 +40,7 @@ const Routing = props => {
                 <Route exact path="/newtask" element={<PrivateRoute redirectRoute="/" ><AddTaskPage /></PrivateRoute>} />
                 <Route exact path="/mytasks" element={<PrivateRoute redirectRoute="/" ><Task /></PrivateRoute>} />
                 <Route exact path="/newtask/:id" element={<AddTaskPage />} />
-                <Route exact path="/homeTour" element={<DashboardTour/>} />
+                <Route exact path="/homeTour" element={<DashboardTour />} />
             </Routes>
         </Router>
     );

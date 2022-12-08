@@ -130,18 +130,26 @@ const createNotification = function createNotification(targetKey, body, type, so
 
 
 const getNotifications = function getNotifications(userKey) {
+  // console.log("notifications?");
+  // console.log(userKey);
   const notifRef = ref(db, `users/${userKey}/notifications`);
   let returnedNotifs = [];
   onValue(notifRef, (snapshot) => {
     let child = snapshot.val();
-
+    // console.log(child);
     for (var key in child) {
-      // console.log("adding");
+      console.log("adding");
       returnedNotifs.push([child[key], key]);
     }
   }, { onlyOnce: true });
-  // console.log(returnedComments);
+  console.log(returnedNotifs);
   return returnedNotifs;
+}
+
+const deleteNotifications = function deleteNotifications(userKey) {
+  const notifRef = ref(db, `users/${userKey}/notifications`);
+  remove(notifRef);
+  // console.log("removed all notifications");
 }
 
 const createNewProjectComment = function createNewProjectComment(body, authorKey, projectKey, authorFirstName) {
@@ -179,7 +187,7 @@ const getProjectComments = function getProjectComments(projectKey) {
     let child = snapshot.val();
 
     for (var key in child) {
-      console.log("adding");
+      // console.log("adding");
       returnedComments.push([child[key], key]);
     }
   }, { onlyOnce: true });
@@ -257,6 +265,9 @@ const updateTaskComment = function updateTaskComment(commentKey, newBody, author
     body: newBody,
     firstName: authorFirstName,
   }
+  console.log(authorKey);
+  console.log(newBody);
+  console.log(authorFirstName);
   const updates = {}
   updates[`/tasks/${taskKey}/comments/${commentKey}`] = commentData
   update(ref(db), updates);
@@ -278,6 +289,7 @@ const getTaskComments = function getTaskComments(taskKey) {
   }, { onlyOnce: true });
   // console.log("finish getting nothing");
   // console.log(returnedTasks);
+  console.log(returnedTasks);
   return returnedTasks;
 
 }
@@ -1013,7 +1025,7 @@ const FirebaseAuthContext = React.createContext();
 const FireBaseDispatchContext = React.createContext();
 
 const FirebaseAuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState(initialState);
+  const [user, setUser] = React.useState(initialState.user);
   //const value = { user };
 
   React.useEffect(() => {
@@ -1131,7 +1143,7 @@ const apiFunctions = {
   app,
   FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,
   deleteProjectComment, updateProjectComment, deleteTaskComment,
-  updateTaskComment, getNotifications,
+  updateTaskComment, getNotifications, deleteNotifications,
   getTaskComments, getTaggedComments, createNewComment,
   createNewProjectComment, getProjectComments,
   auth

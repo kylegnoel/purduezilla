@@ -1,27 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Button, Box } from '@mui/material';
 
-// material ui imports
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 
-import apiFunctions from '../firebase/api';
 //style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate3d(-44.8px, 40.8px, 0px);"
 
-const NotificationsBox = (anchor, handleCloseNotif) => {
+const NotificationsBox = (notifications) => {
+    const navigate = useNavigate();
 
     return (
         /*
+        {notification[0].sourcePath}
+                    {notification[0].body}
+                    {notification[0].type}
+                    {notification[0].timeMade}
+                    {notification[1]}
         <div style={{
             color: "black",
             border: "1px",
@@ -39,29 +32,39 @@ const NotificationsBox = (anchor, handleCloseNotif) => {
             notif <br></br>
             notif <br></br>
         </div>
-        */
-        <Menu
-            sx={{ mt: '45px' }}
-            id="menu-appbar"
-            anchorEl={anchor}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={Boolean(anchor)}
-            onClose={handleCloseNotif}
-        >
-            <MenuItem>notif</MenuItem>
-            <MenuItem>notif</MenuItem>
-            <MenuItem>notif</MenuItem>
-            <MenuItem>notif</MenuItem>
-            <MenuItem>notif</MenuItem>
-        </Menu>
+        {comments.map((comment) => (
+                                <CommentBox
+                                    infoObject={{
+                                        ownComment: user.key === comment[0].author,
+                                        authorKey: comment[0].author,
+                                        authorName: comment[0].firstName,
+                                        body: comment[0].body,
+                                        commentKey: comment[1],
+                                    }}
+                                    handleCommentDelete={deleteComment}
+                                    handleCommentUpdate={updateComment}
+                                ></CommentBox>
+                            ))}
+            */
+        <div>
+
+            {notifications.notifications.map((notification) => (
+                <Box>
+                    <Button onClick={(e) => {
+                        e.preventDefault();
+                        if (notification[0].type == "task") {
+                            navigate(`/task/${notification[0].sourcePath}`);
+                        }
+                        else {
+                            console.log("navigate elsewhere");
+                        }
+                    }}>
+                        {notification[0].body}</Button>
+                    <p>{notification[0].timeMade}</p>
+                </Box>
+            ))}
+        </div>
+
     )
 }
 

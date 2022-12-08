@@ -18,44 +18,44 @@ export const AccountProfile = (props) => {
     avatar: '',
     name: account.info.firstName,
   };
-  
+
   return (
-  <Card {...props}>
-    <CardContent>
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <Avatar
-          src={user.avatar}
+    <Card {...props}>
+      <CardContent>
+        <Box
           sx={{
-            height: 64,
-            mb: 2,
-            width: 64
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'column'
           }}
-        />
-        <Typography
-          color="textPrimary"
-          gutterBottom
-          variant="h5"
         >
-          {user.name}
-        </Typography>
-      </Box>
-    </CardContent>
-    <Divider />
-    <CardActions>
-      <Button
-        color="primary"
-        fullWidth
-        variant="text"
-      >
-        Upload picture
-      </Button>
-    </CardActions>
-  </Card>
+          <Avatar
+            src={user.avatar}
+            sx={{
+              height: 64,
+              mb: 2,
+              width: 64
+            }}
+          />
+          <Typography
+            color="textPrimary"
+            gutterBottom
+            variant="h5"
+          >
+            {user.name}
+          </Typography>
+        </Box>
+      </CardContent>
+      <Divider />
+      <CardActions>
+        <Button
+          color="primary"
+          fullWidth
+          variant="text"
+        >
+          Upload picture
+        </Button>
+      </CardActions>
+    </Card>
   );
 };

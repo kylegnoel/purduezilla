@@ -20,7 +20,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
-import CommentBox from "../comments";
+import CommentBox from "./comments";
 import '../App.css';
 
 import apiFunctions from '../firebase/api';
@@ -235,10 +235,13 @@ export default function ViewTask() {
 
     const newCommentSubmit = (event) => {
         event.preventDefault();
-
+        // console.log("new comment");
+        console.log(user);
+        console.log("new comment submit");
         if (newCommentBody == '') {
             return;
         }
+        console.log("making new comment");
         let tagged = [];
         let splitComment = newCommentBody.split(" ");
         splitComment.forEach((word) => {
@@ -246,8 +249,9 @@ export default function ViewTask() {
                 tagged.push(word.substring(1));
             }
         });
+        console.log(tagged);
 
-        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
+        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged, user.info.firstName);
         // window.location.reload();
 
         setNewCommentBody("");
@@ -268,6 +272,13 @@ export default function ViewTask() {
                 setDesc(curTask[1].description)
                 setHour(curTask[1].estimatedTime)
                 setLabel(curTask[1].status)
+
+                console.log('fetching comments');
+                //fetch comments as well
+                const settingComments = apiFunctions.getTaskComments(id);
+                console.log(settingComments);
+
+                setComments(settingComments);
 
                 // set parent project name
                 const parentProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
@@ -292,12 +303,11 @@ export default function ViewTask() {
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                 }
 
-                //fetch comments as well
-                const settingComments = apiFunctions.getTaskComments(id);
-                setComments(settingComments);
+
             }
             catch {
                 // if there is no internet
+                console.log("something broke");
             }
 
         }

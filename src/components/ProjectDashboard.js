@@ -28,16 +28,17 @@ export default function ProjectDashboard() {
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const user = apiFunctions.useFirebaseAuth();
+    console.log(user);
+    console.log("in project dashboard")
 
 
     useEffect(() => {
-        console.log("reload")
         fetchData()
     }, []);
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addproject") {
-            navigate('/project/'+event.currentTarget.id);
+            navigate('/project/' + event.currentTarget.id);
         }
         else {
             navigate('/newproject/');
@@ -52,47 +53,50 @@ export default function ProjectDashboard() {
         const projectTemp = apiFunctions.getUsersProjects(user.key);
         console.log("value: " + JSON.stringify(projectTemp))
         setProjListArr(projectTemp)
-        
+
         // console.log("taskListarr: " + projListarr.length)
         return true;
     };
 
     return (
         <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="lg">
-                    <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={50} sm={12} lg={'50%'}>
-                                <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
-        flexDirection:"column",}} height={400}>
-                                    { projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
-                                            return (  
-                                            <div key={data[1]}>
-                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
+            <Container component="main" maxWidth="lg">
+                <Box sx={{ mt: 6 }} display="flex" style={{ textAlign: "center" }}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={50} sm={12} lg={'50%'}>
+                            <FixedSizeList sx={{
+                                border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                                flexDirection: "column",
+                            }} height={400}>
+                                {projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
+                                    return (
+                                        <div key={data[1]}>
+                                            <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
                                                 <ListItem>
                                                     <ListItemAvatar>
-                                                        <WorkIcon color="grey"/>
+                                                        <WorkIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[1].name} secondary="Content was changed"/>
+                                                    <ListItemText primary={data[1].name} secondary="Content was changed" />
                                                 </ListItem>
                                             </Button>
                                             <Divider />
-                                        </div>   
-                                        )}): "There are no Projects!" }
-                                    <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <AddIcon color="grey"/>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={"Add Project"}/>
-                                            </ListItem>
-                                        </Button>
-                                </FixedSizeList>
-                            </Grid>
+                                        </div>
+                                    )
+                                }) : "There are no Projects!"}
+                                <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%' }}>
+                                    <ListItem>
+                                        <ListItemAvatar>
+                                            <AddIcon color="grey" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={"Add Project"} />
+                                    </ListItem>
+                                </Button>
+                            </FixedSizeList>
                         </Grid>
-                    </Box>
-                </Container>
-            </ThemeProvider>
-        
+                    </Grid>
+                </Box>
+            </Container>
+        </ThemeProvider>
+
     );
 }
