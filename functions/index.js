@@ -42,12 +42,24 @@ exports.sendMail = functions.https.onRequest((req, res) => {
  *  This function will be uploaded to Google Cloud Function.
  *  It gets triggered whenever there is a new task being created.  
  */
-exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
+exports.sendMailToAddedTaskOwnersAndAssignedUsers = functions.database.ref('tasks/{taskId}')
         .onCreate((snapshot, context) => {
             const taskData = snapshot.val();
             const taskName = taskData.name;
-            console.log(taskName)
+            const auEmail = taskData.assignedUserId[1].email;
             const ownerId = taskData.ownerId;
+            
+            console.log('assigned user email: ' + auEmail);
+            // send email notif to au
+            transporter.sendMail(generaeteTaskAssignedUserNotificationEmail(auEmail, taskName), (error, info) => {
+                if (error) {
+                    console.log('messed up the assigned user email ' + error.toString());
+                } else {
+                    console.log('sent')
+                }
+            });
+
+            // send email notif to owner
             return admin.database().ref('users/' + ownerId).once('value', (ss) => {
                 const userInfo = ss.val();
                 transporter.sendMail(generateTaskOwnerNotificationEmail(userInfo.email, taskName), (error, info) => {
@@ -56,26 +68,26 @@ exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
                     } else {
                         console.log('sent');
                     }
-                })
+                });
             })
 })
 
-/*
- *  This function will be uploaded to Google Cloud Function.
- *  It gets triggered whenever there is a new task being created.  
- */
-exports.sendMailToAddedTaskAssignUser = functions.database.ref('tasks/{taskId}')
-        .onCreate((snapshot, context) => {
-            const taskData = snapshot.val();
-            const taskName = taskData.name;
-            const auid = taskData.assignedUsers;
-            return admin.database().ref('users/' + auid).once('value', (snapshot) => {
-                const userInfo = snapshot.val();
-                transporter.sendMail(generaeteTaskAssignedUserNotificationEmail(userInfo.email, taskName), (error, info) => {
-                    if (error) {
-                        console.log('you done messed up again ' + error.toString());
-                    } else 
-                        console.log('sent')
+
+exports.sendMailToNewGroupMember = functions.database.ref('groups/{groupId}/memberId/{memberId}')
+        .onCreate(snapshot => {
+            const memberId = snapshot.val();
+            const groupNameRef = snapshot.ref.parent.parent.child('name');            
+            console.log('group name: ' + groupNameRef);
+            groupNameRef.once('value', (data) => {
+                admin.database().ref('users/' + memberId).once('value', (ss) => {
+                    const userInfo = ss.val();
+                    transporter.sendMail(generateNewGroupMemberEmail(userInfo.email, data.val()), (error, info) => {
+                        if (error) {
+                            console.log('messed up' + error.toString());
+                        } else {
+                            console.log('sent');
+                        }
+                    });
                 })
             })
 
@@ -96,6 +108,15 @@ const generaeteTaskAssignedUserNotificationEmail = (dest, taskName) => {
         to: dest,
         subject: 'You are now assigned to do ' + taskName,
         html: 'Get working'
+    }
+}
+
+const generateNewGroupMemberEmail = (dest, groupName) => {
+    return {
+        from: 'PurdueZilla Team <purduezilla@gmail.com>',
+        to: dest,
+        subject: 'Welcome to ' + groupName,
+        html: 'better start contributing'
     }
 }
 
