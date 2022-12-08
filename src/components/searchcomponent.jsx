@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button, Box } from '@mui/material';
-import SearchBar from "material-ui-search-bar";
+
+import TextField from '@mui/material';
 import apiFunctions from '../firebase/api';
 
 const SearchComponent = () => {
@@ -36,7 +37,7 @@ const SearchComponent = () => {
 
     return (
         <div>
-            <SearchBar value={searchParam} onChange={(e) => setSearchParam(e.target.value)} />
+            <TextField value={searchParam} onChange={(e) => setSearchParam(e.target.value)} />
             <Button onClick={onSearch}>Search</Button>
             <br></br>
             <Button onClick={() => { swapTarget("Task") }}>Tasks</Button>
