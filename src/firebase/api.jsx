@@ -54,17 +54,25 @@ const createNewUser = function createNewUser(email, username, firstName, lastNam
 }
 
 // Create new group
-const createNewGroup = function createNewGroup(name, description, ownerIds, memberIds, viewerIds) {
+const createNewGroup = function createNewGroup(name, description, ownerId, memberIds, viewerIds) {
 
   const groupListRef = ref(db, 'groups');
   const newGroupRef = push(groupListRef);
   set(newGroupRef, {
     name: name,
     description, description,
-    ownerId: ownerIds,
-    memberId: memberIds,
-    viewerId: viewerIds,
+    ownerId: ownerId,
   });
+
+  // Add member user Id's
+  for (const i in memberIds) {
+    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
+  }
+
+  // Add viewer user Id's
+  for (const i in viewerIds) {
+    addNewViewerToGroup(newGroupRef.key, viewerIds[i]);
+  }
 
   return newGroupRef.key;
 }
@@ -80,7 +88,15 @@ const addNewMemberToGroup = function addNewMemberToGroup(groupKey, userId) {
   const membersListRef = ref(db, 'groups/' + groupKey + '/members');
   const userRef = push(membersListRef);
   set(userRef, {
-    userId: userId
+    memberId: userId
+  });
+}
+
+const addNewViewerToGroup = function addNewViewerToGroup(groupKey, userId) {
+  const membersListRef = ref(db, 'groups/' + groupKey + '/viewers');
+  const userRef = push(membersListRef);
+  set(userRef, {
+    viewerId: userId
   });
 }
 
@@ -204,7 +220,7 @@ const getTaggedComments = function getTaggedComments(userKey) {
 
 // Create new project
 // To get all tasks associated with project, query 'tasks' by project id
-const createNewProject = function createNewProject(name, description, groupId, memberIds, ownerIds) {
+const createNewProject = function createNewProject(name, description, memberIds, ownerId, viewerIds) {
 
   const projectListRef = ref(db, 'projects');
   const newProjectRef = push(projectListRef);
@@ -212,21 +228,18 @@ const createNewProject = function createNewProject(name, description, groupId, m
     name: name,
     description: description,
     creationDate: new Date(),
+    ownerId: ownerId,
     status: "Active"
   });
-
-  if (groupId !== "") {
-    addNewProjectToGroup(groupId, newProjectRef.key, name)
-  }
-
-  // Add owner user Id's
-  for (const i in ownerIds) {
-    addProjectOwner(newProjectRef.key, ownerIds[i])
-  }
 
   // Add member user Id's
   for (const i in memberIds) {
     addProjectMember(newProjectRef.key, memberIds[i]);
+  }
+
+  // Add viewer user Id's
+  for (const i in viewerIds) {
+    addProjectViewer(newProjectRef.key, viewerIds[i]);
   }
 
   return newProjectRef.key;
@@ -234,28 +247,23 @@ const createNewProject = function createNewProject(name, description, groupId, m
 }
 
 /**
- * Adds a list of people as owner of a project
- * @param {*} id of a project
- * @param {*} ownerId 
- */
-const addProjectOwner = (id, ownerId) => {
-  const ownersListRef = ref(db, 'projects/' + id + '/owners');
-  const userRef = push(ownersListRef);
-  set(userRef, {
-    userId: ownerId
-  });
-}
-
-/**
  * Adds a list of people as members of a project
  * @param {*} id 
  * @param {*} memberId 
  */
-const addProjectMember = (id, memberIds) => {
+const addProjectMember = (id, memberId) => {
   const ownersListRef = ref(db, 'projects/' + id + '/members');
   const userRef = push(ownersListRef);
   set(userRef, {
-    userId: memberIds
+    memberId: memberId
+  });
+}
+
+const addProjectViewer = (id, viewerId) => {
+  const ownersListRef = ref(db, 'projects/' + id + '/viewers');
+  const userRef = push(ownersListRef);
+  set(userRef, {
+    viewerId: viewerId
   });
 }
 
@@ -281,14 +289,13 @@ const addTaskToProject = (projectId, taskId) => {
 
 // Create new task
 // permittedUserIds, ownerIds, assignedUserIds, followerIds must be arrays
-const createNewTask = function createNewTask(projectId, name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
+const createNewTask = function createNewTask(name, description, estimatedTime, status, ownerId, assignedUserId, followerIds) {
 
   // Create basic task
   const taskListRef = ref(db, 'tasks');
   const newTaskRef = push(taskListRef);
 
   set(newTaskRef, {
-    projectId: projectId,
     name: name,
     description: description,
     estimatedTime: estimatedTime,
@@ -297,9 +304,9 @@ const createNewTask = function createNewTask(projectId, name, description, estim
     status: status,
   });
 
-  // Add member user Id's
+  // Add follower user Id's
   for (const i in followerIds) {
-    addTaskFollowers(newTaskRef.key, followerIds[i]);
+    addTaskFollower(newTaskRef.key, followerIds[i]);
   }
 
   return newTaskRef.key;
@@ -332,11 +339,11 @@ const changeTaskAssignedUser = (id, assignedUserId) => {
 }
 
 // changed to only one follower - derek
-const addTaskFollowers = (taskId, followerId) => {
+const addTaskFollower = (taskId, followerId) => {
     const followersListRef = ref(db, 'tasks/' + taskId + '/followers');
     const userRef = push(followersListRef);
         set(userRef, {
-            userId: followerId
+            followerId: followerId
         });
 }
 
@@ -393,27 +400,18 @@ const getProjectHistory = (projectId) => {
 }
 
 // Returns array of task keys
-const getProjectsTasks = async function getProjectsTasks(projectId) {
-  const dbRef = ref(db);
-  try {
-    const snapshot = await get(child(dbRef, `tasks`))
-    var tasksInProject = []
-    if (snapshot.exists()) {
-      snapshot.forEach(function (childSnapshot) {
-        if (childSnapshot.val().projectId === projectId) {
-          // Keep track of task key and task's values
-          tasksInProject.push([childSnapshot.key, childSnapshot.val()]);
-        }
-      })
-      console.log("returning: " + tasksInProject)
-      return tasksInProject;
-    } else {
-      console.log("No project tasks");
-    }
-  }
-  catch (err) {
+const getProjectsTasks = function getProjectsTasks(projectId) {
 
-  }
+  const taskKeys = [];
+
+  get(ref(db, "projects/" + projectId + "/tasks")).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      taskKeys.push(childSnapshot.val().taskId);
+    })
+  });
+
+  return taskKeys;
+
 }
 
 // Returns array of task keys
@@ -444,7 +442,7 @@ const getUsersProjects = function getUsersProjects(userId) {
     snapshot.forEach(function (projectSnapshot) {
       onValue(ref(apiFunctions.db, "projects/" + projectSnapshot.key + '/members'), (snapshot2) => {
         snapshot2.forEach(function (memberSnapshot) {
-          if (memberSnapshot.val().userId === userId) {
+          if (memberSnapshot.val().memberId === userId) {
             // Keep track of key and values
             usersProjects.push([projectSnapshot.key, projectSnapshot.val()]);
           }
@@ -484,7 +482,7 @@ const getUsersFollowedTasks = function getUsersFollowedTasks(userId) {
       onValue(ref(apiFunctions.db, "tasks/" + taskSnapshot.key + '/followers'), (snapshot2) => {
         var found = false
         snapshot2.forEach(function (userSnapshot) {
-          if (userSnapshot.val().userId === userId && found === false)  {
+          if (userSnapshot.val().followerId === userId && found === false)  {
             // Keep track of key and values
             usersFollowedTasks.push([taskSnapshot.key, taskSnapshot.val()]);
             found = true
@@ -627,12 +625,32 @@ const getUserByEmail = function getUserByEmail(email) {
   return userInfo;
 }
 
+const getHoursByStatus = function getHoursByStatus(status, projectId) {
+  var hours = 0;
+
+  const taskListRef = ref(db, 'projects/' + projectId + '/tasks');
+
+  onValue(taskListRef, (snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+
+      onValue(ref(apiFunctions.db, "tasks/" + childSnapshot.val().taskId), (taskSnapshot) => {
+        if (taskSnapshot.val().status == status) {
+          hours += taskSnapshot.val().estimatedTime;
+        }
+      });
+
+    })
+  });
+
+  return hours;
+}
+
 // Returns T/F
 const isTaskOwner = function isTaskOwner(userId, taskId) {
   const isOwner = []
 
-  onValue(ref(apiFunctions.db, "tasks/" + taskId), (snapshot) => {
-    if (snapshot.val().ownerId == userId) {
+  onValue(ref(apiFunctions.db, "tasks/" + taskId + "/ownerId"), (snapshot) => {
+    if (snapshot.val() == userId) {
       isOwner.push(1);
     }    
   });
@@ -647,8 +665,8 @@ const isTaskOwner = function isTaskOwner(userId, taskId) {
 const isProjectOwner = function isProjectOwner(userId, projectId) {
   const isOwner = []
 
-  onValue(ref(apiFunctions.db, "projects/" + projectId), (snapshot) => {
-    if (snapshot.val().ownerId == userId) {
+  onValue(ref(apiFunctions.db, "projects/" + projectId + "/ownerId"), (snapshot) => {
+    if (snapshot.val() == userId) {
       isOwner.push(1);
     }
   });
@@ -663,8 +681,8 @@ const isProjectOwner = function isProjectOwner(userId, projectId) {
 const isGroupOwner = function isGroupOwner(userId, groupId) {
   const isOwner = []
 
-  onValue(ref(apiFunctions.db, "groups/" + groupId), (snapshot) => {
-    if (snapshot.val().ownerId == userId) {
+  onValue(ref(apiFunctions.db, "groups/" + groupId + "/ownerId"), (snapshot) => {
+    if (snapshot.val() == userId) {
       isOwner.push(1);
     }
   });
@@ -734,26 +752,12 @@ const updateProjectDetails = (id, name, description, status, userId) => {
 }
 
 /**
- * Given the id of a project, rmeove a list of people from being a member
- * @param {*} id 
- * @param {*} exMemberIds 
- */
-const deleteProjectMembers = (id, exMemberIds) => {
-  exMemberIds.forEach(memberId => {
-    remove(ref(db, "Projects/" + id + "/members/" + memberId))
-      .catch((error) => {
-        console.log(error)
-      })
-  })
-}
-
-/**
  * Updates a task detail. This will overwrite all existing data
  * @param {*} id 
  * @param {*} projectId 
  * @param {*} name 
  * @param {*} description 
- * @param {*} estimatedTime 
+ * @param {*} estimate 
  * @param {*} status 
  * @param {*} userId of user that made change 
  * @returns 
@@ -789,14 +793,70 @@ const updateTaskDetails = (id, name, description, estimatedTime, status, userId)
   return taskListRef.key
 }
 
-const deleteTaskFollowers = (id, exFollowerIds) => {
-  exFollowerIds.forEach(follower => {
-    remove(ref(db, "tasks/" + id + "/followers/" + follower))
-      .catch((error) => {
-        console.log(error)
-      })
-  })
+// Delete project/group member
+// Delete project/group viewer
+// Delete task follower
+// Keys = "projectMember", "groupMember", "projectViewer", "groupViewer", or "taskFollower"
+// id = groupId, projectId, or taskId
+const deleteUserById = (key, userId, id) => {
+
+  var bucket1;
+  var bucket2;
+
+  switch (key) {
+    case "projectMember":
+      bucket1 = "projects/"
+      bucket2 = "/members"
+      break;
+    case "groupMember":
+      bucket1 = "groups/"
+      bucket2 = "/members"
+      break;
+    case "projectViewer":
+      bucket1 = "projects/"
+      bucket2 = "/viewers"
+      break;
+    case "groupViewer":
+      bucket1 = "groups/"
+      bucket2 = "/viewers"
+      break;
+    case "taskFollower":
+      bucket1 = "tasks/"
+      bucket2 = "/followers"
+      break;
+    default:
+      break;
+  }
+
+  const link = bucket1 + id + bucket2;
+  get(ref(db, link)).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      if (bucket2 == "/members" && childSnapshot.val().memberId == userId) {
+        remove(ref(db, link + "/" + childSnapshot.key));      
+      }
+      if (bucket2 == "/viewers" && childSnapshot.val().viewerId == userId) {
+        remove(ref(db, link + "/" + childSnapshot.key));         
+      }
+      if (bucket2 == "/followers" && childSnapshot.val().followerId == userId) {
+        remove(ref(db, link + "/" + childSnapshot.key));   
+      }
+    });
+  });
 }
+
+
+// Delete task
+// Delete project (and all associated tasks)
+// Delete group
+// key = "group", "project", or "task"
+const deleteItemById = (key, id) => {
+
+  remove(ref(db, key + "s/" + id))
+    .catch((error) => {
+      console.log(error)
+    }) 
+}
+
 /*****
  *  
  * Auth functions
@@ -956,10 +1016,12 @@ const apiFunctions = {
   getGroupsMembers,
   changeProjectOwner,
   addTaskToProject,
+  addNewViewerToGroup,
+  addProjectViewer,
   addProjectMember,
   changeTaskAssignedUser,
   changeTaskStatus,
-  addTaskFollowers,
+  addTaskFollower,
   changeTaskOwner,
   createNewTask,
   getTaskHistory,
@@ -974,6 +1036,7 @@ const apiFunctions = {
   getUserByEmail,
   getProjectById,
   getTaskById,
+  getHoursByStatus,
   isTaskOwner,
   isGroupOwner,
   isProjectOwner,
@@ -982,9 +1045,9 @@ const apiFunctions = {
   signOutAccount,
   updateUser,
   updateProjectDetails,
-  deleteProjectMembers,
   updateTaskDetails,
-  deleteTaskFollowers,
+  deleteItemById,
+  deleteUserById,
   db,
   app,
   FirebaseAuthProvider, useFirebaseAuth, useFirebaseDispatch,

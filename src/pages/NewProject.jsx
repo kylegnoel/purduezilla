@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
+
+// components import
 import NavBar from '../components/NavBar';
 import NewProjectDialog from '../components/NewProject'
-import { Typography } from '@mui/material';
+
 import '../App.css'
 
 const NewProject = () => {

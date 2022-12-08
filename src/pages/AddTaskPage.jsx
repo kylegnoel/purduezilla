@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container, Link, CssBaseline, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,17 +17,16 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
-import NavBar from '../components/NavBar';
 import Avatar from "@mui/material/Avatar";
 
-import { useNavigate, useParams } from "react-router-dom";
+// component imports
+import NavBar from '../components/NavBar';
 
+// db imports
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import { FollowTheSignsRounded } from "@mui/icons-material";
 
 const theme = createTheme();
-
 
 export default function AddTaskPage() {
     const {id} = useParams();
@@ -38,13 +37,10 @@ export default function AddTaskPage() {
     const [description, setDesc] = useState('');
     const [assignee, setAssign] = useState('');
     const [hour, setHour] = useState('');
-    const [label, setLabel] = useState('');
     const [owner, setOwner] = useState('');
     const [project, setProject] = useState(id);
     const [projectList, setProjectList] = useState([]);
     const [userList, setUserList] = useState([]);
-
-    const [isLoading, setLoading] = useState(true);
     
     const navigate = useNavigate();
 
@@ -66,10 +62,6 @@ export default function AddTaskPage() {
     
     const handleHourChange = event => {
         setHour(event.target.value)
-    };
-
-    const handleLabelChange = event => {
-        setLabel(event.target.value)
     };
 
     const handleOwnerChange = event => {
@@ -97,11 +89,11 @@ export default function AddTaskPage() {
         const followerId = ([]);
 
         selectedFollower.forEach(function(follower) {
-            followerId.push(follower[1])
+            followerId.push(follower[0])
         })
         // console.log("followers: " + followerId)
 
-        const projVar = await apiFunctions.getProjectById(project)
+        const projVar = await apiFunctions.getProjectById(project)[1]
         console.log("projVar: " + projVar + " " + project)
         const ownerVar = await apiFunctions.getUserById(owner)
         console.log("ownerVar: " + ownerVar + " " + owner)
@@ -127,50 +119,16 @@ export default function AddTaskPage() {
         }
     };
 
-    const fetchData = async(event) => {
+    const fetchData = async() => {
         // projects
-        try {
-            onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
-                    const projectTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const project = child.val()
-                        // console.log("current value: " + project.name + " " + project.projectId)
-                        projectTemp.push([project, child.key])
-                    })
+        const projectTemp = (await apiFunctions.getProjectById(""))
+        console.log("projectTemp: " + JSON.stringify(projectTemp))
+        setProjectList(projectTemp)
 
-                    setProjectList(projectTemp)
-                    // console.log("snapshot: " + projectList.length)
-            })
-            if (projectList.length !== 0) {
-                setLoading(false)
-            }
-        }
-        catch {
-            // if there is no internet
-        }
-
-        // user
-        try {
-            onValue(ref(apiFunctions.db, 'users/'), (snapshot) => {
-                    const userTemp = []
-        
-                    snapshot.forEach(function(child) {
-                        const user = child.val()
-                        // console.log("current value: " + user.name + " " + user.projectId)
-                        userTemp.push([user, child.key])
-                    })
-
-                    setUserList(userTemp)
-                    // console.log("snapshot: " + userList.length)
-            })
-            if (userList.length !== 0) {
-                setLoading(false)
-            }
-        }
-        catch {
-            // if there is no internet
-        }
+        // users
+        const userTemp = (await apiFunctions.getUserById(""))
+        console.log("userTemp: " + JSON.stringify(userTemp))
+        setUserList(userTemp)
     }
 
     const navigateToPage = () => {
@@ -187,7 +145,7 @@ export default function AddTaskPage() {
                         sx={{
                             marginTop:-4,
                             marginBottom:-5,
-                        }}>Create New Task</DialogTitle>
+                        }}><h2>Create New Task</h2></DialogTitle>
                             <Box
                             sx={{
                                 display: 'flex',
@@ -261,7 +219,7 @@ export default function AddTaskPage() {
                                             onChange={handleProjectChange}
                                         >
                                             { projectList && projectList.length != 0 ? projectList.map((data) => 
-                                                <MenuItem value={data[1]}>{data[0].name}</MenuItem>
+                                                <MenuItem value={data[0]}>{data[1].name}</MenuItem>
                                             ): <MenuItem value={0}>New Project</MenuItem> }
                                         </Select>
                                     </FormControl>
@@ -294,7 +252,7 @@ export default function AddTaskPage() {
                                         defaultValue={10}
                                     >
                                         { userList && userList.length != 0 ? userList.map((data) => 
-                                            <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
+                                            <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
                                         ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
                                     <FormHelperText>Select the team member who oversees this task.</FormHelperText>
@@ -314,8 +272,8 @@ export default function AddTaskPage() {
                                         defaultValue={10}
                                     >
                                         { userList && userList.length != 0 ? userList.map((data) => 
-                                                <MenuItem value={data[1]}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                            ): <MenuItem value={0}>New User</MenuItem> }
+                                                <MenuItem value={data}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
+                                          ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
                                     <FormHelperText>Select the team member who is assigned to this task.</FormHelperText>
                                 </FormControl>
@@ -340,17 +298,17 @@ export default function AddTaskPage() {
                                         <div>
                                             {selectedFollower.map((data) => (
                                              <Chip 
-                                             key={data[1]} 
-                                             avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[0].firstName[0]}</Avatar>}
-                                             label={data[0].firstName + " " + data[0].lastName} 
+                                             key={data} 
+                                             avatar={<Avatar sx={{ width: 24, height: 24 }}> {data[1].firstName[0]}</Avatar>}
+                                             label={data[1].firstName + " " + data[1].lastName} 
                                              sx={{marginRight:1,}}/>
                                             ))}
                                         </div>
                                         )}
                                     >
                                         { userList && userList.length != 0 ? userList.map((data) => 
-                                                <MenuItem value={data}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
-                                            ): <MenuItem value={0}>New User</MenuItem> }
+                                                <MenuItem value={data}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
+                                          ): <MenuItem value={0}>New User</MenuItem> }
                                     </Select>
                                     <FormHelperText>Select the team members to follow this task..</FormHelperText>
                                 </FormControl>
