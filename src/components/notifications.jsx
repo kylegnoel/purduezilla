@@ -52,12 +52,10 @@ const NotificationsBox = (notifications) => {
                 <Box>
                     <Button onClick={(e) => {
                         e.preventDefault();
-                        if (notification[0].type == "task") {
-                            navigate(`/task/${notification[0].sourcePath}`);
-                        }
-                        else {
-                            console.log("navigate elsewhere");
-                        }
+
+                        navigate(`/${notification[0].type}/${notification[0].sourcePath}`);
+
+
                     }}>
                         {notification[0].body}</Button>
                     <p>{notification[0].timeMade}</p>

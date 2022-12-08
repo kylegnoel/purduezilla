@@ -46,6 +46,7 @@ export default function ProjectDashboard() {
     }
 
     const fetchData = () => {
+        // console.log("user key: " + user.key);
         // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))

@@ -368,6 +368,7 @@ const changeProjectOwner = (id, ownerId) => {
   update(projectRef, {
     ownerId: ownerId
   });
+  createNotification(ownerId, "you are now the project owner!", "project", id);
 }
 
 const addTaskToProject = (projectId, taskId) => {
@@ -408,6 +409,7 @@ const changeTaskOwner = (id, ownerId) => {
   update(taskRef, {
     ownerId: ownerId
   });
+  createNotification(ownerId, "you are now the owner of a task!", "task", id)
 }
 
 const changeTaskAssignedUser = (id, assignedUserId) => {
@@ -415,6 +417,8 @@ const changeTaskAssignedUser = (id, assignedUserId) => {
   update(taskRef, {
     assignedUserId: assignedUserId
   });
+  createNotification(assignedUserId, "you were assigned a task!", "task", id)
+
 }
 
 /**

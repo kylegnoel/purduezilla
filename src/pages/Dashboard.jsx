@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react';
-
+import { useNavigate, useParams } from "react-router-dom";
 // material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Typography } from '@mui/material';
@@ -33,6 +33,7 @@ const theme = createTheme();
 const Dashboard = () => {
     const user = apiFunctions.useFirebaseAuth();
     console.log(user);
+    const navigate = useNavigate();
 
     const [projListarr, setProjListArr] = useState([]);
     const [taskListarr, setTaskListArr] = useState([]);
@@ -243,13 +244,10 @@ const Dashboard = () => {
                 <div>
 
                     {comments.map((comment) => (
-                        < div >
-                            <p>task key: {comment.taskKey}</p>
-                            <p>commentKey: {comment.commenKey}</p>
-                            <p>author: {comment.author}</p>
-                            <p>body: {comment.body}</p>
-                            <hr></hr>
-                        </div>
+                        < Box >
+                            <Button onClick={() => { navigate(`/task/${comment.taskKey}`) }}>View Comment</Button>
+                            <p>content: {comment.body}</p>
+                        </Box>
                     ))}
 
                 </div>
