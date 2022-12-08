@@ -38,6 +38,10 @@ exports.sendMail = functions.https.onRequest((req, res) => {
     });    
 });
 
+/*
+ *  This function will be uploaded to Google Cloud Function.
+ *  It gets triggered whenever there is a new task being created.  
+ */
 exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
         .onCreate((snapshot, context) => {
             const taskData = snapshot.val();
@@ -56,6 +60,10 @@ exports.sendMailToAddedTaskOwners = functions.database.ref('tasks/{taskId}')
             })
 })
 
+/*
+ *  This function will be uploaded to Google Cloud Function.
+ *  It gets triggered whenever there is a new task being created.  
+ */
 exports.sendMailToAddedTaskAssignUser = functions.database.ref('tasks/{taskId}')
         .onCreate((snapshot, context) => {
             const taskData = snapshot.val();
