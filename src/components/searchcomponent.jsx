@@ -23,6 +23,9 @@ const SearchComponent = () => {
 
     const swapTarget = (newTarget) => {
         setTarget(newTarget);
+        console.log(users);
+        console.log(tasks);
+        console.log(projects);
     }
 
     const onSearch = () => {
