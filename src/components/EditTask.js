@@ -115,7 +115,7 @@ export default function EditTask() {
 
     const assignToMe = async (event) => {
 
-        const userTemp = apiFunctions.getUserById(user.key)
+        const userTemp = apiFunctions.getObjectById("users", user.key)
         let addTaskAssignedUsers = await apiFunctions.addTaskAssignedUsers(
             id,
             userTemp[0][0]
@@ -148,14 +148,16 @@ export default function EditTask() {
             selectedTemp = 'In Progress'
         }
 
+        const userTemp = (await apiFunctions.getObjectById("users", user.key)[0])
 
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
-            project, // projectId 
             newName, // title 
             description, // description
             hour, //estimated time
             selectedTemp, // status
+            user.key,
+            userTemp[1].firstName + " " + userTemp[1].lastName
             )
 
         setLabel(selectedTemp)
@@ -171,6 +173,9 @@ export default function EditTask() {
 
     const handleSubmit = async (event) => {
         //event.preventDefault()
+
+        const userTemp = (await apiFunctions.getObjectById("users", user.key))[0]
+        console.log(userTemp + " " + user.key)
         
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
@@ -179,7 +184,7 @@ export default function EditTask() {
             hour,
             label, // description
             user.key, // status
-            user.info.firstName + " " + user.info.lastName,
+            userTemp[1].firstName + " " + userTemp[1].lastName
         )
 
         if (updateTaskDetails) {
@@ -234,16 +239,16 @@ export default function EditTask() {
                 setLabel(curTask[1].status)
                 setSelectedFollower(curTask[1].followers)
 
-                const curProject = (await apiFunctions.getProjectById(curTask[1].projectId))[0]
+                const curProject = (await apiFunctions.getObjectById("projects", curTask[1].projectId))[0]
                 console.log(JSON.stringify(curProject))
                 setProject(curProject[1].name)
 
                 // set owner field
-                const ownerTemp = (await apiFunctions.getUserById(curTask[1].ownerId))[0]
+                const ownerTemp = (await apiFunctions.getObjectById("users",curTask[1].ownerId))[0]
                 setOwner(ownerTemp[1].firstName + " " + ownerTemp[1].lastName)
 
                 // set assignee field
-                const assignTemp = (await apiFunctions.getUserById(curTask[1].assignedUserId))[0]
+                const assignTemp = (await apiFunctions.getObjectById("users",curTask[1].assignedUserId))[0]
                 setAssign(assignTemp[1].firstName + " " + assignTemp[1].lastName)
                 // set assignee field
 
@@ -259,12 +264,12 @@ export default function EditTask() {
         }
     
         // projects
-        const projectTemp = await apiFunctions.getProjectById("")
+        const projectTemp = await apiFunctions.getObjectById("projects", "")
         console.log("projectTemp: " + JSON.stringify(projectTemp))
         setProjectList(projectTemp)
 
         // users
-        const userTemp = await apiFunctions.getUserById("")
+        const userTemp = await apiFunctions.getObjectById("users", "")
         setUserList(userTemp)
 
         setLoading(false)

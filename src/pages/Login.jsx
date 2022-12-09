@@ -30,7 +30,7 @@ const Login = () => {
         navigateToDashboard()
         } else {
         // perform error UI like highlighting textfield to red
-        alert(signInAttept.msg + "\ninvalid login\n TODO: perform error UI")
+        alert("Username and/or password don't match.\nPlease check and try logging in again.")
         }
     };
 
