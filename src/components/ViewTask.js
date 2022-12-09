@@ -20,6 +20,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
+import CommentBox from "./comments";
 import Avatar from '@mui/material/Avatar';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -37,6 +38,7 @@ import '../App.css';
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { WindowSharp } from '@mui/icons-material';
 
 
 export default function ViewTask() {
@@ -70,7 +72,7 @@ export default function ViewTask() {
     const [isEditing, setEditing] = useState(false);
     const navigate = useNavigate();
     const [selected, setSelected] = useState([]);
-    
+
     const [selectedFollower, setSelectedFollower] = useState([]);
     const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
@@ -135,10 +137,10 @@ export default function ViewTask() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            window.location.href='/task/'+event.currentTarget.id
+            window.location.href = '/task/' + event.currentTarget.id
         }
         else {
-            window.location.href='/newtask/'
+            window.location.href = '/newtask/'
         }
     }
 
@@ -158,7 +160,7 @@ export default function ViewTask() {
 
     const assignToMe = async (event) => {
         if (!assignedToMe) {
-            const curUser = (await apiFunctions.getObjectById("users",user.key))[0]
+            const curUser = (await apiFunctions.getObjectById("users", user.key))[0]
             console.log("assigningTask: " + id + " " + user.key)
             let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
                 id,
@@ -169,7 +171,7 @@ export default function ViewTask() {
             setAssignedToMe(true)
             if (addTaskAssignedUsers) {
                 alert("Assigned to Me!");
-            } 
+            }
         } else {
             // assigned to me, remove designation
             let addTaskAssignedUsers = await apiFunctions.changeTaskAssignedUser(
@@ -183,9 +185,19 @@ export default function ViewTask() {
                 alert("Task Assignee Removed!");
             }
         }
-        
+
     }
-    
+
+    const deleteComment = (commentKey) => {
+        apiFunctions.deleteTaskComment(commentKey, id);
+        window.location.reload();
+    }
+
+    const updateComment = (authorKey, authorName, commentKey, body) => {
+        apiFunctions.updateTaskComment(commentKey, body, authorKey, authorName, id);
+        window.location.reload();
+    }
+
     const handleShowFollow = (event) => {
         setFollow(!showFollow)
     }
@@ -216,13 +228,13 @@ export default function ViewTask() {
             else {
                 alert("Task Marked As In Progress!");
             }
-        }   
+        }
     }
 
 
     const handleSubmit = async (event) => {
         //event.preventDefault()
-        
+
         let updateTaskDetails = await apiFunctions.updateTaskDetails(
             id,
             newProject, // projectId 
@@ -249,10 +261,13 @@ export default function ViewTask() {
 
     const newCommentSubmit = (event) => {
         event.preventDefault();
-
+        // console.log("new comment");
+        console.log(user);
+        console.log("new comment submit");
         if (newCommentBody == '') {
             return;
         }
+        console.log("making new comment");
         let tagged = [];
         let splitComment = newCommentBody.split(" ");
         splitComment.forEach((word) => {
@@ -260,8 +275,9 @@ export default function ViewTask() {
                 tagged.push(word.substring(1));
             }
         });
+        console.log(tagged);
 
-        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged);
+        let newAdded = apiFunctions.createNewComment(newCommentBody, user.key, id, tagged, user.info.firstName);
         // window.location.reload();
 
         setNewCommentBody("");
@@ -282,19 +298,26 @@ export default function ViewTask() {
                 setDesc(curTask[1].description)
                 setHour(curTask[1].estimatedTime)
                 setLabel(curTask[1].status)
-                
+
+                console.log('fetching comments');
+                //fetch comments as well
+                const settingComments = apiFunctions.getTaskComments(id);
+                console.log(settingComments);
+
+                setComments(settingComments);
+
                 // set parent project name
-                const parentProject = (await apiFunctions.getObjectById("projects",curTask[1].projectId))[0]
+                const parentProject = (await apiFunctions.getObjectById("projects", curTask[1].projectId))[0]
                 console.log("parentProject: " + JSON.stringify(parentProject))
                 setProject(parentProject[1].name)
                 // set owner field
-                const ownerTemp = (await apiFunctions.getObjectById("users",curTask[1].ownerId))[0]
+                const ownerTemp = (await apiFunctions.getObjectById("users", curTask[1].ownerId))[0]
                 setOwner(ownerTemp[1].firstName + " " + ownerTemp[1].lastName)
                 // set assignee field
 
                 if (curTask[1].assignedUserId === user.key) {
                     console.log("currently assigned to me")
-                    const assignee = (await apiFunctions.getObjectById("users",curTask[1].assignedUserId))[0]
+                    const assignee = (await apiFunctions.getObjectById("users", curTask[1].assignedUserId))[0]
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                     setAssignedToMe(true);
                 }
@@ -302,30 +325,29 @@ export default function ViewTask() {
                     setAssign("Task Not Assigned To Anyone")
                 }
                 else {
-                    const assignee = (await apiFunctions.getObjectById("users",curTask[1].assignedUserId))[0]
+                    const assignee = (await apiFunctions.getObjectById("users", curTask[1].assignedUserId))[0]
                     setAssign(assignee[1].firstName + " " + assignee[1].lastName)
                 }
-    
-                //fetch comments as well
-                const settingComments = apiFunctions.getTaskComments(id);
-                setComments(settingComments);
+
+
             }
             catch {
                 // if there is no internet
-            }    
+                console.log("something broke");
+            }
 
 
             const taskFollowers = (await apiFunctions.getTaskFollowers(id))
             setFollowers(taskFollowers)
             console.log("followers: " + taskFollowers)
         }
-        
+
         // projects
-        const projectTemp = await apiFunctions.getObjectById("projects","")
+        const projectTemp = await apiFunctions.getObjectById("projects", "")
         setProjectList(projectTemp)
 
         // users
-        const userTemp = await apiFunctions.getObjectById("users","")
+        const userTemp = await apiFunctions.getObjectById("users", "")
         setUserList(userTemp)
 
         return true;
@@ -335,7 +357,7 @@ export default function ViewTask() {
         <div>
             <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="60%">
-                    <Box component="form" Validate sx={{ mt: 3 }}>      
+                    <Box component="form" Validate sx={{ mt: 3 }}>
                         <Box
                             sx={{
                                 display: 'flex',
@@ -347,7 +369,7 @@ export default function ViewTask() {
                                 <Grid container spacing={2}>
                                     <Grid item xs={50} sm={6}>
                                         <Grid item sm={12}>
-                                            <Divider sx={{ mt: 0, mb:2 }}>TASK DETAILS</Divider>
+                                            <Divider sx={{ mt: 0, mb: 2 }}>TASK DETAILS</Divider>
                                             <Grid container spacing={1}>
                                                 <Grid item sm={8}>
                                                     <TextField
@@ -377,96 +399,96 @@ export default function ViewTask() {
                                             </Grid>
 
                                         </Grid>
-                                        <Divider sx={{ mt: 2, mb:2 }}>PROJECT</Divider>
+                                        <Divider sx={{ mt: 2, mb: 2 }}>PROJECT</Divider>
                                         <Grid item sm={12}>
-                                        <FormControl fullWidth>
-                                            <TextField
-                                                autoComplete="given-name"
-                                                name="project"
-                                                fullWidth
-                                                id="project"
-                                                value={project}
-                                                InputProps={{
-                                                    readOnly: true,
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="project"
+                                                    fullWidth
+                                                    id="project"
+                                                    value={project}
+                                                    InputProps={{
+                                                        readOnly: true,
                                                     }}
-                                            />
-                                        </FormControl>
-                                        <Divider sx={{ mt: 2, mb:2 }}>DESCRIPTION</Divider>
+                                                />
+                                            </FormControl>
+                                            <Divider sx={{ mt: 2, mb: 2 }}>DESCRIPTION</Divider>
                                             <TextField
                                                 required
                                                 fullWidth
                                                 multiline
                                                 InputProps={{
                                                     readOnly: true,
-                                                  }}
+                                                }}
                                                 rows={4}
                                                 id="taskDescription"
                                                 name="taskDescription"
                                                 value={description}
                                             />
-                                        <br></br>
-                                        <br></br>
+                                            <br></br>
+                                            <br></br>
                                         </Grid>
-                                    </Grid>
-                                    
+                                    </Grid >
+
                                     <Grid item xs={50} sm={6}>
                                         <Divider>OWNERSHIP</Divider>
-                                        <Accordion 
-                                        sx={{ mt: '10px' }} 
-                                        fullWidth 
-                                        expanded={expanded === 'panel1'} 
-                                        onChange={handleChange('panel1')}>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel1bh-content"
-                                            id="panel1bh-header"
-                                            >
-                                        <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                                            Task Owner
-                                        </Typography>
-                                        <Typography sx={{ color: 'text.secondary' }}>
-                                            Members who created/own the task.
-                                        </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                        <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
-                                        <ListItem alignItems="flex-start">
-                                                <ListItemAvatar>
-                                                    <Avatar alt={owner} src="/static/images/avatar/1.jpg" />
-                                                </ListItemAvatar>
-                                                    <ListItemText
-                                                    primary={<Link fullWidth>{owner}</Link>}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Owner
-                                                        </Typography>
-                                                        </React.Fragment>
-                                                    }
-                                                    />
-                                                    
-                                            </ListItem>
-                                        </List>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                                        <Accordion
+                                            sx={{ mt: '10px' }}
+                                            fullWidth
+                                            expanded={expanded === 'panel1'}
+                                            onChange={handleChange('panel1')}>
                                             <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel2bh-content"
-                                            id="panel2bh-header"
+                                                expandIcon={<ExpandMoreIcon />}
+                                                aria-controls="panel1bh-content"
+                                                id="panel1bh-header"
                                             >
-                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>Assignee</Typography>
-                                            <Typography sx={{ color: 'text.secondary' }}>
-                                                Person assigned to this task.
-                                            </Typography>
+                                                <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                                    Task Owner
+                                                </Typography>
+                                                <Typography sx={{ color: 'text.secondary' }}>
+                                                    Members who created/own the task.
+                                                </Typography>
                                             </AccordionSummary>
                                             <AccordionDetails>
-                                            <Divider></Divider>
+                                                <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>
+                                                    <ListItem alignItems="flex-start">
+                                                        <ListItemAvatar>
+                                                            <Avatar alt={owner} src="/static/images/avatar/1.jpg" />
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+                                                            primary={<Link fullWidth>{owner}</Link>}
+                                                            secondary={
+                                                                <React.Fragment>
+                                                                    <Typography
+                                                                        sx={{ display: 'inline' }}
+                                                                        component="span"
+                                                                        variant="body2"
+                                                                        color="text.primary"
+                                                                    >
+                                                                        Owner
+                                                                    </Typography>
+                                                                </React.Fragment>
+                                                            }
+                                                        />
+
+                                                    </ListItem>
+                                                </List>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMoreIcon />}
+                                                aria-controls="panel2bh-content"
+                                                id="panel2bh-header"
+                                            >
+                                                <Typography sx={{ width: '33%', flexShrink: 0 }}>Assignee</Typography>
+                                                <Typography sx={{ color: 'text.secondary' }}>
+                                                    Person assigned to this task.
+                                                </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                                <Divider></Divider>
                                                 <Grid container spacing={2}>
                                                     <Grid item xs={8}>
                                                         <TextField
@@ -485,10 +507,10 @@ export default function ViewTask() {
                                                             onClick={assignToMe}
                                                             variant="outlined"
                                                             fullWidth
-                                                            startIcon={assignedToMe ? <ClearIcon/> : <CheckIcon />}
+                                                            startIcon={assignedToMe ? <ClearIcon /> : <CheckIcon />}
                                                             sx={{ mt: 1, mb: 2, height: '55px' }}
-                                                            >
-                                                        <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b> 
+                                                        >
+                                                            <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b>
                                                         </Button>
                                                     </Grid>
                                                 </Grid>
@@ -496,49 +518,49 @@ export default function ViewTask() {
                                         </Accordion>
                                         <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                                             <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel3bh-content"
-                                            id="panel3bh-header"
+                                                expandIcon={<ExpandMoreIcon />}
+                                                aria-controls="panel3bh-content"
+                                                id="panel3bh-header"
                                             >
-                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                                                Followers
-                                            </Typography>
-                                            <Typography sx={{ color: 'text.secondary' }}>
-                                                Users who follow this task.
-                                            </Typography>
+                                                <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                                    Followers
+                                                </Typography>
+                                                <Typography sx={{ color: 'text.secondary' }}>
+                                                    Users who follow this task.
+                                                </Typography>
                                             </AccordionSummary>
                                             <AccordionDetails>
-                                            { followers && followers.length !== 0 && followers !== {} ? followers.map((data) => {
-                                                return(
-                                                    <ListItem alignItems="flex-start">
-                                                    <ListItemAvatar>
-                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
-                                                    </ListItemAvatar>
-                                                    <ListItemText
-                                                    primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Viewer
-                                                        </Typography>
-                                                        </React.Fragment>
-                                                    }
-                                                    />
-                                                    </ListItem>
-                                                );
-                                            }): "There are no viewers in this group!" }
+                                                {followers && followers.length !== 0 && followers !== {} ? followers.map((data) => {
+                                                    return (
+                                                        <ListItem alignItems="flex-start">
+                                                            <ListItemAvatar>
+                                                                <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
+                                                            </ListItemAvatar>
+                                                            <ListItemText
+                                                                primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                                secondary={
+                                                                    <React.Fragment>
+                                                                        <Typography
+                                                                            sx={{ display: 'inline' }}
+                                                                            component="span"
+                                                                            variant="body2"
+                                                                            color="text.primary"
+                                                                        >
+                                                                            Viewer
+                                                                        </Typography>
+                                                                    </React.Fragment>
+                                                                }
+                                                            />
+                                                        </ListItem>
+                                                    );
+                                                }) : "There are no viewers in this group!"}
                                             </AccordionDetails>
                                         </Accordion>
-                                        </Grid>
-                                </Grid>
-                            </Box>
-                        </Box>
-                    </Box>
+                                    </Grid>
+                                </Grid >
+                            </Box >
+                        </Box >
+                    </Box >
                     <br></br>
                     <Divider rightAlign><h2>Comment</h2></Divider>
                     <Box component="form" Validate sx={{ mt: 3 }}>
@@ -550,10 +572,17 @@ export default function ViewTask() {
                             }}
                         >
                             {comments.map((comment) => (
-                                < div >
-                                    <p> author key: {comment.author}</p>
-                                    <p>body: {comment.body}</p>
-                                </div>
+                                <CommentBox
+                                    infoObject={{
+                                        ownComment: user.key === comment[0].author,
+                                        authorKey: comment[0].author,
+                                        authorName: comment[0].firstName,
+                                        body: comment[0].body,
+                                        commentKey: comment[1],
+                                    }}
+                                    handleCommentDelete={deleteComment}
+                                    handleCommentUpdate={updateComment}
+                                ></CommentBox>
                             ))}
 
 
@@ -583,10 +612,27 @@ export default function ViewTask() {
                             </Grid>
                         </Box>
                     </Box>
-                </Container>
-            </ThemeProvider>
+                </Container >
+            </ThemeProvider >
             {/* <LoadTasks></LoadTasks> */}
-        </div>
+        </div >
     );
 
 }
+
+
+/*
+{comments.map((comment) => (
+                                        <CommentBox
+                                            infoObject={{
+                                                ownComment: user.key === comment[0].author,
+                                                authorKey: comment[0].author,
+                                                authorName: comment[0].firstName,
+                                                body: comment[0].body,
+                                                commentKey: comment[1],
+                                            }}
+                                            handleCommentDelete={deleteComment}
+                                            handleCommentUpdate={updateComment}
+                                        ></CommentBox>
+                                    ))}
+*/

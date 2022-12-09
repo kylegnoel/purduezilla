@@ -49,6 +49,7 @@ import { ref, onValue } from "firebase/database";
 // components import
 import NavBar from '../components/NavBar';
 import ProjectDashboard from '../components/ProjectDashboard';
+import CommentBox from '../components/comments';
 
 const Projects = () => {
     const { id } = useParams();
@@ -115,7 +116,7 @@ const Projects = () => {
             setOpen(true)
         } else if (setting === 'Transfer Ownership') {
             setOpenVal(true)
-        } 
+        }
     }
 
     const handleOwnerChange = event => {
@@ -147,7 +148,7 @@ const Projects = () => {
         alert("Owner Transfered!")
 
         closeChange();
-        navigate("/project/"+id)
+        navigate("/project/" + id)
     };
 
     const removeUser = (event) => {
@@ -162,15 +163,24 @@ const Projects = () => {
     const createComment = (event) => {
         event.preventDefault();
         console.log(comments);
-        apiFunctions.createNewProjectComment(newCommentBody, user.key, id);
+        apiFunctions.createNewProjectComment(newCommentBody, user.key, id, user.info.firstName);
         // console.log(comments);
         console.log(user.key);
-        setComments([...comments, { body: newCommentBody, author: user.key }]);
+        //setComments([...comments, { body: newCommentBody, author: user.key }]);
         // console.log(comments);
         // console.log(user.key);
         // window.location.reload();
         setNewCommentBody("");
+        window.location.reload(false);
+    }
 
+    const updateComment = (authorKey, authorName, commentKey, newBody) => {
+        apiFunctions.updateProjectComment(commentKey, newBody, authorKey, authorName, id);
+        window.location.reload(false);
+    }
+    const deleteComment = (commentKey) => {
+        apiFunctions.deleteProjectComment(commentKey, id);
+        window.location.reload(false);
     }
 
     const fetchData = async (event) => {
@@ -242,7 +252,7 @@ const Projects = () => {
         alert("Project Deleted.")
 
         // to do implement delete
-        apiFunctions.deleteItemById("project",id);
+        apiFunctions.deleteItemById("project", id);
         navigate("/myprojects")
     }
 
@@ -264,25 +274,25 @@ const Projects = () => {
                     <Container component="main">
                         <br></br>
                         <h2><i>Project: </i>{project}</h2>
-                        <Button sx={{mb: 2 }} component={Link} to={window.location.pathname + "/storyboard"} variant="contained">View {project} Storyboard</Button>
+                        <Button sx={{ mb: 2 }} component={Link} to={window.location.pathname + "/storyboard"} variant="contained">View {project} Storyboard</Button>
                         <br></br>
                         {isOwner ? <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <Tooltip title="Open settings">
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Tooltip title="Open settings">
                                 <Button
                                     width='20%'
                                     variant="outlined"
                                     onClick={handleOpenUserMenu}
                                     startIcon={<ExpandMoreIcon />} >
-                                    <b>Options</b> 
+                                    <b>Options</b>
                                 </Button>
-                                </Tooltip>
-                                <Menu
+                            </Tooltip>
+                            <Menu
                                 sx={{ mt: '45px' }}
                                 id="menu-appbar"
                                 anchorEl={anchorElUser}
@@ -297,46 +307,49 @@ const Projects = () => {
                                 }}
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
-                                >
+                            >
                                 {settings.map((setting) => (
                                     <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
-                                    <Typography textAlign="center">{setting}</Typography>
+                                        <Typography textAlign="center">{setting}</Typography>
                                     </MenuItem>
                                 ))}
-                                </Menu>
-                            </Box> : ''}
-                            <br></br>
+                            </Menu>
+                        </Box> : ''}
+                        <br></br>
                         <Divider></Divider>
-                        <Box sx={{ mt: 0, mb: 6, }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container justifyContent="center" spacing={2} >
-                                { isNotMember ? '' :
-                                <Grid item xs={50} sm={6}>
-                                    <h3>Projects Tasks</h3>
-                                    <FixedSizeList sx={{border: 1, borderColor:'black',minHeight:400, maxHeight:400, overflowY:'auto',flexGrow: 1, mt: '0px',
-            flexDirection:"column",}} height={600}>
-                                            { taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                        <Box sx={{ mt: 0, mb: 6, }} display="flex" style={{ textAlign: "center" }}>
+                            <Grid container justifyContent="center" spacing={2} >
+                                {isNotMember ? '' :
+                                    <Grid item xs={50} sm={6}>
+                                        <h3>Projects Tasks</h3>
+                                        <FixedSizeList sx={{
+                                            border: 1, borderColor: 'black', minHeight: 400, maxHeight: 400, overflowY: 'auto', flexGrow: 1, mt: '0px',
+                                            flexDirection: "column",
+                                        }} height={600}>
+                                            {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
                                                 return (
-                                                <div key={data[0]}>
-                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
-                                                    <ListItem>
-                                                        <ListItemAvatar>
-                                                            <WorkIcon color="grey"/>
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={data[1].name} secondary={data[1].description} />
-                                                    </ListItem>
-                                                </Button>
-                                                <Divider />
-                                            </div>   
-                                            )}): "There are no tasks in this project!" }
-                                    </FixedSizeList>
-                                    <Button 
-                                        onClick={handleTask} 
-                                        id={"addtask"} 
-                                        variant="outlined"
-                                        sx={{ mt: '10px', width: '100%'}}>
-                                        Create New Task
-                                        </Button> 
-                                </Grid>
+                                                    <div key={data[0]}>
+                                                        <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                                            <ListItem>
+                                                                <ListItemAvatar>
+                                                                    <WorkIcon color="grey" />
+                                                                </ListItemAvatar>
+                                                                <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                                            </ListItem>
+                                                        </Button>
+                                                        <Divider />
+                                                    </div>
+                                                )
+                                            }) : "There are no tasks in this project!"}
+                                        </FixedSizeList>
+                                        <Button
+                                            onClick={handleTask}
+                                            id={"addtask"}
+                                            variant="outlined"
+                                            sx={{ mt: '10px', width: '100%' }}>
+                                            Create New Task
+                                        </Button>
+                                    </Grid>
                                 }
                                 <Grid item xs={50} sm={6} sx={{ mt: 0 }}>
                                     <h3>Description</h3>
@@ -350,226 +363,237 @@ const Projects = () => {
                                         name="taskDescription"
                                         value={description}
                                     />
-                                    <Accordion 
-                                        sx={{ mt: '10px' }} 
-                                        fullWidth 
-                                        expanded={expanded === 'panel1'} 
+                                    <Accordion
+                                        sx={{ mt: '10px' }}
+                                        fullWidth
+                                        expanded={expanded === 'panel1'}
                                         onChange={handleChange('panel1')}>
                                         <AccordionSummary
                                             expandIcon={<ExpandMoreIcon />}
                                             aria-controls="panel1bh-content"
                                             id="panel1bh-header"
-                                            >
-                                        <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                                            Project Owners
-                                        </Typography>
-                                        <Typography sx={{ color: 'text.secondary' }}>
-                                            Project Members who created/own the group.
-                                        </Typography>
+                                        >
+                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                                Project Owners
+                                            </Typography>
+                                            <Typography sx={{ color: 'text.secondary' }}>
+                                                Project Members who created/own the group.
+                                            </Typography>
                                         </AccordionSummary>
                                         <AccordionDetails>
-                                        <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
-                                            { owners && owners.length !== 0 && owners !== {} ? owners.map((data) => {
-                                                return(
-                                                    <ListItem alignItems="flex-start">
-                                                    <ListItemAvatar>
-                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
-                                                    </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
-                                                        <ListItemText
-                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
-                                                        secondary={
-                                                            <React.Fragment>
-                                                            <Typography
-                                                                sx={{ display: 'inline' }}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Owner
-                                                            </Typography>
-                                                            </React.Fragment>
-                                                        }
-                                                        />
-                                                    </Link>
-                                                </ListItem>
-                                                );
-                                            }): "There are no owners in this project!" }
-                                        </List>
+                                            <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>
+                                                {owners && owners.length !== 0 && owners !== {} ? owners.map((data) => {
+                                                    return (
+                                                        <ListItem alignItems="flex-start">
+                                                            <ListItemAvatar>
+                                                                <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
+                                                            </ListItemAvatar>
+                                                            <Link onClick={showUser} id={data[0]} fullWidth>
+                                                                <ListItemText
+                                                                    primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                                    secondary={
+                                                                        <React.Fragment>
+                                                                            <Typography
+                                                                                sx={{ display: 'inline' }}
+                                                                                component="span"
+                                                                                variant="body2"
+                                                                                color="text.primary"
+                                                                            >
+                                                                                Owner
+                                                                            </Typography>
+                                                                        </React.Fragment>
+                                                                    }
+                                                                />
+                                                            </Link>
+                                                        </ListItem>
+                                                    );
+                                                }) : "There are no owners in this project!"}
+                                            </List>
                                         </AccordionDetails>
                                     </Accordion>
-                                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
-                                            <AccordionSummary
+                                    <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                                        <AccordionSummary
                                             expandIcon={<ExpandMoreIcon />}
                                             aria-controls="panel2bh-content"
                                             id="panel2bh-header"
-                                            >
+                                        >
                                             <Typography sx={{ width: '33%', flexShrink: 0 }}>Members</Typography>
                                             <Typography sx={{ color: 'text.secondary' }}>
                                                 Members who can create/edit a task in this project.
                                             </Typography>
-                                            </AccordionSummary>
-                                            <AccordionDetails>
-                                                <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
-                                                { members && members.length !== 0 && members !== {} ? members.map((data) => {
-                                                return(
-                                                    <ListItem alignItems="flex-start">
-                                                    <ListItemAvatar>
-                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
-                                                    </ListItemAvatar>
-                                                    <Link onClick={showUser} id={data[0]} fullWidth>
-                                                        <ListItemText
-                                                        primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
-                                                        secondary={
-                                                            <React.Fragment>
-                                                            <Typography
-                                                                sx={{ display: 'inline' }}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Member
-                                                            </Typography>
-                                                            </React.Fragment>
-                                                        }
-                                                        /> 
-                                                    </Link>
-                                                    <ListItemAvatar>
-                                                        <IconButton id={data[0]} onClick={removeUser} aria-label="delete"  color="primary">
-                                                            <ClearIcon />
-                                                        </IconButton>
-                                                        </ListItemAvatar>
-                                                </ListItem>
-                                                );
-                                            }): "There are no members in this project!" }
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>
+                                                {members && members.length !== 0 && members !== {} ? members.map((data) => {
+                                                    return (
+                                                        <ListItem alignItems="flex-start">
+                                                            <ListItemAvatar>
+                                                                <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
+                                                            </ListItemAvatar>
+                                                            <Link onClick={showUser} id={data[0]} fullWidth>
+                                                                <ListItemText
+                                                                    primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                                    secondary={
+                                                                        <React.Fragment>
+                                                                            <Typography
+                                                                                sx={{ display: 'inline' }}
+                                                                                component="span"
+                                                                                variant="body2"
+                                                                                color="text.primary"
+                                                                            >
+                                                                                Member
+                                                                            </Typography>
+                                                                        </React.Fragment>
+                                                                    }
+                                                                />
+                                                            </Link>
+                                                            <ListItemAvatar>
+                                                                <IconButton id={data[0]} onClick={removeUser} aria-label="delete" color="primary">
+                                                                    <ClearIcon />
+                                                                </IconButton>
+                                                            </ListItemAvatar>
+                                                        </ListItem>
+                                                    );
+                                                }) : "There are no members in this project!"}
                                             </List>
-                                            </AccordionDetails>
-                                        </Accordion>
-                                        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
-                                            <AccordionSummary
+                                        </AccordionDetails>
+                                    </Accordion>
+                                    <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                        <AccordionSummary
                                             expandIcon={<ExpandMoreIcon />}
                                             aria-controls="panel3bh-content"
                                             id="panel3bh-header"
-                                            >
+                                        >
                                             <Typography sx={{ width: '33%', flexShrink: 0 }}>Project Statistics</Typography>
                                             <Typography sx={{ color: 'text.secondary' }}>
                                                 Members who can create/edit a task in this project.
                                             </Typography>
-                                            </AccordionSummary>
-                                            <AccordionDetails>
-                                                <b><u>Project Hours</u></b>
-                                                To Do ${todo}
-                                                In Progress: ${inProgress}
-                                                Completed: ${completed}
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <b><u>Project Hours</u></b>
+                                            To Do ${todo}
+                                            In Progress: ${inProgress}
+                                            Completed: ${completed}
 
-                                            </AccordionDetails>
-                                        </Accordion>
+                                        </AccordionDetails>
+                                    </Accordion>
                                 </Grid>
                             </Grid>
-                            </Box>
-                            <Divider></Divider>
-                            <Grid fullWidth xs={50} sm={12}>
-                                <Grid>
-                                    {comments.map((comment) => (
-                                        < div >
-                                            <p> author key: {comment.author}</p>
-                                            <p>body: {comment.body}</p>
-                                        </div>
-                                    ))}
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        multiline
-                                        rows={4}
-                                        id="commentbox"
-                                        name="commentbox"
-                                        value={newCommentBody}
-                                        onChange={(e) => setNewCommentBody(e.target.value)}
-                                    />
-                                    <Button onClick={createComment}>New Comment</Button>
-                                </Grid>
+                        </Box>
+                        <Divider></Divider>
+                        <Grid fullWidth xs={50} sm={12}>
+                            <Grid>
+                                {comments.map((comment) => (
+
+                                    < div >
+                                        <CommentBox
+                                            infoObject={{
+                                                ownComment: user.key === comment[0].author,
+                                                authorKey: comment[0].author,
+                                                authorName: comment[0].firstName,
+                                                body: comment[0].body,
+                                                commentKey: comment[1],
+                                            }}
+                                            handleCommentDelete={deleteComment}
+                                            handleCommentUpdate={updateComment}
+                                        ></CommentBox>
+                                    </div>
+
+                                ))}
+                                <TextField
+                                    required
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    id="commentbox"
+                                    name="commentbox"
+                                    value={newCommentBody}
+                                    onChange={(e) => setNewCommentBody(e.target.value)}
+                                />
+                                <Button onClick={createComment}>New Comment</Button>
                             </Grid>
 
                             <Dialog
-                            open={open}
-                            onClose={handleClose}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Are you sure you want to delete this project?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    This action cannot be undone.
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleClose}>Close</Button>
-                                <Button onClick={handleDelete} autoFocus>
-                                    Delete
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                                open={open}
+                                onClose={handleClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Are you sure you want to delete this project?"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        This action cannot be undone.
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClose}>Close</Button>
+                                    <Button onClick={handleDelete} autoFocus>
+                                        Delete
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
 
-                        <Dialog
-                            open={openUser}
-                            onClose={handleClose}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Are you sure you want to remove this user?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    This action cannot be undone.
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleClose}>Close</Button>
-                                <Button onClick={handleDeleteUser} autoFocus>
-                                    Delete
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                            <Dialog
+                                open={openUser}
+                                onClose={handleClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Are you sure you want to remove this user?"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        This action cannot be undone.
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClose}>Close</Button>
+                                    <Button onClick={handleDeleteUser} autoFocus>
+                                        Delete
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
 
 
-                        <Dialog
-                            open={openVal}
-                            onClose={closeChange}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Change the owner"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="ownerLabel">Owner</InputLabel>
-                                        <Select
-                                            labelId="ownerLabelSelect"
-                                            id="ownerSelect"
-                                            label="ownerLabel"
-                                            onChange={handleOwnerChange}
-                                            defaultValue={10}
-                                        >
-                                            {userList && userList.length != 0 ? userList.map((data) =>
-                                                <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
-                                            ) : <MenuItem value={0}>New User</MenuItem>}
-                                        </Select>
-                                        <FormHelperText>Select the team member who oversees this project.</FormHelperText>
-                                    </FormControl>
-                                </Box>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={closeChange}>Close</Button>
-                                <Button onClick={handleSubmit} autoFocus>
-                                    Submit
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                            <Dialog
+                                open={openVal}
+                                onClose={closeChange}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Change the owner"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="ownerLabel">Owner</InputLabel>
+                                            <Select
+                                                labelId="ownerLabelSelect"
+                                                id="ownerSelect"
+                                                label="ownerLabel"
+                                                onChange={handleOwnerChange}
+                                                defaultValue={10}
+                                            >
+                                                {userList && userList.length != 0 ? userList.map((data) =>
+                                                    <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
+                                                ) : <MenuItem value={0}>New User</MenuItem>}
+                                            </Select>
+                                            <FormHelperText>Select the team member who oversees this project.</FormHelperText>
+                                        </FormControl>
+                                    </Box>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={closeChange}>Close</Button>
+                                    <Button onClick={handleSubmit} autoFocus>
+                                        Submit
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                        </Grid>
                     </Container>
                 </ThemeProvider>
                 {/* <LoadTasks></LoadTasks> */}

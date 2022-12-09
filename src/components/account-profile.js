@@ -28,7 +28,7 @@ export const AccountProfile = (props) => {
   const [isSelf, setSelf] = useState(false)
   const [followed, setFollow] = useState(true)
 
-  
+
   useEffect(() => {
     // console.log("reload");
     fetchData();
@@ -49,56 +49,56 @@ export const AccountProfile = (props) => {
     console.log("hello")
     setName(userTemp[1].firstName)
   }
-  
+
   return (
-  <Card {...props}>
-    <CardContent>
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <Avatar
-          src={avatar}
+    <Card {...props}>
+      <CardContent>
+        <Box
           sx={{
-            height: 64,
-            mb: 2,
-            width: 64
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'column'
           }}
-        />
-        <Typography
-          color="textPrimary"
-          gutterBottom
-          variant="h5"
         >
-          {name}
-        </Typography>
-      </Box>
-    </CardContent>
-    <Divider />
-    <CardActions>
-      <Button
-        color="primary"
-        fullWidth
-        variant="text"
-      >
-        Upload picture
-      </Button>
-    </CardActions>
-    {isSelf ? '' :
-    <div>
+          <Avatar
+            src={avatar}
+            sx={{
+              height: 64,
+              mb: 2,
+              width: 64
+            }}
+          />
+          <Typography
+            color="textPrimary"
+            gutterBottom
+            variant="h5"
+          >
+            {name}
+          </Typography>
+        </Box>
+      </CardContent>
       <Divider />
-      <CardActions><Button
-        color="primary"
-        fullWidth
-        variant="text"
-        onClick={handleFollow}
-      >
-        {followed ? 'Follow User' : 'Unfollow User'}
-      </Button></CardActions>
-    </div>}
-  </Card>
+      <CardActions>
+        <Button
+          color="primary"
+          fullWidth
+          variant="text"
+        >
+          Upload picture
+        </Button>
+      </CardActions>
+      {isSelf ? '' :
+        <div>
+          <Divider />
+          <CardActions><Button
+            color="primary"
+            fullWidth
+            variant="text"
+            onClick={handleFollow}
+          >
+            {followed ? 'Follow User' : 'Unfollow User'}
+          </Button></CardActions>
+        </div>}
+    </Card>
   );
 };

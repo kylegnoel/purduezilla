@@ -72,9 +72,9 @@ const Task = () => {
         setOpen(false);
 
         alert("Task Deleted.")
-        apiFunctions.deleteItemById("task",id);
+        apiFunctions.deleteItemById("task", id);
         navigate("/home")
-        
+
         // to do implement delete
     }
 
@@ -97,7 +97,7 @@ const Task = () => {
     const handleCancel = () => {
         setEditing(false)
     };
-    
+
     const handleButtonClick = async (setting) => {
         setAnchorElUser(null);
         if (setting === 'Mark as Complete') {
@@ -152,7 +152,7 @@ const Task = () => {
         console.log("values: " + id)
 
         const curTask = (await apiFunctions.getTaskById(id))[0]
-        setName(curTask[1].name) 
+        setName(curTask[1].name)
 
         console.log("loading status: " + curTask[1].status)
         if (curTask[1].status === "Complete") {
@@ -176,33 +176,33 @@ const Task = () => {
                     <NavBar></NavBar>
                     <ThemeProvider theme={theme}>
                         <Container component="main" maxWidth="sm">
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                mt: '20px',
-                            }}
-                        >
-                            <h2>{isEditing ? "Editing: " : "Viewing: "}{name}</h2>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={handleCancel}
-                                startIcon={<ClearIcon />} >
-                                <b>Cancel</b> 
-                            </Button>
-                        </Box>
-                        <br></br>
-                        <Divider></Divider>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    mt: '20px',
+                                }}
+                            >
+                                <h2>{isEditing ? "Editing: " : "Viewing: "}{name}</h2>
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    onClick={handleCancel}
+                                    startIcon={<ClearIcon />} >
+                                    <b>Cancel</b>
+                                </Button>
+                            </Box>
+                            <br></br>
+                            <Divider></Divider>
                         </Container>
                     </ThemeProvider>
                     <EditTask></EditTask>
@@ -255,35 +255,35 @@ const Task = () => {
                                 }}
                             >
                                 <Tooltip title="Open settings">
-                                <Button
-                                    width='20%'
-                                    variant="outlined"
-                                    onClick={handleOpenUserMenu}
-                                    startIcon={<ExpandMoreIcon />} >
-                                    <b>Options</b> 
-                                </Button>
+                                    <Button
+                                        width='20%'
+                                        variant="outlined"
+                                        onClick={handleOpenUserMenu}
+                                        startIcon={<ExpandMoreIcon />} >
+                                        <b>Options</b>
+                                    </Button>
                                 </Tooltip>
                                 <Menu
-                                sx={{ mt: '45px' }}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'center',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'center',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
+                                    sx={{ mt: '45px' }}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'center',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'center',
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
                                 >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))}
+                                    {settings.map((setting) => (
+                                        <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
+                                            <Typography textAlign="center">{setting}</Typography>
+                                        </MenuItem>
+                                    ))}
                                 </Menu>
                             </Box>
                             <br></br>

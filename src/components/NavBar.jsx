@@ -17,6 +17,8 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { ref, onValue } from "firebase/database";
 
+
+import NotificationsBox from "./notifications";
 const pages = ['Login', 'Teams'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -24,9 +26,23 @@ const ResponsiveAppBar = () => {
   const user = apiFunctions.useFirebaseAuth();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [notifications, setNotifications] = React.useState([]);
+  const [anchorNotif, setAnchorNotif] = React.useState(null);
 
   const navigate = useNavigate();
-  
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+  const fetchData = () => {
+    console.log(user);
+    console.log(user.key);
+    const notifs = apiFunctions.getNotifications(user.key);
+    // console.log("getting notifications");
+    setNotifications(notifs);
+  }
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -50,9 +66,16 @@ const ResponsiveAppBar = () => {
       apiFunctions.signOutAccount();
       navigate('/');
     }
-    
+
   }
 
+  const swapNotif = (event) => {
+    setAnchorNotif(event.currentTarget);
+  }
+
+  const handleCloseNotif = () => {
+    setAnchorNotif(null);
+  }
   return (
     <AppBar position="static" style={{ background: '#CFB991' }}>
 
@@ -140,21 +163,50 @@ const ResponsiveAppBar = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} className="second-step">
             <MenuItem component={Link} to="/mygroups"><h1>
-                <Typography textAlign="center">My Groups</Typography></h1>
+              <Typography textAlign="center">My Groups</Typography></h1>
             </MenuItem>
             <MenuItem component={Link} to="/myprojects"><h1>
-                <Typography textAlign="center">My Projects</Typography></h1>
+              <Typography textAlign="center">My Projects</Typography></h1>
             </MenuItem>
             <MenuItem component={Link} to="/mytasks"><h1>
-                <Typography textAlign="center">My Tasks</Typography></h1>
+              <Typography textAlign="center">My Tasks</Typography></h1>
             </MenuItem>
+            <MenuItem component={Link} to="/searchPage"><h1>
+              <Typography textAlign="center">Search Page</Typography></h1>
+            </MenuItem>
+            <div style={{ marginTop: 20 }}>
+              <IconButton onClick={swapNotif}>
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorNotif}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorNotif)}
+                onClose={handleCloseNotif}
+              >
+                <IconButton onClick={() => { setNotifications([]); apiFunctions.deleteNotifications(user.key) }}> Clear Notifications <MenuIcon /></IconButton>
+                <NotificationsBox notifications={notifications}></NotificationsBox>
+
+              </Menu>
+            </div>
           </Box>
+
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }} className="third-step">
                 <Avatar></Avatar>
-              {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
+                {/* <Avatar> {user && user != null ? user.info.firstName[0]}</Avatar> */}
               </IconButton>
             </Tooltip>
             <Menu
@@ -181,8 +233,8 @@ const ResponsiveAppBar = () => {
             </Menu>
           </Box>
         </Toolbar>
-      </Container>
-    </AppBar>
+      </Container >
+    </AppBar >
   );
 };
 export default ResponsiveAppBar;
