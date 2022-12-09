@@ -108,7 +108,7 @@ export default function AddTask() {
         })
 
         let createNewTask = await apiFunctions.createNewTask(
-            apiFunctions.getObjectById("projects", project)[0], // projectId 
+            apiFunctions.getProjectById(project)[0], // projectId 
             name, // title 
             description, // description
             hour, // estimatedTime

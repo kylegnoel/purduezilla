@@ -21,8 +21,7 @@ import { ref, onValue } from "firebase/database";
 const theme = createTheme();
 
 export default function ProjectDashboard() {
-    var user = useState([]);
-    user = apiFunctions.useFirebaseAuth();
+    const user = apiFunctions.useFirebaseAuth();
     const { id } = useParams();
     const [projListarr1, setProjListArr] = useState([]);
     // const taskListarr = []

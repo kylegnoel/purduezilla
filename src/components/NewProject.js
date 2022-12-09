@@ -62,7 +62,11 @@ export default function NewProject() {
         setOwner(event.target.value)
     };
 
-    const handleGroupChange = event => {
+    const handleGroupChange = async(event) => {
+        if (event.target.value != undefined) {
+            const userListTemp = (await apiFunctions.getGroupsMembers("", id))
+            setUserList(userListTemp)
+        }
         setGroup(event.target.value)
     };
 
@@ -101,10 +105,17 @@ export default function NewProject() {
     }, []);
 
     const fetchData = async (event) => {
-        // users
-        const userTemp = (await apiFunctions.getObjectById("users",""))
-        console.log("userTemp: " + JSON.stringify(userTemp))
-        setUserList(userTemp)
+        if (id !== undefined) {
+            console.log("not defined")
+            const userListTemp = (await apiFunctions.getGroupsMembers("", id))
+            console.log("returned: " + JSON.stringify(userListTemp))
+            setUserList(userListTemp)
+        } else {
+            // users
+            const userTemp = (await apiFunctions.getObjectById("users",""))
+            console.log("userTemp: " + JSON.stringify(userTemp))
+            setUserList(userTemp)
+        }
 
         // projects
         const groupTemp = (await apiFunctions.getObjectById("groups", ""))

@@ -30,6 +30,7 @@ const theme = createTheme();
 
 export default function AddTaskPage() {
     const {id} = useParams();
+    const user = apiFunctions.useFirebaseAuth();
 
     const [selected, setSelected] = useState([]);
     const [selectedFollower, setSelectedFollower] = useState([]);
@@ -68,7 +69,17 @@ export default function AddTaskPage() {
         setOwner(event.target.value)
     };
 
-    const handleProjectChange = event => {
+    const handleProjectChange = async (event) => {
+        if (event.target.value !== undefined) {
+            console.log(event.target.value)
+            const userListTemp = (await apiFunctions.getProjectMembers("", event.target.value))
+            console.log("returned: " + JSON.stringify(userListTemp))
+            setUserList(userListTemp)
+        }
+        console.log(event.target.value)
+        if (event.target.value === 0) {
+            navigate('/newproject')
+        }
         setProject(event.target.value)
     };
 
@@ -82,7 +93,6 @@ export default function AddTaskPage() {
     }, []);
 
     const handleSubmit = async (event) => {
-
         event.preventDefault()
         // console.log("submitted")
 
@@ -121,14 +131,20 @@ export default function AddTaskPage() {
 
     const fetchData = async() => {
         // projects
-        const projectTemp = (await apiFunctions.getObjectById("projects",""))
+        const projectTemp = (await apiFunctions.getUsersProjects(user.key))
         console.log("projectTemp: " + JSON.stringify(projectTemp))
         setProjectList(projectTemp)
 
-        // users
-        const userTemp = (await apiFunctions.getObjectById("users",""))
-        console.log("userTemp: " + JSON.stringify(userTemp))
-        setUserList(userTemp)
+        if (id !== undefined) {
+            const userListTemp = (await apiFunctions.getProjectMembers("", id))
+            console.log("returned: " + JSON.stringify(userListTemp))
+            setUserList(userListTemp)
+        } else {
+            // users
+            const userTemp = (await apiFunctions.getObjectById("users",""))
+            console.log("userTemp: " + JSON.stringify(userTemp))
+            setUserList(userTemp)
+        }
     }
 
     const navigateToPage = () => {

@@ -61,17 +61,19 @@ const createNewGroup = function createNewGroup(name, description, ownerId, membe
     name: name,
     description, description,
     ownerId: ownerId,
+    members: memberIds,
+    viewers: viewerIds
   });
 
-  // Add member user Id's
-  for (const i in memberIds) {
-    addNewMemberToGroup(newGroupRef.key, memberIds[i]);
-  }
+  // // Add member user Id's
+  // for (const i in memberIds) {
+  //   addNewMemberToGroup(newGroupRef.key, memberIds[i]);
+  // }
 
-  // Add viewer user Id's
-  for (const i in viewerIds) {
-    addNewViewerToGroup(newGroupRef.key, viewerIds[i]);
-  }
+  // // Add viewer user Id's
+  // for (const i in viewerIds) {
+  //   addNewViewerToGroup(newGroupRef.key, viewerIds[i]);
+  // }
 
   return newGroupRef.key;
 }
@@ -524,6 +526,8 @@ const getUsersProjects = async function getUsersProjects(userId) {
     });
   }
 
+  console.log("returning values: " + usersProjects)
+
   return usersProjects;
 }
 
@@ -630,13 +634,35 @@ const getGroupsMembers = async function getGroupsMembers(lookVal, groupId) {
   const dbRef = ref(db);
 
   const groupMemberIds = []
-  // accepted values: owners, members, viewers
-  await get(child(dbRef, 'groups/' + groupId + `/` + lookVal)).then((snapshot) => {
-    snapshot.forEach(function (childSnapshot) {
-      groupMemberIds.push(childSnapshot.val());
-    })
-  });
+  if (lookVal === "") {
+    await get(child(dbRef, 'groups/' + groupId + `/ownerId`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        groupMemberIds.push(childSnapshot.val());
+        console.log("adding: "+ childSnapshot.val())
+      })
+    });
+    await get(child(dbRef, 'groups/' + groupId + `/members`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        if(!groupMemberIds.includes(childSnapshot.val()))
+          groupMemberIds.push(childSnapshot.val());
+      })
+    });
+    await get(child(dbRef, 'groups/' + groupId + `/viewers`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        if(!groupMemberIds.includes(childSnapshot.val()))
+          groupMemberIds.push(childSnapshot.val());
+      })
+    });
+  }else {
+    // accepted values: owners, members, viewers
+    await get(child(dbRef, 'groups/' + groupId + `/` + lookVal)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        groupMemberIds.push(childSnapshot.val());
+      })
+    });    
+  }
 
+  console.log("groupMembers: " + groupMemberIds)
   for (const ids of groupMemberIds) {
     const tempUser = await getObjectById("users", ids)
     groupMembers.push(tempUser[0]);
@@ -651,7 +677,18 @@ const getProjectMembers = async function getProjectMembers(lookVal, groupId) {
 
   console.log(groupId)
 
-  if (lookVal !== "members") {
+  if (lookVal === "") {
+    await get(child(dbRef, 'projects/' + groupId + `/ownerId`)).then((snapshot) => {
+      groupMemberIds.push(snapshot.val());
+    });
+    await get(child(dbRef, 'projects/' + groupId + `/members`)).then((snapshot) => {
+      snapshot.forEach(function (childSnapshot) {
+        if(!groupMemberIds.includes(childSnapshot.val().userId))
+          groupMemberIds.push(childSnapshot.val().userId);
+      })
+    });
+  }
+  else if (lookVal !== "members") {
     await get(child(dbRef, 'projects/' + groupId + `/ownerId`)).then((snapshot) => {
       groupMemberIds.push(snapshot.val());
     });
@@ -664,6 +701,9 @@ const getProjectMembers = async function getProjectMembers(lookVal, groupId) {
       })
     });
   }
+
+  console.log("currentValues: " + groupMemberIds)
+    
 
   for (const ids of groupMemberIds) {
     const tempUser = await getObjectById("users", ids)
@@ -788,13 +828,6 @@ const isProjectMember = async function isProjectMember(userId, projectId) {
   console.log("userId: " + userId)
   var ret = 0;
 
-  await get(child(dbRef, 'projects/' + projectId + `/ownerId`)).then((snapshot) => {
-    console.log(snapshot.val())
-    if (snapshot.val() === userId) {
-      console.log("they are an owner")
-      ret = 1;
-    }
-  });
   await get(child(dbRef, 'projects/' + projectId + `/members`)).then((snapshot) => {
     console.log(JSON.stringify(snapshot))
     snapshot.forEach(function (childSnapshot) {
@@ -804,6 +837,14 @@ const isProjectMember = async function isProjectMember(userId, projectId) {
         ret = 2;
       }
     })
+  });
+
+  await get(child(dbRef, 'projects/' + projectId + `/ownerId`)).then((snapshot) => {
+    console.log(snapshot.val())
+    if (snapshot.val() === userId) {
+      console.log("they are an owner")
+      ret = 1;
+    }
   });
   return ret;
 }
@@ -815,13 +856,13 @@ const isGroupMember = async function isGroupMember(userId, groupId) {
   console.log("userId: " + userId)
   var ret = 0;
 
-  await get(child(dbRef, 'groups/' + groupId + `/ownerId`)).then((snapshot) => {
-    console.log(snapshot.val())
+  await get(child(dbRef, 'groups/' + groupId + `/viewerId`)).then((snapshot) => {
+    console.log(JSON.stringify(snapshot))
     snapshot.forEach(function (childSnapshot) {
       console.log("current: " + childSnapshot.val().userId)
       if (childSnapshot.val() === userId) {
-        console.log("they are a owner")
-        ret = 1;
+        console.log("they are a viewer")
+        ret = 3;
       }
     })
   });
@@ -835,16 +876,17 @@ const isGroupMember = async function isGroupMember(userId, groupId) {
       }
     })
   });
-  await get(child(dbRef, 'groups/' + groupId + `/viewerId`)).then((snapshot) => {
-    console.log(JSON.stringify(snapshot))
+  await get(child(dbRef, 'groups/' + groupId + `/ownerId`)).then((snapshot) => {
+    console.log(snapshot.val())
     snapshot.forEach(function (childSnapshot) {
       console.log("current: " + childSnapshot.val().userId)
       if (childSnapshot.val() === userId) {
-        console.log("they are a viewer")
-        ret = 3;
+        console.log("they are a owner")
+        ret = 1;
       }
     })
   });
+  
   return ret;
 }
 
@@ -900,6 +942,16 @@ const updateProjectDetails = (id, name, description, status, userId) => {
     name: name,
     description: description,
     status: status
+  });
+
+  return projectListRef.key;
+}
+
+const updateGroupOwner = (id, userId) => {
+  const projectListRef = ref(db, 'group/' + id);
+
+  update(projectListRef, {
+    ownerId: userId
   });
 
   return projectListRef.key;
@@ -999,6 +1051,49 @@ const deleteUserById = (key, userId, id) => {
       }
       if (bucket2 == "/followers" && childSnapshot.val().followerId == userId) {
         remove(ref(db, link + "/" + childSnapshot.key));   
+      }
+    });
+  });
+}
+
+const deleteMemberFromGroup = (groupId, userId) => {
+
+  const link = "/groups/" + groupId + "/members";
+  get(ref(db, link)).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      console.log("childSnapshot: " + childSnapshot.val());   
+      if (childSnapshot.val() == userId) {
+        remove(ref(db, link + "/" + childSnapshot.key)); 
+        console.log("FOUND USER");     
+      }
+    });
+  });
+}
+
+const deleteMemberFromProject = (groupId, userId) => {
+
+  const link = "/projects/" + groupId + "/members";
+  get(ref(db, link)).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      console.log("childSnapshot: " + childSnapshot.val());   
+      if (childSnapshot.val().userId === userId) {
+        remove(ref(db, link + "/" + childSnapshot.key)); 
+        console.log("FOUND USER");     
+      }
+    });
+  });
+}
+
+const deleteViewerFromGroup = (groupId, userId) => {
+  console.log(userId)
+
+  const link = "/groups/" + groupId + "/viewers";
+  get(ref(db, link)).then((snapshot) => {
+    snapshot.forEach(function (childSnapshot) {
+      console.log("childSnapshot: " + childSnapshot.val());   
+      if (childSnapshot.val() == userId) {
+        remove(ref(db, link + "/" + childSnapshot.key)); 
+        console.log("FOUND USER");     
       }
     });
   });
@@ -1216,6 +1311,9 @@ const apiFunctions = {
   tryCreateAccount,
   trySignInAccount,
   signOutAccount,
+  deleteMemberFromGroup,
+  deleteViewerFromGroup,
+  deleteMemberFromProject,
   sendUserPasswordResetEmail,
   updateUser,
   updateProjectDetails,

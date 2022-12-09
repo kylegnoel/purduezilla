@@ -56,10 +56,10 @@ const Dashboard = () => {
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
         const settingProjects = apiFunctions.getUsersProjects(user.key);
-        await setProjListArr(settingProjects);
+        //await setProjListArr(settingProjects);
 
         const settingTasks = await apiFunctions.getUsersAssignedTasks(user.key);
-        await setTaskListArr(settingTasks);
+        //await setTaskListArr(settingTasks);
 
         setLoading(false)
         

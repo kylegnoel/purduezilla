@@ -73,7 +73,7 @@ const Task = () => {
 
         alert("Task Deleted.")
         apiFunctions.deleteItemById("task",id);
-        navigate("/")
+        navigate("/home")
         
         // to do implement delete
     }

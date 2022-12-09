@@ -16,6 +16,11 @@ import WorkIcon from '@mui/icons-material/Work';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -23,6 +28,18 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
+
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Menu from '@mui/material/Menu';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 
 
 // db import
@@ -49,15 +66,90 @@ const Projects = () => {
     const [members, setMembers] = useState([]);
     const [viewers, setViewers] = useState([]);
 
+    const [open, setOpen] = React.useState(false);
+
+    const [permissions, setPermissions] = useState(0);
+    const [canEdit, setCanEdit] = useState(0);
+    const [isOwner, setOwner] = useState(0);
+    const [isNotMember, setNonMember] = useState(0);
+    const [openVal, setOpenVal] = React.useState(false);
+    const [newOwner, setNewOwner] = useState("")
+    const [userList, setUserList] = useState([]);
+    const [userTemp, setUserTemp] = useState("")
+
+    const settings = ["Edit Description", 'Delete Project', 'Transfer Ownership'];
+    const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
+
     const [expanded, setExpanded] = React.useState(false);
+    const [openUser, setWarningOpen] = React.useState(false);
+
 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
     };
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleDeleteUser = (event) => {
+        setWarningOpen(false);
+
+        // to do implement delete
+        apiFunctions.deleteMemberFromProject(id, userTemp);
+        navigate("/myprojects/")
+    }
+
     const showUser = (event) => {
         console.log(event.currentTarget.id)
         navigate('/profile/' + event.currentTarget.id);
+    }
+
+    const handleButtonClick = async (setting) => {
+        setAnchorElUser(null);
+        if (setting === 'Delete Project') {
+            setOpen(true)
+        } else if (setting === 'Transfer Ownership') {
+            setOpenVal(true)
+        } 
+    }
+
+    const handleOwnerChange = event => {
+        console.log("owner: " + event.target.value)
+        setNewOwner(event.target.value)
+    };
+
+    const handleOpenNavMenu = (event) => {
+        setAnchorElNav(event.currentTarget);
+    };
+
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseNavMenu = () => {
+        setAnchorElNav(null);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+
+    const handleSubmit = async (event) => {
+        console.log("owner final: " + newOwner)
+
+        let changeOwner = await apiFunctions.changeProjectOwner(id, newOwner);
+
+        alert("Owner Transfered!")
+
+        closeChange();
+        navigate("/project/"+id)
+    };
+
+    const removeUser = (event) => {
+        setWarningOpen(true);
+        setUserTemp(event.currentTarget.id)
     }
 
     useEffect(() => {
@@ -80,16 +172,27 @@ const Projects = () => {
 
     const fetchData = async (event) => {
         setTaskListArr([]);
-        // Update the document title using the browser API
-        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // console.log("response: " + response)
+        const userListTemp = (await apiFunctions.getObjectById("users", ""))
+        console.log("returned: " + JSON.stringify(userListTemp))
+        setUserList(userListTemp)
+
         if (id === undefined) {
 
         }
         else {
             const permTemp = (await apiFunctions.isProjectMember(user.key, id));
             console.log("permission is: " + JSON.stringify(permTemp))
-            
+            setPermissions(permTemp)
+            if (permTemp === 1 || permTemp === 2) {
+                setCanEdit(1)
+            }
+            if (permTemp === 0 || permTemp === 3) {
+                setNonMember(1)
+            }
+            if (permTemp === 1) {
+                setOwner(1)
+            }
+
             // set project tasks
             const finishedArr = await apiFunctions.getProjectsTasks(id);
             setTaskListArr(finishedArr);
@@ -114,6 +217,10 @@ const Projects = () => {
         return true;
     };
 
+    const closeChange = () => {
+        setOpenVal(false);
+    };
+
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
             navigate('/task/' + event.currentTarget.id);
@@ -121,6 +228,15 @@ const Projects = () => {
         else {
             navigate('/newtask/' + id);
         }
+    }
+
+    const handleDelete = (event) => {
+        setOpen(false);
+        alert("Project Deleted.")
+
+        // to do implement delete
+        apiFunctions.deleteItemById("project",id);
+        navigate("/myprojects")
     }
 
     if (id === undefined) {
@@ -143,9 +259,50 @@ const Projects = () => {
                         <h2><i>Project: </i>{project}</h2>
                         <Button sx={{mb: 2 }} component={Link} to={window.location.pathname + "/storyboard"} variant="contained">View {project} Storyboard</Button>
                         <br></br>
+                        {isOwner ? <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Tooltip title="Open settings">
+                                <Button
+                                    width='20%'
+                                    variant="outlined"
+                                    onClick={handleOpenUserMenu}
+                                    startIcon={<ExpandMoreIcon />} >
+                                    <b>Options</b> 
+                                </Button>
+                                </Tooltip>
+                                <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'center',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'center',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                                >
+                                {settings.map((setting) => (
+                                    <MenuItem key={setting} onClick={() => handleButtonClick(setting)}>
+                                    <Typography textAlign="center">{setting}</Typography>
+                                    </MenuItem>
+                                ))}
+                                </Menu>
+                            </Box> : ''}
+                            <br></br>
                         <Divider></Divider>
                         <Box sx={{ mt: 0, mb: 6, }} display="flex" style={{textAlign: "center"}}>
-                        <Grid container spacing={2}>
+                        <Grid container justifyContent="center" spacing={2} >
+                                { isNotMember ? '' :
                                 <Grid item xs={50} sm={6}>
                                     <h3>Projects Tasks</h3>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',minHeight:400, maxHeight:400, overflowY:'auto',flexGrow: 1, mt: '0px',
@@ -171,8 +328,9 @@ const Projects = () => {
                                         variant="outlined"
                                         sx={{ mt: '10px', width: '100%'}}>
                                         Create New Task
-                                        </Button>
+                                        </Button> 
                                 </Grid>
+                                }
                                 <Grid item xs={50} sm={6} sx={{ mt: 0 }}>
                                     <h3>Description</h3>
                                     <TextField
@@ -267,8 +425,13 @@ const Projects = () => {
                                                             </Typography>
                                                             </React.Fragment>
                                                         }
-                                                        />
+                                                        /> 
                                                     </Link>
+                                                    <ListItemAvatar>
+                                                        <IconButton id={data[0]} onClick={removeUser} aria-label="delete"  color="primary">
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                        </ListItemAvatar>
                                                 </ListItem>
                                                 );
                                             }): "There are no members in this project!" }
@@ -300,6 +463,87 @@ const Projects = () => {
                                     <Button onClick={createComment}>New Comment</Button>
                                 </Grid>
                             </Grid>
+
+                            <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Are you sure you want to delete this project?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    This action cannot be undone.
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose}>Close</Button>
+                                <Button onClick={handleDelete} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <Dialog
+                            open={openUser}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Are you sure you want to remove this user?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    This action cannot be undone.
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose}>Close</Button>
+                                <Button onClick={handleDeleteUser} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+
+                        <Dialog
+                            open={openVal}
+                            onClose={closeChange}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Change the owner"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="ownerLabel">Owner</InputLabel>
+                                        <Select
+                                            labelId="ownerLabelSelect"
+                                            id="ownerSelect"
+                                            label="ownerLabel"
+                                            onChange={handleOwnerChange}
+                                            defaultValue={10}
+                                        >
+                                            {userList && userList.length != 0 ? userList.map((data) =>
+                                                <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
+                                            ) : <MenuItem value={0}>New User</MenuItem>}
+                                        </Select>
+                                        <FormHelperText>Select the team member who oversees this project.</FormHelperText>
+                                    </FormControl>
+                                </Box>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={closeChange}>Close</Button>
+                                <Button onClick={handleSubmit} autoFocus>
+                                    Submit
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </Container>
                 </ThemeProvider>
                 {/* <LoadTasks></LoadTasks> */}

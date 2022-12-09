@@ -21,6 +21,12 @@ import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
 import ClearIcon from '@mui/icons-material/Clear';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+
+
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -65,6 +71,10 @@ const Groups = () => {
     const [permissions, setPermissions] = useState(0);
     const [canEdit, setCanEdit] = useState(0);
     const [isOwner, setOwner] = useState(0);
+    const [newOwner, setNewOwner] = useState("")
+    const [userTemp, setUserTemp] = useState("")
+    const [viewerTemp, setViewerTemp] = useState("")
+
 
     const [expanded, setExpanded] = React.useState(false);
 
@@ -72,6 +82,12 @@ const Groups = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [open, setOpen] = React.useState(false);
+    const [openUser, setWarningOpen] = React.useState(false);
+    const [openViewer, setViewerOpen] = React.useState(false);
+
+    const [openVal, setOpenVal] = React.useState(false);
+
+    const [userList, setUserList] = useState([]);
 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
@@ -90,14 +106,22 @@ const Groups = () => {
         setOpen(false);
     };
 
+    const handleViewerClose = () => {
+        setViewerOpen(false);
+    };
+
+    const closeChange = () => {
+        setOpenVal(false);
+    };
+
     const handleButtonClick = async (setting) => {
         setAnchorElUser(null);
         if (setting === 'Delete Group') {
             setOpen(true)
         } else if (setting === 'Edit Description') {
-            
+            setOpenVal(true)
         } else if (setting === 'Transfer Ownership') {
-            
+            setOpenVal(true)
         } 
     }
 
@@ -107,7 +131,34 @@ const Groups = () => {
 
         // to do implement delete
         apiFunctions.deleteItemById("group",id);
-        navigate("/")
+        navigate("/home")
+    }
+
+    const removeUser = (event) => {
+        setWarningOpen(true);
+        setUserTemp(event.currentTarget.id)
+    }
+
+    const removeViewer = (event) => {
+        setViewerOpen(true);
+        setViewerTemp(event.currentTarget.id)
+    }
+
+
+    const handleDeleteUser = (event) => {
+        setWarningOpen(false);
+
+        // to do implement delete
+        apiFunctions.deleteMemberFromGroup(id, userTemp);
+        navigate("/mygroups")
+    }
+
+    const handleDeleteViewer = (event) => {
+        setViewerOpen(false);
+
+        // to do implement delete
+        apiFunctions.deleteViewerFromGroup(id, viewerTemp);
+        navigate("/mygroups")
     }
 
     useEffect(() => {
@@ -116,6 +167,10 @@ const Groups = () => {
     }, []);
 
     const fetchData = async (event) => {
+        const userTemp = (await apiFunctions.getObjectById("users",""))
+        console.log("userTemp: " + JSON.stringify(userTemp))
+        setUserList(userTemp)
+
         if (id !== undefined) {
             const permTemp = (await apiFunctions.isGroupMember(user.key, id));
             setPermissions(permTemp)
@@ -125,9 +180,9 @@ const Groups = () => {
             if (permTemp === 1) {
                 setOwner(1)
             }
-            if (permTemp === 0) {
-                navigate("/mygroups")
-            }
+            // if (permTemp === 0) {
+            //     navigate("/mygroups")
+            // }
             console.log("permission: " + permTemp)
 
             const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
@@ -145,13 +200,13 @@ const Groups = () => {
             // console.log("owners: " + groupOwners)
 
             // get members
-            const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
+            const groupMembers = (await apiFunctions.getGroupsMembers("members", id))
             setMembers(groupMembers)
             // console.log("members: " + groupMembers)
 
 
             // get viewers
-            const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
+            const groupViewers = (await apiFunctions.getGroupsMembers("viewers", id))
             setViewers(groupViewers)
             // console.log("viewers: " + groupViewers)
 
@@ -186,6 +241,16 @@ const Groups = () => {
         }
     }
 
+    const handleSubmit = async (event) => {
+        console.log("owner final: " + newOwner)
+
+        let changeOwner = await apiFunctions.changeGroupOwner(id, newOwner);
+
+        alert("Owner Transfered!")
+
+        closeChange();
+    };
+
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -193,6 +258,12 @@ const Groups = () => {
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
+
+    const handleOwnerChange = event => {
+        console.log("owner: " + event.target.value)
+        setNewOwner(event.target.value)
+    };
+
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
@@ -340,11 +411,7 @@ const Groups = () => {
                                                             </React.Fragment>
                                                         }
                                                         />
-                                                        <ListItemAvatar>
-                                                        <IconButton aria-label="delete" disabled color="primary">
-                                                            <ClearIcon />
-                                                        </IconButton>
-                                                    </ListItemAvatar>
+                                                        
                                                 </ListItem>
                                                 );
                                             }): "There are no owners in this group!" }
@@ -386,7 +453,7 @@ const Groups = () => {
                                                         }
                                                         />
                                                         <ListItemAvatar>
-                                                        <IconButton aria-label="delete" disabled color="primary">
+                                                        <IconButton id={data[0]} onClick={removeUser} aria-label="delete"  color="primary">
                                                             <ClearIcon />
                                                         </IconButton>
                                                         </ListItemAvatar>
@@ -432,7 +499,7 @@ const Groups = () => {
                                                     }
                                                     />
                                                     <ListItemAvatar>
-                                                    <IconButton aria-label="delete" disabled color="primary">
+                                                    <IconButton id={data[0]} onClick={removeViewer} aria-label="delete"  color="primary">
                                                         <ClearIcon />
                                                     </IconButton>
                                                     </ListItemAvatar>
@@ -492,6 +559,87 @@ const Groups = () => {
                                 <Button onClick={handleClose}>Close</Button>
                                 <Button onClick={handleDelete} autoFocus>
                                     Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <Dialog
+                            open={openUser}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Are you sure you want to remove this user?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    This action cannot be undone.
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose}>Close</Button>
+                                <Button onClick={handleDeleteUser} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <Dialog
+                            open={openViewer}
+                            onClose={handleViewerClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Are you sure you want to remove this user?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    This action cannot be undone.
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleViewerClose}>Close</Button>
+                                <Button onClick={handleDeleteViewer} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+
+                        <Dialog
+                            open={openVal}
+                            onClose={closeChange}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Change the owner"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="ownerLabel">Owner</InputLabel>
+                                        <Select
+                                            labelId="ownerLabelSelect"
+                                            id="ownerSelect"
+                                            label="ownerLabel"
+                                            onChange={handleOwnerChange}
+                                            defaultValue={10}
+                                        >
+                                            {userList && userList.length != 0 ? userList.map((data) =>
+                                                <MenuItem value={data[0]}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
+                                            ) : <MenuItem value={0}>New User</MenuItem>}
+                                        </Select>
+                                        <FormHelperText>Select the team member who oversees this group.</FormHelperText>
+                                    </FormControl>
+                                </Box>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={closeChange}>Close</Button>
+                                <Button onClick={handleSubmit} autoFocus>
+                                    Submit
                                 </Button>
                             </DialogActions>
                         </Dialog>
