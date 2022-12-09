@@ -87,32 +87,32 @@ test("Inserts and reads new project into db correctly", () => {
 
 
 test("Inserts and reads new task into db correctly", () => {
-const taskId = apiFunctions.createNewTask("1234", "Test Task", "Task description", 2, "Planned", "456", "789", ["25", "50"]);
+  const taskId = apiFunctions.createNewTask("1234", "Test Task", "Task description", 2, "Planned", "456", "789", ["25", "50"]);
 
-const inputTask = {
-     "tasks": {
-       taskId: {
-         "name": "Test Task",
-         "description": "Task description",
-         "estimatedTime": 2,
-         "assignedUserId": "789",
-         "followers": ["25", "50"],
-         "ownerId": "456",
-         "projectId": "1234",
-         "status": "Planned",
-       }
-     }
-   }
+  const inputTask = {
+    "tasks": {
+      taskId: {
+        "name": "Test Task",
+        "description": "Task description",
+        "estimatedTime": 2,
+        "assignedUserId": "789",
+        "followers": ["25", "50"],
+        "ownerId": "456",
+        "projectId": "1234",
+        "status": "Planned",
+      }
+    }
+  }
 
-   onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
-     const retrievedTask = snapshot.val();
-     expect(retrievedTask).toMatch(inputTask);
-   });
+  onValue(ref(apiFunctions.db, 'tasks/' + taskId), (snapshot) => {
+    const retrievedTask = snapshot.val();
+    expect(retrievedTask).toMatch(inputTask);
   });
+});
 
 test("Inserts and reads new comment into db correctly", () => {
   const projectId = apiFunctions.createNewProject("New Project Name", "Project description", "In Progress", ["22", "99"], ["123", "456"]);
-  apiFunctions.createNewProjectComment("Changed Stuff", "123", projectId);
+  apiFunctions.createNewProjectComment("Changed Stuff", "123", projectId, "yellow");
 
   const inputProject = {
     "projects": {
@@ -124,7 +124,8 @@ test("Inserts and reads new comment into db correctly", () => {
         "status": "In Progress",
         comments: {
           "body": "Changed Stuff",
-          "authorId": "123"
+          "author": "123",
+          "firstName": "yellow"
         }
       }
     }
@@ -134,7 +135,7 @@ test("Inserts and reads new comment into db correctly", () => {
     const retrievedProject = snapshot.val();
     expect(retrievedProject).toMatch(inputProject);
   });
- });
+});
 
 // /*****
 //  *
@@ -239,7 +240,7 @@ test("Correctly returns all comments of a project", () => {
     const retrievedProject = snapshot.val();
     expect(retrievedProject).toMatch(inputProject);
   });
- });
+});
 
 // /*****
 //  *
