@@ -218,7 +218,7 @@ test("Correctly returns all tasks that a user is following", () => {
 
 test("Correctly returns all comments of a project", () => {
   const projectId = apiFunctions.createNewProject("New Project Name", "Project description", "In Progress", ["22", "99"], ["123", "456"]);
-  apiFunctions.createNewProjectComment("Changed Stuff", "123", projectId);
+  apiFunctions.createNewProjectComment("Changed Stuff", "123", projectId, "yellow");
 
   const inputProject = {
     "projects": {
@@ -230,7 +230,8 @@ test("Correctly returns all comments of a project", () => {
         "status": "In Progress",
         comments: {
           "body": "Changed Stuff",
-          "authorId": "123"
+          "author": "123",
+          "firstName": "yellow"
         }
       }
     }
