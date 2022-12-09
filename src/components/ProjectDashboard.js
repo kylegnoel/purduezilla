@@ -21,13 +21,14 @@ import { ref, onValue } from "firebase/database";
 const theme = createTheme();
 
 export default function ProjectDashboard() {
+    const user = apiFunctions.useFirebaseAuth();
     const { id } = useParams();
-    const [projListarr, setProjListArr] = useState([]);
+    const [projListarr1, setProjListArr] = useState([]);
     // const taskListarr = []
 
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const user = apiFunctions.useFirebaseAuth();
+
     console.log(user);
     console.log("in project dashboard")
 
@@ -45,13 +46,11 @@ export default function ProjectDashboard() {
         }
     }
 
-    const fetchData = async () => {
-        // console.log("hello")
-        // Update the document title using the browser API
-        // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
-        // // console.log("response: " + response)
-        const projectTemp = (await apiFunctions.getUsersProjects(user.key));
-        console.log("value: " + JSON.stringify(projectTemp))
+    const fetchData = async (event) => {
+        console.log("user.key: " + user.key)
+
+        setProjListArr([])
+        const projectTemp = (await apiFunctions.getUsersProjects(user.key))
         setProjListArr(projectTemp)
 
         // console.log("taskListarr: " + projListarr.length)
@@ -68,7 +67,7 @@ export default function ProjectDashboard() {
                                 border: 1, borderColor: 'black', maxHeight: 600, overflowY: 'auto', flexGrow: 1,
                                 flexDirection: "column",
                             }} height={400}>
-                                {projListarr && projListarr.length !== 0 ? projListarr.map((data) => {
+                                {projListarr1 && projListarr1.length !== 0 ? projListarr1.map((data) => {
                                     return (
                                         <div key={data[1]}>
                                             <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
@@ -76,11 +75,11 @@ export default function ProjectDashboard() {
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey" />
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[1].name} secondary="Content was changed" />
-                                                </ListItem>
-                                            </Button>
+                                                    <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                                </ListItem >
+                                            </Button >
                                             <Divider />
-                                        </div>
+                                        </div >
                                     )
                                 }) : "There are no Projects!"}
                                 <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%' }}>
@@ -91,12 +90,12 @@ export default function ProjectDashboard() {
                                         <ListItemText primary={"Add Project"} />
                                     </ListItem>
                                 </Button>
-                            </FixedSizeList>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Container>
-        </ThemeProvider>
+                            </FixedSizeList >
+                        </Grid >
+                    </Grid >
+                </Box >
+            </Container >
+        </ThemeProvider >
 
     );
 }

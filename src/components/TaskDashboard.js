@@ -19,7 +19,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
 
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
@@ -44,6 +44,8 @@ export default function TaskDashboard() {
     const [completed, setCompleted] = React.useState(false);
 
     const user = apiFunctions.useFirebaseAuth();
+    const navigate = useNavigate();
+
 
     const handleShowFollow = (event) => {
         setFollow(!showFollow)
@@ -56,10 +58,10 @@ export default function TaskDashboard() {
 
     const handleTask = (event) => {
         if (event.currentTarget.id !== "addtask") {
-            window.location.href='/task/'+event.currentTarget.id
+            navigate('/task/'+event.currentTarget.id)
         }
         else {
-            window.location.href='/newtask/'
+            navigate('/newtask/')
         }
     }
 

@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import Divider from '@mui/material/Divider';
 import { Button } from '@mui/material';
-import { AddModerator } from '@mui/icons-material';
+import { AddModerator, AlarmTwoTone } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ClearIcon from '@mui/icons-material/Clear';
 import TaskDashboard from '../components/TaskDashboard';
@@ -70,7 +70,10 @@ const Task = () => {
 
     const handleDelete = (event) => {
         setOpen(false);
-        alert("this functionality has not been implemented yet")
+
+        alert("Task Deleted.")
+        apiFunctions.deleteItemById("task", id);
+        navigate("/home")
 
         // to do implement delete
     }

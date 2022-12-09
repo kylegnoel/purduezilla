@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 
 import Box from '@mui/material/Box';
+import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -62,7 +63,11 @@ export default function NewProject() {
         setOwner(event.target.value)
     };
 
-    const handleGroupChange = event => {
+    const handleGroupChange = async(event) => {
+        if (event.target.value != undefined) {
+            const userListTemp = (await apiFunctions.getGroupsMembers("", id))
+            setUserList(userListTemp)
+        }
         setGroup(event.target.value)
     };
 
@@ -72,30 +77,24 @@ export default function NewProject() {
         // console.log(memberId)
 
         // convert member names into userid 
-        const memberId = ([]);
+        var memberId = ([]);
 
         selected.forEach(function(member) {
+            console.log("adding new member: " + member[0])
             memberId.push(member[0])
         })
 
-        // convert owner names into userid 
-        const ownersTemp = []
-        userList.forEach(function(userTemp) {
-            if (owner === userTemp[0].firstName + " " + userTemp[0].lastName) {
-                ownersTemp.push (userTemp[1])
-            }
-        })
-
         console.log("members: " + memberId)
-        let createNewProject = await apiFunctions.createNewProject(
-            name, description, group, memberId, ownersTemp)
+        console.log("group: " + group)
 
-        navigate('/myprojects')
+        let createNewProject = await apiFunctions.createNewProject(
+            name, description, group, memberId, owner[0])
+
         if (createNewProject) {
-            
+            navigate('/myprojects')
         } else {
         // perform error UI like highlighting textfield to red
-            alert("invalid login\n TODO: perform error UI")
+            alert("Project Creation Failed.\nPlease try again.")
         }
         // console.log("FINISHED");
         alert("Project Added");
@@ -107,10 +106,17 @@ export default function NewProject() {
     }, []);
 
     const fetchData = async (event) => {
-        // users
-        const userTemp = (await apiFunctions.getUserById(""))
-        console.log("userTemp: " + JSON.stringify(userTemp))
-        setUserList(userTemp)
+        if (id !== undefined) {
+            console.log("not defined")
+            const userListTemp = (await apiFunctions.getGroupsMembers("", id))
+            console.log("returned: " + JSON.stringify(userListTemp))
+            setUserList(userListTemp)
+        } else {
+            // users
+            const userTemp = (await apiFunctions.getObjectById("users",""))
+            console.log("userTemp: " + JSON.stringify(userTemp))
+            setUserList(userTemp)
+        }
 
         // projects
         const groupTemp = (await apiFunctions.getObjectById("groups", ""))
@@ -120,13 +126,13 @@ export default function NewProject() {
 
     return(
         <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xm">
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                <h2 align='center' 
+            <Container component="main" maxWidth="sm">
+            <Box component="form"  onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
+                <h2><DialogTitle align='center' 
                 sx={{
-                    marginTop:10,
+                    marginTop:-4,
                     marginBottom:-5,
-                }}>New Project</h2>
+                }}><h2>New Project</h2></DialogTitle></h2>
                     <Box
                     sx={{
                         display: 'flex',
@@ -173,6 +179,7 @@ export default function NewProject() {
                                     labelId="groupLabel"
                                     id="groupLabel"
                                     label="Group"
+                                    required
                                     defaultValue={id}
                                     onChange={handleGroupChange}
                                 >
@@ -193,6 +200,7 @@ export default function NewProject() {
                                 labelId="ownerLabelSelect"
                                 id="ownerSelect"
                                 label="ownerLabel"
+                                required
                                 onChange={handleOwnerChange}
                                 defaultValue={10}
                             >
@@ -200,7 +208,7 @@ export default function NewProject() {
                                                 <MenuItem value={data} id={data}>{data[1].firstName + " " + data[1].lastName}</MenuItem>
                                             ): <MenuItem value={0}>New User</MenuItem> }
                             </Select>
-                            <FormHelperText>Select the team member who oversees this task.</FormHelperText>
+                            <FormHelperText>Select the team member who oversees this project.</FormHelperText>
                         </FormControl>
 
                             <br></br>
@@ -208,10 +216,11 @@ export default function NewProject() {
                         <br></br>
 
                             <FormControl xs={12} fullWidth>
-                                <InputLabel id="memberLabel">Follower</InputLabel>
+                                <InputLabel id="memberLabel">Members</InputLabel>
                                 <Select
                                     multiple
                                     defaultValue={10}
+                                    required
                                     value={selected}
                                     onChange={selectionChangeHandler}
                                     label="memberLabel"
@@ -244,7 +253,7 @@ export default function NewProject() {
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                             >
-                        Add Project
+                        Create Project
                         </Button>
                 </Box>
             </Container>

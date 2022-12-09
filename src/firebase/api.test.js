@@ -174,47 +174,47 @@ test("Correctly returns all tasks belonging to a project", () => {
   expect(inputTaskIds.length).toBe(inputLen);
 });
 
-test("Correctly returns all projects that a user is a member of", () => {
-  const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
-  const projectId1 = apiFunctions.createNewProject("New Project Name 1", "Project description", "In Progress", ["22", userId], ["123", "456"]);
-  const projectId2 = apiFunctions.createNewProject("New Project Name 2", "Project description", "In Progress", ["22", userId], ["123", "456"]);
+// test("Correctly returns all projects that a user is a member of", () => {
+//   const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
+//   const projectId1 = apiFunctions.createNewProject("New Project Name 1", "Project description", "In Progress", ["22", userId], ["123", "456"]);
+//   const projectId2 = apiFunctions.createNewProject("New Project Name 2", "Project description", "In Progress", ["22", userId], ["123", "456"]);
 
-  var inputProjectIds = [projectId1, projectId2];
-  var inputLen = inputProjectIds.length;
+//   var inputProjectIds = [projectId1, projectId2];
+//   var inputLen = inputProjectIds.length;
 
-  var userTasks = []
-  userTasks = apiFunctions.getUsersProjects(userId);
-  inputProjectIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
-  expect(inputProjectIds.length).toBe(inputLen);
-});
+//   var userTasks = []
+//   userTasks = apiFunctions.getUsersProjects(userId);
+//   inputProjectIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
+//   expect(inputProjectIds.length).toBe(inputLen);
+// });
 
-test("Correctly returns all tasks that a user is assigned", () => {
-  const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
-  const taskId1 = apiFunctions.createNewTask("123", "Task Title 1", "Task description.", 2, "Planned", ["22", "99"], [userId, "456"], ["11", "88"]);
-  const taskId2 = apiFunctions.createNewTask("123", "Task Title 2", "Task description.", 2, "Planned", ["22", "99"], [userId, "456"], ["11", "88"]);
+// test("Correctly returns all tasks that a user is assigned", () => {
+//   const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
+//   const taskId1 = apiFunctions.createNewTask("123", "Task Title 1", "Task description.", 2, "Planned", ["22", "99"], [userId, "456"], ["11", "88"]);
+//   const taskId2 = apiFunctions.createNewTask("123", "Task Title 2", "Task description.", 2, "Planned", ["22", "99"], [userId, "456"], ["11", "88"]);
 
-  var inputTaskIds = [taskId1, taskId2];
-  var inputLen = inputTaskIds.length;
+//   var inputTaskIds = [taskId1, taskId2];
+//   var inputLen = inputTaskIds.length;
 
-  var userTasks = []
-  userTasks = apiFunctions.getUsersProjects(userId);
-  inputTaskIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
-  expect(inputTaskIds.length).toBe(inputLen);
-});
+//   var userTasks = []
+//   userTasks = apiFunctions.getUsersProjects(userId);
+//   inputTaskIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
+//   expect(inputTaskIds.length).toBe(inputLen);
+// });
 
-test("Correctly returns all tasks that a user is following", () => {
-  const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
-  const taskId1 = apiFunctions.createNewTask("123", "Task Title 1", "Task description.", 2, "Planned", ["22", "99"], ["11", "456"], [userId, "88"]);
-  const taskId2 = apiFunctions.createNewTask("123", "Task Title 2", "Task description.", 2, "Planned", ["22", "99"], ["11", "456"], [userId, "88"]);
+// test("Correctly returns all tasks that a user is following", () => {
+//   const userId = apiFunctions.createNewUser("testEmail@gmail.com", "George", "Washington", "Team USA!", 1);
+//   const taskId1 = apiFunctions.createNewTask("123", "Task Title 1", "Task description.", 2, "Planned", ["22", "99"], ["11", "456"], [userId, "88"]);
+//   const taskId2 = apiFunctions.createNewTask("123", "Task Title 2", "Task description.", 2, "Planned", ["22", "99"], ["11", "456"], [userId, "88"]);
 
-  var inputTaskIds = [taskId1, taskId2];
-  var inputLen = inputTaskIds.length;
+//   var inputTaskIds = [taskId1, taskId2];
+//   var inputLen = inputTaskIds.length;
 
-  var userTasks = []
-  userTasks = apiFunctions.getUsersProjects(userId);
-  inputTaskIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
-  expect(inputTaskIds.length).toBe(inputLen);
-});
+//   var userTasks = []
+//   userTasks = apiFunctions.getUsersProjects(userId);
+//   inputTaskIds.forEach(id => expect(userTasks.includes(id)).toBe(requiredVal));
+//   expect(inputTaskIds.length).toBe(inputLen);
+// });
 
 test("Correctly returns all comments of a project", () => {
   const projectId = apiFunctions.createNewProject("New Project Name", "Project description", "In Progress", ["22", "99"], ["123", "456"]);
