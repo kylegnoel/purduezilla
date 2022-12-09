@@ -169,6 +169,9 @@ const ResponsiveAppBar = () => {
             <MenuItem component={Link} to="/mytasks"><h1>
               <Typography textAlign="center">My Tasks</Typography></h1>
             </MenuItem>
+            <MenuItem component={Link} to="/searchPage"><h1>
+              <Typography textAlign="center">Search Page</Typography></h1>
+            </MenuItem>
             <div style={{ marginTop: 20 }}>
               <IconButton onClick={swapNotif}>
                 <MenuIcon />

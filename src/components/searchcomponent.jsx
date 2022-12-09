@@ -14,6 +14,7 @@ const SearchComponent = () => {
     useEffect(() => {
         fetchData();
     }, []);
+    const navigate = useNavigate();
 
     const fetchData = () => {
         setUsers(apiFunctions.getAllAccounts);
@@ -42,8 +43,55 @@ const SearchComponent = () => {
             <Button onClick={() => { swapTarget("Task") }}>Tasks</Button>
             <Button onClick={() => { swapTarget("Project") }}>Projects</Button>
             <Button onClick={() => { swapTarget("User") }}>Users</Button>
+            {target == "Task" &&
+                <div>
+                    {tasks.map((task) => (
+                        <div>
+                            {
+                                task[0].name.includes(filterParam) &&
+                                < Box >
+                                    <Button onClick={navigate(`/task/${task[1]}`)}> {task[0].name}</Button>
+                                    <p>{task[0].description}</p>
+                                </Box>
+                            }
+                        </div>
+                    ))}
 
-        </div>
+                </div>
+            }
+            {
+                target == "Project" &&
+                <div>
+                    {projects.map((project) => (
+                        <div>
+                            {
+                                project[0].name.includes(filterParam) &&
+                                < Box >
+                                    <Button onClick={navigate(`/project/${project[1]}`)}>{project[0].name}</Button>
+                                    <p>{project[0].description}</p>
+                                </Box>
+                            }
+                        </div>
+                    ))}
+                </div>
+            }
+            {
+                target == "User" &&
+                <div>
+                    {users.map((user) => (
+                        <div>
+                            {
+                                user[0].email.includes(filterParam) &&
+                                < Box >
+                                    <Button onClick={navigate(`/profile/${user[1]}`)}>{user[0].email}</Button>
+                                    <p>{user[0].firstName} {user[0].lastName}</p>
+                                </Box>
+                            }
+                        </div>
+                    ))}
+                </div>
+            }
+        </div >
     )
 
 }
