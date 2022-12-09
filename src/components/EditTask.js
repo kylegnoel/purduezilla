@@ -179,6 +179,7 @@ export default function EditTask() {
             hour,
             label, // description
             user.key, // status
+            user.info.firstName + " " + user.info.lastName,
         )
 
         if (updateTaskDetails) {

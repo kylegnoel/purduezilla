@@ -7,6 +7,7 @@ import NavBar from '../components/NavBar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -50,9 +51,14 @@ const Groups = () => {
 
     const [expanded, setExpanded] = React.useState(false);
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  };
+    const handleChange = (panel) => (event, isExpanded) => {
+        setExpanded(isExpanded ? panel : false);
+    };
+
+    const showUser = (event) => {
+        console.log(event.currentTarget.id)
+        navigate('/profile/' + event.currentTarget.id);
+    }
 
     useEffect(() => {
         console.log("reload")
@@ -60,7 +66,7 @@ const Groups = () => {
     }, []);
 
     const fetchData = async (event) => {
-        const currGroup =  (await apiFunctions.getObjectById("groups", id))[0]
+        const currGroup =  (await apiFunctions.getObjectById("/groups", id))[0]
         setGroup(currGroup[1].name)
         setDesc(currGroup[1].description)
 
@@ -70,16 +76,20 @@ const Groups = () => {
         console.log("projectListTemp: " + projectListArr)
 
         // get owners
-        const groupOwners = (await apiFunctions.getGroupsMembers("owners", id))
+        const groupOwners = (await apiFunctions.getGroupsMembers("ownerId", id))
         setOwners(groupOwners)
+        console.log("owners: " + groupOwners)
 
         // get members
-        const groupMembers = (await apiFunctions.getGroupsMembers("members", id))
+        const groupMembers = (await apiFunctions.getGroupsMembers("memberId", id))
         setMembers(groupMembers)
+        console.log("members: " + groupMembers)
+
 
         // get viewers
-        const groupViewers = (await apiFunctions.getGroupsMembers("viewers", id))
+        const groupViewers = (await apiFunctions.getGroupsMembers("viewerId", id))
         setViewers(groupViewers)
+        console.log("viewers: " + groupViewers)
 
         const taskListTemp = (await apiFunctions.getGroupsTasks(id))
         console.log("taskList: " + JSON.stringify(taskListArr))
@@ -115,10 +125,12 @@ const Groups = () => {
                 <ThemeProvider theme={theme}>
                     <Container component="main" maxWidth="lg">
                         <br></br>
-                        <h2>{group}</h2>
-                        <Box sx={{ mt: 6 }} display="flex" style={{textAlign: "center"}}>
+                        <h2><i>Group: </i>{group}</h2>
+                        <Divider></Divider>
+                        <Box sx={{ mt: 2 }} display="flex" style={{textAlign: "center"}}>
                             <Grid container spacing={2}>
                                 <Grid item xs={50} sm={6}>
+                                    <h3>Group Projects</h3>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',minHeight:400, maxHeight:400, overflowY:'auto',flexGrow: 1, mt: '0px',
             flexDirection:"column",}} height={600}>
                                             { projectListArr && projectListArr.length != 0 ? projectListArr.map((data) => {
@@ -145,6 +157,7 @@ const Groups = () => {
                                         </Button>
                                 </Grid>
                                 <Grid item xs={50} sm={6} sx={{ mt: 0 }}>
+                                    <h3>Description</h3>
                                     <TextField
                                         required
                                         fullWidth
@@ -180,21 +193,23 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <ListItemText
-                                                    primary={data[1].firstName + " " + data[1].lastName}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Owner
-                                                        </Typography>
-                                                        </React.Fragment>
-                                                    }
-                                                    />
+                                                    <Link onClick={showUser} id={data[0]} fullWidth>
+                                                        <ListItemText
+                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        secondary={
+                                                            <React.Fragment>
+                                                            <Typography
+                                                                sx={{ display: 'inline' }}
+                                                                component="span"
+                                                                variant="body2"
+                                                                color="text.primary"
+                                                            >
+                                                                Owner
+                                                            </Typography>
+                                                            </React.Fragment>
+                                                        }
+                                                        />
+                                                    </Link>
                                                 </ListItem>
                                                 );
                                             }): "There are no owners in this group!" }
@@ -220,21 +235,23 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <ListItemText
-                                                    primary={data[1].firstName + " " + data[1].lastName}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Member
-                                                        </Typography>
-                                                        </React.Fragment>
-                                                    }
-                                                    />
+                                                    <Link onClick={showUser} id={data[0]} fullWidth>
+                                                        <ListItemText
+                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        secondary={
+                                                            <React.Fragment>
+                                                            <Typography
+                                                                sx={{ display: 'inline' }}
+                                                                component="span"
+                                                                variant="body2"
+                                                                color="text.primary"
+                                                            >
+                                                                Member
+                                                            </Typography>
+                                                            </React.Fragment>
+                                                        }
+                                                        />
+                                                    </Link>
                                                 </ListItem>
                                                 );
                                             }): "There are no members in this group!" }
@@ -261,29 +278,32 @@ const Groups = () => {
                                                     <ListItemAvatar>
                                                         <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
                                                     </ListItemAvatar>
-                                                    <ListItemText
-                                                    primary={data[1].firstName + " " + data[1].lastName}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Viewer
-                                                        </Typography>
-                                                        </React.Fragment>
-                                                    }
-                                                    />
-                                                </ListItem>
+                                                    <Link onClick={showUser} id={data[0]} fullWidth>
+                                                        <ListItemText
+                                                        primary={data[1].firstName + " " + data[1].lastName}
+                                                        secondary={
+                                                            <React.Fragment>
+                                                            <Typography
+                                                                sx={{ display: 'inline' }}
+                                                                component="span"
+                                                                variant="body2"
+                                                                color="text.primary"
+                                                            >
+                                                                Viewer
+                                                            </Typography>
+                                                            </React.Fragment>
+                                                        }
+                                                        />
+                                                    </Link>
+                                                    </ListItem>
                                                 );
                                             }): "There are no viewers in this group!" }
                                             </AccordionDetails>
                                         </Accordion>
                                 </Grid>
-
                                 <Grid item xs={50} sm={12}>
+                                    <Divider></Divider>
+                                    <h3>Group Tasks</h3>
                                     <FixedSizeList sx={{border: 1, borderColor:'black',maxHeight:600, overflowY:'auto',flexGrow: 1,
             flexDirection:"column",}} height={400}>
                                             { taskListArr && taskListArr.length != 0 ? taskListArr.map((data) => {

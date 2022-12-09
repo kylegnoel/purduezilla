@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-// material ui imports
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Container } from '@mui/material';
+import { Container, Link, CssBaseline, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Dialog from '@mui/material/Dialog';
@@ -20,6 +17,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
+import { useNavigate } from "react-router-dom";
 
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
@@ -39,6 +37,8 @@ export default function AddTask() {
     const [project, setProject] = useState('');
     const [projectList, setProjectList] = useState([]);
     const [userList, setUserList] = useState([]);
+
+    const [isLoading, setLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -130,7 +130,7 @@ export default function AddTask() {
         navigateToDashboard();
     };
 
-    const fetchData = () => {
+    const fetchData = (event) => {
         // projects
         try {
             onValue(ref(apiFunctions.db, 'projects/'), (snapshot) => {
@@ -145,6 +145,9 @@ export default function AddTask() {
                     setProjectList(projectTemp)
                     // console.log("snapshot: " + projectList.length)
             })
+            if (projectList.length !== 0) {
+                setLoading(false)
+            }
         }
         catch {
             // if there is no internet
@@ -165,6 +168,9 @@ export default function AddTask() {
                     setUserList(userTemp)
                     // console.log("snapshot: " + userList.length)
             })
+            if (userList.length !== 0) {
+                setLoading(false)
+            }
         }
         catch {
             // if there is no internet
@@ -273,7 +279,7 @@ export default function AddTask() {
                                                     label="Project"
                                                     onChange={handleProjectChange}
                                                 >
-                                                    {projectList && projectList.length !== 0 ? projectList.map((data) =>
+                                                    {projectList && projectList.length != 0 ? projectList.map((data) =>
                                                         <MenuItem value={data[0].name} id={data[1]}>{data[0].name}</MenuItem>
                                                     ) : <MenuItem value={0}>New Project</MenuItem>}
                                                 </Select>
@@ -325,7 +331,7 @@ export default function AddTask() {
                                             label="assignLabel"
                                             defaultValue={10}
                                         >
-                                            {userList && userList.length !== 0 ? userList.map((data) =>
+                                            {userList && userList.length != 0 ? userList.map((data) =>
                                                 <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ) : <MenuItem value={0}>New User</MenuItem>}
                                         </Select>
@@ -356,7 +362,7 @@ export default function AddTask() {
                                                 </div>
                                             )}
                                         >
-                                            {userList && userList.length !== 0 ? userList.map((data) =>
+                                            {userList && userList.length != 0 ? userList.map((data) =>
                                                 <MenuItem value={data[0].firstName + " " + data[0].lastName}>{data[0].firstName + " " + data[0].lastName}</MenuItem>
                                             ) : <MenuItem value={0}>New User</MenuItem>}
                                         </Select>

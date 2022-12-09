@@ -45,13 +45,12 @@ export default function ProjectDashboard() {
         }
     }
 
-    const fetchData = () => {
-        // console.log("user key: " + user.key);
+    const fetchData = async () => {
         // console.log("hello")
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // // console.log("response: " + response)
-        const projectTemp = apiFunctions.getUsersProjects(user.key);
+        const projectTemp = (await apiFunctions.getUsersProjects(user.key));
         console.log("value: " + JSON.stringify(projectTemp))
         setProjListArr(projectTemp)
 

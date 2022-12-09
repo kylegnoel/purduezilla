@@ -23,10 +23,10 @@ export default function SignUp() {
     
     if (data.get('confirmPassword') !== data.get('password')) {
         //TODO: change alerts from a standard alert to a MUI alert. Probably need a new component.
-        alert("Passwords don't match!"); 
+        alert("ERROR: Passwords don't match!"); 
     } else if (!(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(data.get('password')))) {
         document.getElementById('password')
-        alert("Password is too weak!")
+        alert("ERROR: Password is too weak!")
     } else {
         let createSuccess = await apiFunctions.tryCreateAccount(data.get('email'), data.get('password'))
         if (createSuccess.status) {
