@@ -25,9 +25,6 @@ const SearchComponent = () => {
     const swapTarget = (newTarget) => {
         setTarget(newTarget);
 
-        console.log(users);
-        console.log(tasks);
-        console.log(projects);
     }
 
     const onSearch = () => {
@@ -48,9 +45,9 @@ const SearchComponent = () => {
                     {tasks.map((task) => (
                         <div>
                             {
-                                task[0].name.includes(filterParam) &&
+                                task[0].name.toLowerCase().includes(filterParam) &&
                                 < Box >
-                                    <Button onClick={navigate(`/task/${task[1]}`)}> {task[0].name}</Button>
+                                    <Button onClick={() => { navigate(`/task/${task[1]}`) }}> {task[0].name}</Button>
                                     <p>{task[0].description}</p>
                                 </Box>
                             }
@@ -65,9 +62,9 @@ const SearchComponent = () => {
                     {projects.map((project) => (
                         <div>
                             {
-                                project[0].name.includes(filterParam) &&
+                                project[0].name.toLowerCase().includes(filterParam) &&
                                 < Box >
-                                    <Button onClick={navigate(`/project/${project[1]}`)}>{project[0].name}</Button>
+                                    <Button onClick={() => { navigate(`/project/${project[1]}`) }}>{project[0].name}</Button>
                                     <p>{project[0].description}</p>
                                 </Box>
                             }
@@ -81,9 +78,9 @@ const SearchComponent = () => {
                     {users.map((user) => (
                         <div>
                             {
-                                user[0].email.includes(filterParam) &&
+                                user[0].email.toLowerCase().includes(filterParam) &&
                                 < Box >
-                                    <Button onClick={navigate(`/profile/${user[1]}`)}>{user[0].email}</Button>
+                                    <Button onClick={() => { navigate(`/profile/${user[1]}`) }}>{user[0].email}</Button>
                                     <p>{user[0].firstName} {user[0].lastName}</p>
                                 </Box>
                             }
