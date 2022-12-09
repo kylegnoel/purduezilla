@@ -120,8 +120,8 @@ export default function NewProject() {
         <div>
             <NavBar></NavBar>
                 <ThemeProvider theme={theme}>
-                    <Container component="main" maxWidth="xm">
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <Container component="main" maxWidth="sm">
+                    <Box component="form" onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
                         <h2 align='center' 
                         sx={{
                             marginTop:10,
@@ -176,6 +176,7 @@ export default function NewProject() {
                                         multiple
                                         defaultValue={10}
                                         value={owner}
+                                        required
                                         onChange={handleOwnerChange}
                                         label="ownerLabel"
                                         textOverflow="ellipsis"

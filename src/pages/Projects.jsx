@@ -76,6 +76,9 @@ const Projects = () => {
     const [newOwner, setNewOwner] = useState("")
     const [userList, setUserList] = useState([]);
     const [userTemp, setUserTemp] = useState("")
+    const [completed, setCompleted] = useState(0)
+    const [todo, setToDo] = useState(0)
+    const [inProgress, setProgress] = useState(0)
 
     const settings = ["Edit Description", 'Delete Project', 'Transfer Ownership'];
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -175,6 +178,10 @@ const Projects = () => {
         const userListTemp = (await apiFunctions.getObjectById("users", ""))
         console.log("returned: " + JSON.stringify(userListTemp))
         setUserList(userListTemp)
+
+        setCompleted(await apiFunctions.getHoursByStatus("Completed", id))
+        setToDo(await apiFunctions.getHoursByStatus("To Do", id))
+        setProgress(await apiFunctions.getHoursByStatus("In Progress", id))
 
         if (id === undefined) {
 
@@ -436,6 +443,25 @@ const Projects = () => {
                                                 );
                                             }): "There are no members in this project!" }
                                             </List>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                            <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel3bh-content"
+                                            id="panel3bh-header"
+                                            >
+                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>Project Statistics</Typography>
+                                            <Typography sx={{ color: 'text.secondary' }}>
+                                                Members who can create/edit a task in this project.
+                                            </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                                <b><u>Project Hours</u></b>
+                                                To Do ${todo}
+                                                In Progress: ${inProgress}
+                                                Completed: ${completed}
+
                                             </AccordionDetails>
                                         </Accordion>
                                 </Grid>

@@ -25,6 +25,7 @@ import NavBar from '../components/NavBar';
 // db imports
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
+import { assign } from "nodemailer/lib/shared";
 
 const theme = createTheme();
 
@@ -107,6 +108,7 @@ export default function AddTaskPage() {
         console.log("projVar: " + projVar + " " + project)
         const ownerVar = await apiFunctions.getObjectById("users",owner)
         console.log("ownerVar: " + ownerVar + " " + owner)
+        console.log("assignee: " + assignee)
 
         let createNewTask = await apiFunctions.createNewTask(
             project, // projectId 
@@ -115,7 +117,7 @@ export default function AddTaskPage() {
             hour, // estimatedTime
             selected, // status
             owner, // ownerIds
-            assignee, // assignedUserIds
+            assignee[0], // assignedUserIds
             followerId, // followerIds
             )
 

@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Container } from '@mui/material';
 
 import Box from '@mui/material/Box';
+import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -125,13 +126,13 @@ export default function NewProject() {
 
     return(
         <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xm">
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                <h2 align='center' 
+            <Container component="main" maxWidth="sm">
+            <Box component="form"  onSubmit={handleSubmit} Validate sx={{ mt: 3 }}>
+                <h2><DialogTitle align='center' 
                 sx={{
-                    marginTop:10,
+                    marginTop:-4,
                     marginBottom:-5,
-                }}>New Project</h2>
+                }}><h2>New Project</h2></DialogTitle></h2>
                     <Box
                     sx={{
                         display: 'flex',
@@ -178,6 +179,7 @@ export default function NewProject() {
                                     labelId="groupLabel"
                                     id="groupLabel"
                                     label="Group"
+                                    required
                                     defaultValue={id}
                                     onChange={handleGroupChange}
                                 >
@@ -198,6 +200,7 @@ export default function NewProject() {
                                 labelId="ownerLabelSelect"
                                 id="ownerSelect"
                                 label="ownerLabel"
+                                required
                                 onChange={handleOwnerChange}
                                 defaultValue={10}
                             >
@@ -217,6 +220,7 @@ export default function NewProject() {
                                 <Select
                                     multiple
                                     defaultValue={10}
+                                    required
                                     value={selected}
                                     onChange={selectionChangeHandler}
                                     label="memberLabel"
@@ -249,7 +253,7 @@ export default function NewProject() {
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                             >
-                        Add Project
+                        Create Project
                         </Button>
                 </Box>
             </Container>

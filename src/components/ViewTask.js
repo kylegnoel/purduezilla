@@ -325,7 +325,9 @@ export default function ViewTask() {
                                                         fullWidth
                                                         id="taskName"
                                                         value={name}
-                                                        disabled
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                          }}
                                                     />
                                                 </Button>
                                             </Grid>
@@ -337,7 +339,9 @@ export default function ViewTask() {
                                                         fullWidth
                                                         id="label"
                                                         value={label}
-                                                        disabled
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                          }}
                                                     />
                                                 </Button>
                                             </Grid>
@@ -350,7 +354,9 @@ export default function ViewTask() {
                                                         fullWidth
                                                         id="label"
                                                         value={hour + " hours"}
-                                                        disabled
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                          }}
                                                     />
                                                 </Button>
                                             </Grid>
@@ -365,7 +371,9 @@ export default function ViewTask() {
                                                     fullWidth
                                                     id="project"
                                                     value={project}
-                                                    disabled
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                      }}
                                                 />
                                             </Button>
                                         </FormControl>
@@ -376,7 +384,9 @@ export default function ViewTask() {
                                                 required
                                                 fullWidth
                                                 multiline
-                                                disabled
+                                                InputProps={{
+                                                    readOnly: true,
+                                                  }}
                                                 rows={4}
                                                 id="taskDescription"
                                                 name="taskDescription"
@@ -396,7 +406,9 @@ export default function ViewTask() {
                                         fullWidth
                                         id="owner"
                                         value={owner}
-                                        disabled
+                                        InputProps={{
+                                            readOnly: true,
+                                          }}
                                     />
                                 </Button>
 
@@ -412,7 +424,9 @@ export default function ViewTask() {
                                             fullWidth
                                             id="assign"
                                             value={assignee}
-                                            disabled
+                                            InputProps={{
+                                                readOnly: true,
+                                              }}
                                         />
                                         </Button>
                                     </Grid>
@@ -455,6 +469,9 @@ export default function ViewTask() {
                                     <Grid container spacing={2}></Grid>
                                     <Grid item xs={12}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             fullWidth
                                             multiline

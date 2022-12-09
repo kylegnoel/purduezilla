@@ -55,13 +55,13 @@ const Dashboard = () => {
         // Update the document title using the browser API
         // const response = onValue(await ref(apiFunctions.db, 'tasks/'), (response))
         // console.log("response: " + response)
-        const settingProjects = apiFunctions.getUsersProjects(user.key);
-        //await setProjListArr(settingProjects);
+        const settingProjects = (await apiFunctions.getUsersProjects(user.key))
+        setProjListArr(settingProjects)
+        console.log("projects: " + JSON.stringify(settingProjects))
 
-        const settingTasks = await apiFunctions.getUsersAssignedTasks(user.key);
-        //await setTaskListArr(settingTasks);
-
-        setLoading(false)
+        const settingTasks = (await apiFunctions.getUsersAssignedTasks(user.key));
+        setTaskListArr(settingTasks)
+        console.log("tasks: " + JSON.stringify(settingTasks))
         
         return true;
     };
@@ -135,7 +135,7 @@ const Dashboard = () => {
                 textDecoration: 'none',
                 }}
                 >
-            Followed Tasks Feed
+            Assigned Tasks Feed
           </Typography>
                 </div>
             </div>
