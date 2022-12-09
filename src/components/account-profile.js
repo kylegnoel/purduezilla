@@ -20,17 +20,29 @@ import { ref, onValue } from "firebase/database";
 
 
 export const AccountProfile = (props) => {
+  const user = apiFunctions.useFirebaseAuth();
   const { id } = useParams();
 
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [isSelf, setSelf] = useState(false)
+  const [followed, setFollow] = useState(true)
+
   
   useEffect(() => {
     // console.log("reload");
     fetchData();
   }, []);
 
+  const handleFollow = (event) => {
+    setFollow(!followed)
+  }
+
   const fetchData = async (event) => {
+    if (user.key === id) {
+      setSelf(true)
+    }
+
     console.log("loading: " + id)
     const userTemp = (await apiFunctions.getObjectById("users", id))[0];
     console.log(JSON.stringify(userTemp))
@@ -75,6 +87,18 @@ export const AccountProfile = (props) => {
         Upload picture
       </Button>
     </CardActions>
+    {isSelf ? '' :
+    <div>
+      <Divider />
+      <CardActions><Button
+        color="primary"
+        fullWidth
+        variant="text"
+        onClick={handleFollow}
+      >
+        {followed ? 'Follow User' : 'Unfollow User'}
+      </Button></CardActions>
+    </div>}
   </Card>
   );
 };

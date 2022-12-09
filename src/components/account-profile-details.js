@@ -20,7 +20,7 @@ import FixedSizeList from '@mui/material/List';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import GroupIcon from '@mui/icons-material/Group';
 import apiFunctions from '../firebase/api';
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, set } from "firebase/database";
 
 
 
@@ -88,6 +88,7 @@ const handleTask = (event) => {
   };
 
   const fetchData = async() => {
+
     const userTemp = (await apiFunctions.getObjectById("users", id))[0];
     setName(userTemp[1].firstName)
     setEmail(userTemp[1].email)
@@ -230,7 +231,7 @@ const handleTask = (event) => {
                                 <Divider />
                             </div>
                         )
-                    }) : "There are no tasks!"}
+                    }) : "No Tasks Found!"}
                 </FixedSizeList>
             </Grid>
         </Grid>
@@ -252,7 +253,7 @@ const handleTask = (event) => {
                                                 </Button>
                                                 <Divider />
                                             </div>   
-                                        )}): "You aren't in any groups!" }
+                                        )}): "No Groups Found!" }
                                 </FixedSizeList>
         <Box
           sx={{
@@ -272,6 +273,7 @@ const handleTask = (event) => {
           
         </Box>
       </Card>
+
       
     </form>
   );
