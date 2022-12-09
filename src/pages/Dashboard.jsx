@@ -41,13 +41,23 @@ const Dashboard = () => {
         fetchData()
     }, []);
 
-    const handleTask = (event) => {
+    const handleProject = (event) => {
         if (event.currentTarget.id !== "addtask") {
             window.location.href='/project/'+event.currentTarget.id;
             //window.location.reload()
         }
         else {
-            window.location.href='/newtask/';
+            window.location.href='/newproject/';
+        }
+    }
+
+    const handleTask = (event) => {
+        if (event.currentTarget.id !== "addtask") {
+            navigate('/task/'+event.currentTarget.id);
+            //window.location.reload()
+        }
+        else {
+            navigate('/newtask/');
         }
     }
 
@@ -215,7 +225,7 @@ const Dashboard = () => {
                                         { projListarr && projListarr.length != 0 ? projListarr.map((data) => {
                                                 return (  
                                                 <div key={data[1]}>
-                                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleProject} id={data[0]} sx={{ height: '100%', width: '100%'}}>
                                                     <ListItem>
                                                         <ListItemAvatar>
                                                             <WorkIcon color="grey"/>
@@ -226,7 +236,7 @@ const Dashboard = () => {
                                                 <Divider />
                                             </div>   
                                             )}): "There are no Projects!" }
-                                        <Button onClick={handleTask} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
+                                        <Button onClick={handleProject} id={"addproject"} sx={{ height: '80%', width: '100%'}}>
                                                 <ListItem>
                                                     <ListItemAvatar>
                                                         <AddIcon color="grey"/>

@@ -70,7 +70,7 @@ export default function ProjectDashboard() {
                                                     <ListItemAvatar>
                                                         <WorkIcon color="grey"/>
                                                     </ListItemAvatar>
-                                                    <ListItemText primary={data[1].name} secondary="Content was changed"/>
+                                                    <ListItemText primary={data[1].name} secondary={data[1].description}/>
                                                 </ListItem>
                                             </Button>
                                             <Divider />

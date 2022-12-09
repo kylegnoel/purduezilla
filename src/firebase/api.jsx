@@ -520,7 +520,7 @@ const getUsersProjects = async function getUsersProjects(userId) {
   }
   for (const i of projects) {
     await get(child(dbRef, "projects/" + i[0] + '/ownerId')).then((snapshot) => {
-      if (snapshot.val() == userId && !usersProjects.includes([i[0], i[1]])) {
+      if (snapshot.val() === userId && !usersProjects.includes([i[0], i[1]])) {
         usersProjects.push([i[0], i[1]]);
       }
     });

@@ -25,7 +25,6 @@ import NavBar from '../components/NavBar';
 // db imports
 import apiFunctions from '../firebase/api';
 import { ref, onValue } from "firebase/database";
-import { assign } from "nodemailer/lib/shared";
 
 const theme = createTheme();
 

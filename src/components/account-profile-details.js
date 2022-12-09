@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   Box,
@@ -9,8 +9,11 @@ import {
   CardHeader,
   Divider,
   Grid,
-  TextField
+  TextField,
+  Container,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import TaskIcon from '@mui/icons-material/Task';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import FixedSizeList from '@mui/material/List';
@@ -32,8 +35,11 @@ export const AccountProfileDetails = (props) => {
   const [description, setDesc] = useState('');
 
   const [viewOnly, setViewOnly] = useState(0);
+  const [taskListarr, setTaskListArr] = useState([]);
 
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -41,7 +47,7 @@ export const AccountProfileDetails = (props) => {
     fetchData()
 }, []);
 
-const handleTask = (event) => {
+const handleGroup = (event) => {
   if (event.currentTarget.id === "addgroup") {
       window.location.href='/newgroup/';
   }
@@ -51,6 +57,16 @@ const handleTask = (event) => {
   else {
       console.log("eventid: " + event.currentTarget.id)
       window.location.href='/group/'+event.currentTarget.id;
+  }
+}
+
+const handleTask = (event) => {
+  if (event.currentTarget.id !== "addtask") {
+      navigate('/task/'+event.currentTarget.id);
+      //window.location.reload()
+  }
+  else {
+    navigate('/newtask/');
   }
 }
 
@@ -76,6 +92,10 @@ const handleTask = (event) => {
     setName(userTemp[1].firstName)
     setEmail(userTemp[1].email)
     setDesc(userTemp[1].description)
+
+    const settingTasks = (await apiFunctions.getUsersFollowedTasks(id));
+      setTaskListArr(settingTasks)
+      console.log("tasks: " + JSON.stringify(settingTasks))
 
     try {
         onValue(ref(apiFunctions.db, 'groups/'), (snapshot) => {
@@ -189,6 +209,32 @@ const handleTask = (event) => {
         </CardContent>
         <Divider />
         <CardHeader
+          title="Followed Tasks"
+        />
+        <Grid container spacing={2} alignItems="center">
+            <Grid item xs={50} sm={12} lg={'50%'}>
+                <FixedSizeList sx={{ maxHeight: 600, overflowY: 'auto', flexGrow: 1,
+                    flexDirection: "column",
+                }} height={400}>
+                    {taskListarr && taskListarr.length != 0 ? taskListarr.map((data) => {
+                        return (
+                            <div key={data.projectId}>
+                                <Button onClick={handleTask} id={data[0]} sx={{ height: '100%', width: '100%' }}>
+                                    <ListItem>
+                                        <ListItemAvatar>
+                                            <TaskIcon color="grey" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={data[1].name} secondary={data[1].description} />
+                                    </ListItem>
+                                </Button>
+                                <Divider />
+                            </div>
+                        )
+                    }) : "There are no tasks!"}
+                </FixedSizeList>
+            </Grid>
+        </Grid>
+        <CardHeader
           title="Groups"
         />
         <FixedSizeList sx={{maxHeight:600, overflowY:'auto',flexGrow: 1,
@@ -196,7 +242,7 @@ const handleTask = (event) => {
                                         { groupList && groupList.length != 0 ? groupList.map((data) => {
                                             return (
                                             <div key={data[1]}>
-                                                <Button onClick={handleTask} id={data[1]} sx={{ height: '100%', width: '100%'}}>
+                                                <Button onClick={handleGroup} id={data[1]} sx={{ height: '100%', width: '100%'}}>
                                                 <ListItemAvatar>
                                                             <GroupIcon color="grey"/>
                                                         </ListItemAvatar>
