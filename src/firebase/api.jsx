@@ -185,6 +185,7 @@ const createNewComment = function createNewComment(body, authorKey, taskKey, tag
   return { body: body, author: authorKey };
 }
 
+
 //get the comments for a task
 const getTaskComments = function getTaskComments(taskKey) {
   // console.log("called function " + taskKey);
@@ -710,6 +711,30 @@ const getProjectMembers = async function getProjectMembers(lookVal, groupId) {
     groupMembers.push(tempUser[0]);
   }
   return groupMembers;
+}
+
+const getTaskFollowers = async function getProjectMembers(taskId) {
+  const taskMembers = []
+  const dbRef = ref(db);
+  const groupMemberIds = []
+
+
+  await get(child(dbRef, 'tasks/' + taskId + `/followers`)).then((snapshot) => {
+    console.log("values: " + snapshot)
+    snapshot.forEach(function (childSnapshot) {
+      console.log("values: " + childSnapshot)
+      groupMemberIds.push(childSnapshot.val().followerId);
+    }) 
+  });
+
+  console.log("currentValues: " + JSON.stringify(groupMemberIds))
+    
+
+  for (const ids of groupMemberIds) {
+    const tempUser = await getObjectById("users", ids)
+    taskMembers.push(tempUser[0]);
+  }
+  return taskMembers;
 }
 
 const getTaskById = async function getTaskById(taskId) {
@@ -1292,6 +1317,7 @@ const apiFunctions = {
   changeTaskOwner,
   createNewTask,
   getProjectMembers,
+  getTaskFollowers,
   getTaskHistory,
   getProjectHistory,
   getGroupsProjects,

@@ -20,6 +20,19 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import { useNavigate } from "react-router-dom";
 
+import Avatar from '@mui/material/Avatar';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import IconButton from '@mui/material/IconButton';
+
+
 import '../App.css';
 
 import apiFunctions from '../firebase/api';
@@ -48,6 +61,8 @@ export default function ViewTask() {
     const [userList, setUserList] = useState([]);
     const [comments, setComments] = useState([]);
     const [newCommentBody, setNewCommentBody] = useState('');
+
+    const [followers, setFollowers] = useState([]);
     // const [taggingBody, setTaggingBody] = useState('');
 
     const user = apiFunctions.useFirebaseAuth();
@@ -60,11 +75,17 @@ export default function ViewTask() {
     const [open, setOpen] = React.useState(false);
     const [completed, setCompleted] = React.useState(false);
 
+    const [expanded, setExpanded] = React.useState(false);
+
     const selectionChangeHandler = (event) => {
         setSelected(event.target.value);
         if (event.target.value === 'Complete') {
             alert('Task Completed!');
         }
+    };
+
+    const handleChange = (panel) => (event, isExpanded) => {
+        setExpanded(isExpanded ? panel : false);
     };
 
     const handleFollowerChange = (event) => {
@@ -90,6 +111,11 @@ export default function ViewTask() {
     const handleOwnerChange = event => {
         setOwner(event.target.value)
     };
+
+    const showUser = (event) => {
+        console.log(event.currentTarget.id)
+        navigate('/profile/' + event.currentTarget.id);
+    }
 
     const handleProjectChange = event => {
         setNewProject(event.target.value)
@@ -288,6 +314,10 @@ export default function ViewTask() {
                 // if there is no internet
             }    
 
+
+            const taskFollowers = (await apiFunctions.getTaskFollowers(id))
+            setFollowers(taskFollowers)
+            console.log("followers: " + taskFollowers)
         }
         
         // projects
@@ -304,7 +334,7 @@ export default function ViewTask() {
     return (
         <div>
             <ThemeProvider theme={theme}>
-                <Container component="main" maxWidth="sm">
+                <Container component="main" maxWidth="60%">
                     <Box component="form" Validate sx={{ mt: 3 }}>      
                         <Box
                             sx={{
@@ -315,24 +345,11 @@ export default function ViewTask() {
                         >
                             <Box sx={{ mt: 2, mb: 2 }}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={50} sm={12}>
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12}>
-                                                <Button onClick={handleClick} fullWidth>
-                                                    <TextField
-                                                        autoComplete="given-name"
-                                                        name="taskName"
-                                                        fullWidth
-                                                        id="taskName"
-                                                        value={name}
-                                                        InputProps={{
-                                                            readOnly: true,
-                                                          }}
-                                                    />
-                                                </Button>
-                                            </Grid>
-                                            <Grid item xs={8}>
-                                                <Button onClick={handleClick} fullWidth>
+                                    <Grid item xs={50} sm={6}>
+                                        <Grid item sm={12}>
+                                            <Divider sx={{ mt: 0, mb:2 }}>TASK DETAILS</Divider>
+                                            <Grid container spacing={1}>
+                                                <Grid item sm={8}>
                                                     <TextField
                                                         autoComplete="given-name"
                                                         name="label"
@@ -341,13 +358,11 @@ export default function ViewTask() {
                                                         value={label}
                                                         InputProps={{
                                                             readOnly: true,
-                                                          }}
+                                                        }}
                                                     />
-                                                </Button>
-                                            </Grid>
+                                                </Grid>
 
-                                            <Grid item xs={4}>
-                                                <Button onClick={handleClick} fullWidth>
+                                                <Grid item sm={4}>
                                                     <TextField
                                                         autoComplete="given-name"
                                                         name="label"
@@ -356,30 +371,27 @@ export default function ViewTask() {
                                                         value={hour + " hours"}
                                                         InputProps={{
                                                             readOnly: true,
-                                                          }}
+                                                        }}
                                                     />
-                                                </Button>
+                                                </Grid>
                                             </Grid>
+
                                         </Grid>
-                                    </Grid>
-                                    <Grid item xs={12}>
+                                        <Divider sx={{ mt: 2, mb:2 }}>PROJECT</Divider>
+                                        <Grid item sm={12}>
                                         <FormControl fullWidth>
-                                            <Button onClick={handleClick} fullWidth>
-                                                <TextField
-                                                    autoComplete="given-name"
-                                                    name="project"
-                                                    fullWidth
-                                                    id="project"
-                                                    value={project}
-                                                    InputProps={{
-                                                        readOnly: true,
-                                                      }}
-                                                />
-                                            </Button>
+                                            <TextField
+                                                autoComplete="given-name"
+                                                name="project"
+                                                fullWidth
+                                                id="project"
+                                                value={project}
+                                                InputProps={{
+                                                    readOnly: true,
+                                                    }}
+                                            />
                                         </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Button onClick={handleClick} fullWidth>
+                                        <Divider sx={{ mt: 2, mb:2 }}>DESCRIPTION</Divider>
                                             <TextField
                                                 required
                                                 fullWidth
@@ -392,57 +404,138 @@ export default function ViewTask() {
                                                 name="taskDescription"
                                                 value={description}
                                             />
-                                        </Button>
+                                        <br></br>
+                                        <br></br>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-
-                                <br></br>
-                                <Divider>OWNERSHIP</Divider>
-                                <br></br>
-                                <Button onClick={handleClick} fullWidth>
-                                    <TextField
-                                        autoComplete="given-name"
-                                        name="owner"
-                                        fullWidth
-                                        id="owner"
-                                        value={owner}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Button>
-
-                                <br></br>
-                                <br></br>
-                                <Divider>ASSIGN</Divider>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={8}>
-                                    <Button onClick={handleClick} fullWidth>
-                                        <TextField
-                                            autoComplete="given-name"
-                                            name="assign"
-                                            fullWidth
-                                            id="assign"
-                                            value={assignee}
-                                            InputProps={{
-                                                readOnly: true,
-                                              }}
-                                        />
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <Button
-                                            onClick={assignToMe}
-                                            variant="outlined"
-                                            fullWidth
-                                            startIcon={assignedToMe ? <ClearIcon/> : <CheckIcon />}
-                                            sx={{ mt: 1, mb: 2, height: '55px' }}
+                                    
+                                    <Grid item xs={50} sm={6}>
+                                        <Divider>OWNERSHIP</Divider>
+                                        <Accordion 
+                                        sx={{ mt: '10px' }} 
+                                        fullWidth 
+                                        expanded={expanded === 'panel1'} 
+                                        onChange={handleChange('panel1')}>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel1bh-content"
+                                            id="panel1bh-header"
                                             >
-                                        <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b> 
-                                        </Button>
-                                    </Grid>
+                                        <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                            Task Owner
+                                        </Typography>
+                                        <Typography sx={{ color: 'text.secondary' }}>
+                                            Members who created/own the task.
+                                        </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                        <List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>  
+                                        <ListItem alignItems="flex-start">
+                                                <ListItemAvatar>
+                                                    <Avatar alt={owner} src="/static/images/avatar/1.jpg" />
+                                                </ListItemAvatar>
+                                                    <ListItemText
+                                                    primary={<Link fullWidth>{owner}</Link>}
+                                                    secondary={
+                                                        <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'inline' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            Owner
+                                                        </Typography>
+                                                        </React.Fragment>
+                                                    }
+                                                    />
+                                                    
+                                            </ListItem>
+                                        </List>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                                            <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel2bh-content"
+                                            id="panel2bh-header"
+                                            >
+                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>Assignee</Typography>
+                                            <Typography sx={{ color: 'text.secondary' }}>
+                                                Person assigned to this task.
+                                            </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                            <Divider></Divider>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={8}>
+                                                        <TextField
+                                                            autoComplete="given-name"
+                                                            name="assign"
+                                                            fullWidth
+                                                            id="assign"
+                                                            value={assignee}
+                                                            InputProps={{
+                                                                readOnly: true,
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <Button
+                                                            onClick={assignToMe}
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            startIcon={assignedToMe ? <ClearIcon/> : <CheckIcon />}
+                                                            sx={{ mt: 1, mb: 2, height: '55px' }}
+                                                            >
+                                                        <b>{assignedToMe ? 'Unassign Me' : 'Assign to Me'}</b> 
+                                                        </Button>
+                                                    </Grid>
+                                                </Grid>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                            <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel3bh-content"
+                                            id="panel3bh-header"
+                                            >
+                                            <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                                Followers
+                                            </Typography>
+                                            <Typography sx={{ color: 'text.secondary' }}>
+                                                Users who follow this task.
+                                            </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                            { followers && followers.length !== 0 && followers !== {} ? followers.map((data) => {
+                                                return(
+                                                    <ListItem alignItems="flex-start">
+                                                    <ListItemAvatar>
+                                                        <Avatar alt={data[1].firstName + " " + data[1].lastName} src="/static/images/avatar/1.jpg" />
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                    primary={<Link onClick={showUser} id={data[0]} fullWidth>{data[1].firstName + " " + data[1].lastName}</Link>}
+                                                    secondary={
+                                                        <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'inline' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            Viewer
+                                                        </Typography>
+                                                        </React.Fragment>
+                                                    }
+                                                    />
+                                                    </ListItem>
+                                                );
+                                            }): "There are no viewers in this group!" }
+                                            </AccordionDetails>
+                                        </Accordion>
+                                        </Grid>
                                 </Grid>
-                                <br></br>
                             </Box>
                         </Box>
                     </Box>
